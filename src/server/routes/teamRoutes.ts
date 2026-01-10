@@ -29,7 +29,6 @@ teamRoutes.use("*", authMiddleware);
 teamRoutes.get("/teams/my-teams", async (c) => {
   try {
     const user = c.get("user");
-    console.log(`[Teams] Fetching teams for user: ${user.id}`);
 
     const result = await teamMethodsV2.getUserTeams(user.id);
 
@@ -68,14 +67,6 @@ teamRoutes.get("/teams/hierarchy", async (c) => {
     const userPermissions = c.get("userPermissions");
 
     //Enhanced logging for debugging
-    console.log(`[Teams] Fetching hierarchy for user:`, {
-      userId: user?.id,
-      email: user?.email,
-      role,
-      isSuperAdmin,
-      status: userPermissions?.status
-    });
-
     // Validate user context
     if (!user || !user.id) {
       console.error("[Teams] Missing user context in request");
@@ -95,7 +86,6 @@ teamRoutes.get("/teams/hierarchy", async (c) => {
       );
     }
 
-    console.log(`[Teams] Hierarchy returned: ${result.data?.length || 0} items`);
 
     return c.json({
       success: true,
@@ -119,7 +109,6 @@ teamRoutes.get("/teams/:teamId/access", async (c) => {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
 
-    console.log(`[Teams] Checking access for user ${user.id} to team ${teamId}`);
 
     const result = await teamMethodsV2.checkUserTeamAccess(user.id, teamId);
 
@@ -156,7 +145,6 @@ teamRoutes.get("/teams/:teamId", async (c) => {
     const teamId = c.req.param("teamId");
     const includeHierarchy = c.req.query("includeHierarchy") !== "false"; // Default true
 
-    console.log(`[Teams] Fetching team ${teamId} (hierarchy: ${includeHierarchy})`);
 
     // Check user access to team
     const accessCheck = await teamMethodsV2.checkUserTeamAccess(user.id, teamId);
@@ -203,7 +191,6 @@ teamRoutes.get("/teams", async (c) => {
     const role = c.get("role");
     const includeHierarchy = c.req.query("includeHierarchy") === "true"; // Default false
 
-    console.log(`[Teams] Fetching all teams (hierarchy: ${includeHierarchy})`);
 
     // Admin/superadmin can see all teams
     const result = await teamMethodsV2.getAllTeams(includeHierarchy);
@@ -252,7 +239,6 @@ teamRoutes.post("/teams", async (c) => {
     const body = await c.req.json();
     const { customer_id, name, linear_team_id, linear_team_key } = body;
 
-    console.log(`[Teams] Creating team:`, { customer_id, name, linear_team_id });
 
     if (!customer_id || !name) {
       return c.json(
@@ -308,7 +294,6 @@ teamRoutes.put("/teams/:teamId", async (c) => {
     const body = await c.req.json();
     const { name, linear_team_id, linear_team_key, status } = body;
 
-    console.log(`[Teams] Updating team ${teamId}:`, body);
 
     const result = await teamMethodsV2.updateTeam(
       teamId,
@@ -355,7 +340,6 @@ teamRoutes.delete("/teams/:teamId", async (c) => {
       );
     }
 
-    console.log(`[Teams] Deleting team ${teamId}`);
 
     const result = await teamMethodsV2.deleteTeam(teamId, user.id);
 
@@ -401,7 +385,6 @@ teamRoutes.post("/teams/sync-from-linear", async (c) => {
       );
     }
 
-    console.log(`[Teams] Syncing teams from Linear API (requested by ${user.email})...`);
 
     // Import LinearTeamService
     const { LinearTeamService } = await import("../services/linearTeamService");
@@ -419,7 +402,6 @@ teamRoutes.post("/teams/sync-from-linear", async (c) => {
     }
 
     const teams = linearResult.teams;
-    console.log(`[Teams] Fetched ${teams.length} teams from Linear`);
 
     // Save teams to KV database
     let syncedCount = 0;
@@ -443,14 +425,12 @@ teamRoutes.post("/teams/sync-from-linear", async (c) => {
         });
 
         syncedCount++;
-        console.log(`[Teams] Synced team: ${team.name} (${team.key})`);
       } catch (error) {
         errorCount++;
         console.error(`[Teams] Failed to sync team ${team.name}:`, error);
       }
     }
 
-    console.log(`[Teams] Sync complete: ${syncedCount}/${teams.length} teams synced`);
 
     return c.json({
       success: true,
@@ -483,7 +463,6 @@ teamRoutes.get("/teams/:teamId/members", async (c) => {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
 
-    console.log(`[Teams] Fetching members for team ${teamId}`);
 
     // Check user has access to this team
     const accessCheck = await teamMethodsV2.checkUserTeamAccess(user.id, teamId);
@@ -535,7 +514,6 @@ teamRoutes.post("/teams/:teamId/members/:userId", async (c) => {
       );
     }
 
-    console.log(`[Teams] Adding user ${userId} to team ${teamId}`);
 
     const result = await teamMethodsV2.addMemberToTeam(teamId, userId, user.id);
 
@@ -578,7 +556,6 @@ teamRoutes.delete("/teams/:teamId/members/:userId", async (c) => {
       );
     }
 
-    console.log(`[Teams] Removing user ${userId} from team ${teamId}`);
 
     const result = await teamMethodsV2.removeMemberFromTeam(teamId, userId, user.id);
 

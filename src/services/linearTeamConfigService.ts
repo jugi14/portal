@@ -46,14 +46,11 @@ export class LinearTeamConfigService {
         );
         
         if (cached) {
-          console.log(`[LinearTeamConfig] Using cached config for ${cleanTeamId}`);
           return cached;
         }
       }
 
       // Fetch from API using global apiClient
-      console.log(`[LinearTeamConfig] Fetching config from API for ${cleanTeamId}`);
-      
       // Use global apiClient for authenticated requests
       const response = await globalApiClient.get(`/linear/teams/${cleanTeamId}/config`);
 
@@ -113,11 +110,6 @@ export class LinearTeamConfigService {
   async getTeamIssues(teamId: string): Promise<LinearIssue[]> {
     const cleanTeamId = extractTeamId(teamId);
     const requestId = Math.random().toString(36).substr(2, 6);
-
-    console.log(
-      `[LinearTeamConfig-${requestId}] Getting team issues for: ${cleanTeamId}`,
-    );
-
     try {
       // Use global apiClient for authenticated requests
       const response = await globalApiClient.get(`/linear/teams/${cleanTeamId}/issues`);
@@ -131,10 +123,6 @@ export class LinearTeamConfigService {
       }
 
       const issues = response.data?.issues || [];
-      console.log(
-        `[LinearTeamConfig-${requestId}] Loaded ${issues.length} issues`,
-      );
-
       return issues;
     } catch (error) {
       console.error(
@@ -170,11 +158,6 @@ export class LinearTeamConfigService {
   ): Promise<LinearIssue[]> {
     const cleanTeamId = extractTeamId(teamId);
     const requestId = Math.random().toString(36).substr(2, 6);
-
-    console.log(
-      `[LinearTeamConfig-${requestId}] Getting customer deliverables for: ${cleanTeamId}`,
-    );
-
     try {
       // Use global apiClient for authenticated requests
       const response = await globalApiClient.post(
@@ -194,10 +177,6 @@ export class LinearTeamConfigService {
       }
 
       const deliverables = response.data?.deliverables || [];
-      console.log(
-        `[LinearTeamConfig-${requestId}] Loaded ${deliverables.length} deliverables`,
-      );
-
       return deliverables;
     } catch (error) {
       console.error(
@@ -223,11 +202,6 @@ export class LinearTeamConfigService {
     isAdmin = false,
   ): Promise<any> {
     const requestId = Math.random().toString(36).substr(2, 6);
-
-    console.log(
-      `[LinearTeamConfig-${requestId}] Getting teams hierarchy`,
-    );
-
     try {
       const response = await this.apiClient.getTeamsHierarchy(
         customerId,
@@ -241,10 +215,6 @@ export class LinearTeamConfigService {
         );
         return { totalTeams: 0, rootTeams: 0, hierarchy: [] };
       }
-
-      console.log(
-        `[LinearTeamConfig-${requestId}] Teams hierarchy loaded`,
-      );
       return response.data;
     } catch (error) {
       console.error(
@@ -266,11 +236,6 @@ export class LinearTeamConfigService {
    */
   async getTeamsList(customerId?: string): Promise<any[]> {
     const requestId = Math.random().toString(36).substr(2, 6);
-
-    console.log(
-      `[LinearTeamConfig-${requestId}] Getting teams list`,
-    );
-
     try {
       const response =
         await this.apiClient.getTeams(customerId);
@@ -284,10 +249,6 @@ export class LinearTeamConfigService {
       }
 
       const teams = response.data?.teams || [];
-      console.log(
-        `[LinearTeamConfig-${requestId}] Loaded ${teams.length} teams`,
-      );
-
       return teams;
     } catch (error) {
       console.error(
@@ -311,11 +272,6 @@ export class LinearTeamConfigService {
     issueId: string,
   ): Promise<LinearIssue | null> {
     const requestId = Math.random().toString(36).substr(2, 6);
-
-    console.log(
-      `[LinearTeamConfig-${requestId}] Getting issue detail for: ${issueId}`,
-    );
-
     try {
       const response =
         await this.apiClient.getIssueDetail(issueId);
@@ -329,14 +285,6 @@ export class LinearTeamConfigService {
       }
 
       const issue = response.data?.issue;
-      console.log(
-        `[LinearTeamConfig-${requestId}] Issue detail loaded:`,
-        {
-          id: issue?.id,
-          title: issue?.title,
-        },
-      );
-
       return issue || null;
     } catch (error) {
       console.error(
@@ -364,11 +312,6 @@ export class LinearTeamConfigService {
   ): Promise<string | null> {
     const cleanTeamId = extractTeamId(teamId);
     const requestId = Math.random().toString(36).substr(2, 6);
-
-    console.log(
-      `[LinearTeamConfig-${requestId}] Getting state ID for "${stateName}" in team: ${cleanTeamId}`,
-    );
-
     try {
       // Use cached config (super fast!)
       const teamConfig = await this.getTeamConfig(cleanTeamId, false);
@@ -424,11 +367,6 @@ export class LinearTeamConfigService {
   ): Promise<LinearIssue[]> {
     const cleanTeamId = extractTeamId(teamId);
     const requestId = Math.random().toString(36).substr(2, 6);
-
-    console.log(
-      `🎯 [LinearTeamConfig-${requestId}] Getting issues in state "${stateName}" for team: ${cleanTeamId}`,
-    );
-
     try {
       // First, get the state ID
       const stateId = await this.getStateIdByName(
@@ -458,10 +396,6 @@ export class LinearTeamConfigService {
       }
 
       const issues = response.data?.issues || [];
-      console.log(
-        `✅ [LinearTeamConfig-${requestId}] Found ${issues.length} issues in state "${stateName}"`,
-      );
-
       return issues;
     } catch (error) {
       console.error(

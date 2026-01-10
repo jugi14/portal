@@ -47,8 +47,6 @@ export async function initializeSuperadmins(emails: string[]): Promise<{ success
         error: response.error || 'Failed to initialize superadmins'
       };
     }
-
-    console.log('[SuperadminService] Initialized superadmin list with', emails.length, 'emails');
     return { success: true };
   } catch (error) {
     console.error('[SuperadminService] Error initializing superadmins:', error);
@@ -72,8 +70,6 @@ export async function addSuperAdmin(email: string): Promise<{ success: boolean; 
         error: response.error || 'Failed to add superadmin'
       };
     }
-
-    console.log(`[SuperadminService] Added ${email} to superadmin list`);
     return { success: true };
   } catch (error) {
     console.error('[SuperadminService] Error adding superadmin:', error);
@@ -97,8 +93,6 @@ export async function removeSuperAdmin(email: string): Promise<{ success: boolea
         error: response.error || 'Failed to remove superadmin'
       };
     }
-
-    console.log(`[SuperadminService] Removed ${email} from superadmin list`);
     return { success: true };
   } catch (error) {
     console.error('[SuperadminService] Error removing superadmin:', error);
@@ -147,11 +141,9 @@ export async function getSuperadminAuditTrail(): Promise<any[]> {
     const logs = response.data?.logs || [];
     
     if (response.data?.cached) {
-      console.log('[SuperadminService] Audit trail from cache');
     }
     
     if (response.data?.total && response.data.total > response.data.count) {
-      console.log(`[SuperadminService] Showing ${response.data.count} of ${response.data.total} audit logs`);
     }
 
     return logs;

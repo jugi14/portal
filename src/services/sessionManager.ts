@@ -215,9 +215,6 @@ class SessionManager {
       // Set warning timer (5 minutes before timeout)
       this.warningTimer = setTimeout(() => {
         if (!this.warningShown) {
-          console.log(
-            "️ [SessionManager] Session will timeout in 5 minutes due to inactivity",
-          );
           this.emit("session:warning", {
             reason: "inactivity",
             timeRemaining: 5 * 60 * 1000, // 5 minutes
@@ -228,9 +225,6 @@ class SessionManager {
 
       // Set timeout timer (2 hours of inactivity)
       this.activityTimer = setTimeout(() => {
-        console.log(
-          "[SessionManager] Session inactive for 2 hours",
-        );
         this.handleInactiveSession();
       }, this.INACTIVITY_TIMEOUT);
     };
@@ -280,22 +274,11 @@ class SessionManager {
 
       // Only log if session is significantly long (16+ hours)
       if (sessionAge >= 16) {
-        console.log(
-          "[SessionManager] Extended session:",
-          sessionAge,
-          "h - state preserved",
-        );
-        console.log(
-          "[SessionManager] Consider refreshing if experiencing issues",
-        );
       }
     }
 
     // Remove any cached location state - let React Router sync from window.location
     if (this.cache.location) {
-      console.log(
-        "[SessionManager] Removing cached location state",
-      );
       delete this.cache.location;
       this.saveCache();
     }
@@ -303,10 +286,6 @@ class SessionManager {
     // Always update activity when page becomes visible
     this.state.lastActivity = Date.now();
     this.saveState();
-
-    console.log(
-      "[SessionManager] State preserved, activity updated, location cleared",
-    );
   }
 
   /**
@@ -347,9 +326,6 @@ class SessionManager {
 
     // Only log if inactivity is significant (3+ hours)
     if (inactiveHours >= 3) {
-      console.log(
-        `ℹ️ [SessionManager] Extended inactivity: ${inactiveHours}h - session preserved`,
-      );
     }
 
     // Emit session timeout event (UI can show reconnect dialog)
@@ -432,10 +408,6 @@ class SessionManager {
     sessionStorage.setItem("session_preserved", "true");
 
     this.saveState();
-
-    console.log(
-      `[SessionManager] Marked ${component} as initialized`,
-    );
   }
 
   /**
@@ -506,9 +478,6 @@ class SessionManager {
   public invalidateCache(key?: string): void {
     if (key) {
       delete this.cache[key];
-      console.log(
-        `️ [SessionManager] Invalidated cache for ${key}`,
-      );
     } else {
       this.cache = {
         auth: null,
@@ -516,7 +485,6 @@ class SessionManager {
         organizations: null,
         teams: null,
       };
-      console.log("️ [SessionManager] Invalidated all cache");
     }
 
     this.saveCache();
@@ -526,8 +494,6 @@ class SessionManager {
    * Clear session completely
    */
   public clearSession(): void {
-    console.log("️ [SessionManager] Clearing session");
-
     // Clear timers
     if (this.activityTimer) {
       clearTimeout(this.activityTimer);
@@ -573,8 +539,6 @@ class SessionManager {
    * Useful when showing "session about to expire" warning
    */
   public extendSession(): void {
-    console.log("[SessionManager] Session extended by user");
-
     // Update last activity
     this.state.lastActivity = Date.now();
     this.saveState();
@@ -594,9 +558,6 @@ class SessionManager {
     // Set new warning timer
     this.warningTimer = setTimeout(() => {
       if (!this.warningShown) {
-        console.log(
-          "️ [SessionManager] Session will timeout in 5 minutes due to inactivity",
-        );
         this.emit("session:warning", {
           reason: "inactivity",
           timeRemaining: 5 * 60 * 1000,
@@ -607,15 +568,8 @@ class SessionManager {
 
     // Set new timeout timer
     this.activityTimer = setTimeout(() => {
-      console.log(
-        "️ [SessionManager] Session inactive for 2 hours",
-      );
       this.handleInactiveSession();
     }, this.INACTIVITY_TIMEOUT);
-
-    console.log(
-      "[SessionManager] Session extended - timeout reset to 2 hours",
-    );
   }
 
   /**
@@ -728,9 +682,6 @@ if (typeof window !== "undefined") {
     );
 
     if (inactiveMinutes >= 115) {
-      console.log(
-        "️ WARNING: Session will expire in 5 minutes!",
-      );
     } else if (inactiveMinutes >= 60) {
       console.log(
         `ℹ️ Warning in ${warningMinutes}m (at 115m inactive)`,
@@ -740,19 +691,7 @@ if (typeof window !== "undefined") {
         `Session healthy (warning in ${115 - inactiveMinutes}m)`,
       );
     }
-
-    console.log(
-      "Visibility Changes:",
-      info.visibilityChangeCount,
-    );
-    console.log(
-      "Session Expired:",
-      info.isExpired ? "️ YES" : "NO",
-    );
-    console.log("Cached Keys:", info.cacheKeys);
     console.groupEnd();
-
-    console.log("\nTips:");
     console.log(
       "  • sessionManager.extendSession() - Extend session by 2 hours",
     );
@@ -769,6 +708,5 @@ if (typeof window !== "undefined") {
   // Helper for extending session
   (window as any).extendSession = () => {
     sessionManager.extendSession();
-    console.log("Session extended! Timeout reset to 2 hours.");
   };
 }

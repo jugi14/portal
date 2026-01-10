@@ -19,6 +19,10 @@
  * @updated 2025-10-19 - Force recompile for GraphQL cycles fix
  */
 
+// Load environment variables from .env file
+// Note: tsx --env-file flag also loads .env, but keeping this as fallback
+import 'dotenv/config';
+
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
@@ -60,7 +64,9 @@ app.use(
   cors({
     origin: (origin) => {
       // Allow same-origin requests (no origin header)
-      if (!origin) return origin;
+      if (!origin) {
+        return origin;
+      }
 
       // Check if origin is in whitelist
       if (ALLOWED_ORIGINS.includes(origin)) {
@@ -97,38 +103,38 @@ app.use("*", logger(console.log));
 // MOUNT ROUTES
 // ==================================================
 
-const PREFIX = "/make-server-7f0d90fb";
+const API_PREFIX = "/api";
 
 // System routes (health, status, migrations) - No auth required
-app.route(PREFIX, systemRoutes);
+app.route(API_PREFIX, systemRoutes);
 
 // Admin routes (users, customers, permissions) - Auth required
-app.route(PREFIX, adminRoutes);
+app.route(API_PREFIX, adminRoutes);
 
 // User routes (team access, permissions) - Auth required
-app.route(PREFIX, userRoutes);
+app.route(API_PREFIX, userRoutes);
 
 // Team routes (hierarchy, access, assignments) - Auth required
-app.route(PREFIX, teamRoutes);
+app.route(API_PREFIX, teamRoutes);
 
 // Linear routes (teams, issues, GraphQL) - Auth required
-app.route(PREFIX, linearRoutes);
+app.route(API_PREFIX, linearRoutes);
 
 // Linear maintenance routes (cleanup, validation) - Auth required
-app.route(PREFIX, linearMaintenanceRoutes);
+app.route(API_PREFIX, linearMaintenanceRoutes);
 
 // Issue routes (Linear issue management with caching) - Auth required
-app.route(PREFIX, issueRoutes);
+app.route(API_PREFIX, issueRoutes);
 
 // Superadmin routes (KV-based management with audit trail) - Auth required
-app.route(PREFIX, superadminRoutes);
+app.route(API_PREFIX, superadminRoutes);
 
 // ==================================================
 // DEBUG ROUTES (DEVELOPMENT ONLY)
 // ==================================================
 
 // Debug: Clear ownership cache
-app.post(`${PREFIX}/debug/clear-ownership-cache`, async (c) => {
+app.post("/api/debug/clear-ownership-cache", async (c) => {
   try {
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(
@@ -167,7 +173,7 @@ app.post(`${PREFIX}/debug/clear-ownership-cache`, async (c) => {
 });
 
 // Debug: Inspect ownership data
-app.get(`${PREFIX}/debug/ownership-data`, async (c) => {
+app.get("/api/debug/ownership-data", async (c) => {
   try {
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(
@@ -237,12 +243,12 @@ app.get("/", (c) => {
     status: "operational",
     architecture: "Clean & Modular",
     endpoints: {
-      system: `${PREFIX}/health`,
-      admin: `${PREFIX}/admin/stats`,
-      teams: `${PREFIX}/teams/my-teams`,
-      linear: `${PREFIX}/linear/test`,
-      issues: `${PREFIX}/issues/team/:teamId`,
-      superadmin: `${PREFIX}/superadmin/list`,
+      system: `/api/health`,
+      admin: `/api/admin/stats`,
+      teams: `/api/teams/my-teams`,
+      linear: `/api/linear/test`,
+      issues: `/api/issues/team/:teamId`,
+      superadmin: `/api/superadmin/list`,
     },
     documentation:
       "https://github.com/teifi-digital/client-portal",
@@ -258,7 +264,7 @@ app.all("*", (c) => {
       error: "Endpoint not found",
       path: c.req.path,
       method: c.req.method,
-      available_prefixes: [PREFIX],
+      available_prefixes: [],
     },
     { status: 404 },
   );

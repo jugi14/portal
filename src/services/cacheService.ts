@@ -106,7 +106,6 @@ export class CacheService {
   delete(key: string): boolean {
     const result = this.cache.delete(key);
     this.updateStats();
-    console.log(`Cache DELETE: ${key}`);
     return result;
   }
 
@@ -114,7 +113,6 @@ export class CacheService {
   clear(): void {
     this.cache.clear();
     this.stats = { hits: 0, misses: 0, entries: 0, totalSize: 0 };
-    console.log('Cache CLEARED');
   }
 
   // Get cache statistics
@@ -183,7 +181,6 @@ export class CacheService {
       });
       
       if (keysToRemove.length > 0) {
-        console.log(`[Cache] Removed ${keysToRemove.length} keys from sessionStorage`);
       }
     } catch (error) {
       console.warn('[Cache] Failed to clear sessionStorage:', error);
@@ -196,7 +193,6 @@ export class CacheService {
 
   // Warm up cache with preloaded data
   warmUp<T>(data: Array<{ key: string; value: T; ttl?: number }>): void {
-    console.log(`[Cache] WARMUP: Loading ${data.length} entries`);
     data.forEach(({ key, value, ttl }) => {
       this.set(key, value, ttl);
     });
@@ -289,7 +285,6 @@ export const CACHE_STRATEGIES = {
   // Invalidate all admin-related cache when admin data changes
   ADMIN_DATA_CHANGE: () => {
     globalCache.invalidatePattern('admin:*');
-    console.log('[Cache Strategy] Admin data change - invalidated admin:* pattern');
   },
   
   // Invalidate user-related cache when user data changes
@@ -300,7 +295,6 @@ export const CACHE_STRATEGIES = {
       globalCache.invalidatePattern('user:*');
     }
     globalCache.invalidatePattern('admin:users*');
-    console.log('[Cache Strategy] User data change - invalidated user patterns');
   },
   
   // Invalidate customer-related cache when customer data changes
@@ -312,7 +306,6 @@ export const CACHE_STRATEGIES = {
     }
     globalCache.invalidatePattern('admin:customers*');
     globalCache.invalidatePattern('admin:stats*');
-    console.log('[Cache Strategy] Customer data change - invalidated customer patterns');
   },
   
   // Invalidate team-related cache when team assignments change
@@ -321,19 +314,16 @@ export const CACHE_STRATEGIES = {
     globalCache.invalidatePattern('admin:linear*');
     globalCache.invalidatePattern('admin:customers*');
     globalCache.invalidatePattern('admin:stats*');
-    console.log('[Cache Strategy] Team assignment change - invalidated team patterns');
   },
   
   // Full cache refresh strategy
   FULL_REFRESH: () => {
     globalCache.clear();
-    console.log('[Cache Strategy] Full refresh - cleared all cache');
   },
   
   // Clear all cache strategy  
   CLEAR_ALL_CACHE: () => {
     globalCache.clear();
-    console.log('[Cache Strategy] Clear all cache - cleared all entries');
   }
 } as const;
 
@@ -357,10 +347,6 @@ export const cachePerformance = {
     const report = cachePerformance.getPerformanceReport();
     console.group('[Cache Performance Report]');
     console.log(`Hit Ratio: ${(report.hitRatio * 100).toFixed(1)}% (${report.efficiency})`);
-    console.log(`Total Entries: ${report.entries}`);
-    console.log(`Cache Hits: ${report.hits}`);
-    console.log(`Cache Misses: ${report.misses}`);
-    console.log('Recommendations:', report.recommendations);
     console.groupEnd();
   }
 };

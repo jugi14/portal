@@ -4,7 +4,7 @@
   "outputDirectory": "build",
   "rewrites": [
     {
-      "source": "/make-server-7f0d90fb/:path*",
+      "source": "/api/:path*",
       "destination": "/api/server"
     }
   ],

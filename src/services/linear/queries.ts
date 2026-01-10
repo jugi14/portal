@@ -101,8 +101,6 @@ export class LinearQueries {
 
   async getTeamConfig(teamId: string): Promise<LinearTeam> {
     const methodId = `getTeamConfig-${Math.random().toString(36).substr(2, 6)}`;
-    console.log(`[${methodId}] Starting getTeamConfig for teamId: ${teamId}`);
-    
     try {
       // CRITICAL: Ensure token is set in apiClient
       this.ensureToken();
@@ -114,19 +112,6 @@ export class LinearQueries {
       }
 
       const team = result.data.team;
-      
-      console.log(`[${methodId}] REST API result received:`, {
-        hasTeam: !!team,
-        teamData: {
-          id: team.id,
-          name: team.name,
-          key: team.key,
-          statesCount: team.states?.nodes?.length || 0,
-          labelsCount: team.labels?.nodes?.length || 0,
-          membersCount: team.members?.nodes?.length || 0
-        }
-      });
-
       return team;
     } catch (error) {
       console.error(`[${methodId}] Error getting team config:`, error);
@@ -144,8 +129,6 @@ export class LinearQueries {
     const methodId = `getIssueDetail-${Math.random().toString(36).substr(2, 6)}`;
     
     const fetcher = async (): Promise<LinearIssue> => {
-      console.log(`[${methodId}] Fetching from REST API for issue: ${issueId}`);
-      
       // CRITICAL: Ensure token is set in apiClient
       this.ensureToken();
       
@@ -187,19 +170,10 @@ export class LinearQueries {
       if (!issue.subIssues) {
         issue.subIssues = [];
       }
-
-      console.log(`[${methodId}] Issue fetched:`, {
-        id: issue.id,
-        identifier: issue.identifier,
-        title: issue.title,
-        subIssuesCount: issue.subIssues?.length || 0
-      });
-
       return issue;
     };
 
     if (bypassCache) {
-      console.log(`[${methodId}] Bypassing cache for issue ${issueId}`);
       return fetcher();
     }
 
@@ -217,8 +191,6 @@ export class LinearQueries {
 
   async getTeamIssues(teamId: string): Promise<LinearIssue[]> {
     const methodId = `getTeamIssues-${Math.random().toString(36).substr(2, 6)}`;
-    console.log(`[${methodId}] Fetching all issues for team: ${teamId}`);
-
     try {
       // CRITICAL: Ensure token is set in apiClient
       this.ensureToken();
@@ -228,9 +200,6 @@ export class LinearQueries {
       if (!result.success || !result.data?.issues) {
         throw new Error(result.error || 'No issues data returned');
       }
-
-      console.log(`[${methodId}] Fetched ${result.data.issues.length} issues`);
-
       return result.data.issues;
     } catch (error) {
       console.error(`[${methodId}] Error fetching team issues:`, error);
@@ -240,8 +209,6 @@ export class LinearQueries {
 
   async getIssuesGroupedByParent(teamId: string): Promise<IssuesByParentResponse> {
     const methodId = `getIssuesGroupedByParent-${Math.random().toString(36).substr(2, 6)}`;
-    console.log(`[${methodId}] Fetching issues grouped by parent for team: ${teamId}`);
-
     try {
       // CRITICAL: Ensure token is set in apiClient
       this.ensureToken();
@@ -251,13 +218,6 @@ export class LinearQueries {
       if (!result.success || !result.data) {
         throw new Error(result.error || 'No data returned');
       }
-
-      console.log(`[${methodId}] Fetched hierarchy:`, {
-        parents: result.data.parents?.length || 0,
-        orphans: result.data.orphans?.length || 0,
-        total: result.data.stats?.total || 0
-      });
-
       return result.data;
     } catch (error) {
       console.error(`[${methodId}] Error fetching issues by parent:`, error);
@@ -267,8 +227,6 @@ export class LinearQueries {
 
   async getTeamWorkflowStates(teamId: string): Promise<any[]> {
     const methodId = `getTeamWorkflowStates-${Math.random().toString(36).substr(2, 6)}`;
-    console.log(`[${methodId}] Fetching workflow states for team: ${teamId}`);
-
     try {
       const teamConfig = await this.getTeamConfig(teamId);
       return teamConfig.states?.nodes || [];
@@ -284,8 +242,6 @@ export class LinearQueries {
 
   async getIssuesInState(teamId: string, stateId: string): Promise<LinearIssue[]> {
     const methodId = `getIssuesInState-${Math.random().toString(36).substr(2, 6)}`;
-    console.log(`[${methodId}] Fetching issues for team ${teamId} in state ${stateId}`);
-
     try {
       // CRITICAL: Ensure token is set in apiClient
       this.ensureToken();
@@ -295,9 +251,6 @@ export class LinearQueries {
       if (!result.success || !result.data?.issues) {
         throw new Error(result.error || 'No issues data returned');
       }
-
-      console.log(`[${methodId}] Fetched ${result.data.issues.length} issues`);
-
       return result.data.issues;
     } catch (error) {
       console.error(`[${methodId}] Error fetching issues in state:`, error);
@@ -326,7 +279,6 @@ export class LinearQueries {
         specificKeys.forEach(key => {
           if (localStorage.getItem(key)) {
             localStorage.removeItem(key);
-            console.log(`[LinearQueries] Invalidated cache: ${key}`);
           }
         });
       } catch (error) {

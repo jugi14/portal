@@ -15,9 +15,6 @@ import { secureTokenStorage } from '../secureTokenStorage';
 function generateUserMetadata(): string {
   try {
     const sessionData = sessionStorage.getItem('current_session');
-    
-    console.log('[Linear] generateUserMetadata - Checking session...');
-    console.log('[Linear] sessionData exists:', !!sessionData);
     console.log('[Linear] Available sessionStorage keys:', Object.keys(sessionStorage));
     
     if (!sessionData) {
@@ -196,15 +193,6 @@ export class LinearMutations {
       
       if (metadata) {
         commentWithMetadata = externalComment + metadata;
-        
-        console.log('[Linear] Metadata appended:', {
-          originalBody: body,
-          externalComment: externalComment,
-          metadataLength: metadata.length,
-          finalCommentLength: commentWithMetadata.length,
-          metadataContent: metadata,
-          fullComment: commentWithMetadata
-        });
       } else {
         console.warn('[Linear] No metadata generated - comment will not have metadata');
       }
@@ -244,8 +232,6 @@ export class LinearMutations {
     color?: string;
     description?: string;
   }): Promise<{ id: string; name: string; color?: string }> {
-    console.log('[LinearMutations] Creating label:', params);
-    
     const data = await this.executeQuery(LINEAR_MUTATIONS.CREATE_LABEL, {
       teamId: params.teamId,
       name: params.name,
@@ -261,8 +247,6 @@ export class LinearMutations {
     if (!data.issueLabelCreate.success) {
       throw new Error('Failed to create label');
     }
-    
-    console.log('[LinearMutations] Label created:', data.issueLabelCreate.issueLabel);
     return data.issueLabelCreate.issueLabel;
   }
 
@@ -276,13 +260,6 @@ export class LinearMutations {
     labelIds?: string[];
     cycleId?: string;
   }): Promise<LinearIssue> {
-    console.log('[LinearMutations] Creating parent issue:', {
-      teamId: params.teamId,
-      title: params.title,
-      hasPriority: params.priority !== undefined,
-      hasAssignee: !!params.assigneeId
-    });
-    
     try {
       this.ensureToken();
 
@@ -309,8 +286,6 @@ export class LinearMutations {
       if (!result.success || !result.data) {
         throw new Error(result.error || 'Failed to create issue');
       }
-
-      console.log(`[LinearMutations] Issue created: ${result.data.identifier}`);
       return result.data;
     } catch (error) {
       console.error('[LinearMutations] createIssue failed:', error);
@@ -323,8 +298,6 @@ export class LinearMutations {
     title: string, 
     description?: string
   ): Promise<LinearIssue> {
-    console.log(`[LinearMutations] Creating sub-issue for parent: ${parentIssueId}`);
-    
     try {
       this.ensureToken();
 
@@ -352,8 +325,6 @@ export class LinearMutations {
       if (!result.success || !result.data) {
         throw new Error(result.error || 'Failed to create sub-issue');
       }
-
-      console.log(`[LinearMutations] Sub-issue created: ${result.data.identifier}`);
       return result.data;
     } catch (error) {
       console.error('[LinearMutations] createSubIssue failed:', error);
@@ -362,8 +333,6 @@ export class LinearMutations {
   }
 
   async uploadFilesToIssue(issueId: string, files: File[]): Promise<any> {
-    console.log(`[LinearMutations] Uploading ${files.length} files to issue: ${issueId}`);
-    
     try {
       const formData = new FormData();
       
@@ -384,8 +353,6 @@ export class LinearMutations {
       if (!result.success) {
         throw new Error(result.error || 'Failed to upload files');
       }
-
-      console.log(`[LinearMutations] Files uploaded successfully:`, result.data);
       return result.data;
     } catch (error) {
       console.error('[LinearMutations] uploadFilesToIssue failed:', error);
@@ -412,8 +379,6 @@ export class LinearMutations {
   }
 
   async updateIssueCycle(issueId: string, cycleId: string | null): Promise<boolean> {
-    console.log(`[LinearMutations] Updating issue ${issueId} cycle:`, cycleId || 'remove from cycle');
-    
     const data = await this.executeQuery(LINEAR_MUTATIONS.UPDATE_ISSUE_CYCLE, { 
       issueId, 
       cycleId 
@@ -428,8 +393,6 @@ export class LinearMutations {
   }
 
   async getTeamCycles(teamId: string): Promise<any[]> {
-    console.log(`[LinearMutations] Getting cycles for team: ${teamId}`);
-    
     const data = await this.executeQuery(LINEAR_MUTATIONS.GET_TEAM_CYCLES, { teamId });
     
     if (!data || !data.team) {
@@ -441,15 +404,12 @@ export class LinearMutations {
   }
 
   async getNextCycle(teamId: string, currentCycleEndsAt?: string): Promise<any | null> {
-    console.log(`[LinearMutations] Getting next cycle for team: ${teamId}`);
-    
     // Use isFuture filter instead of date comparison
     const data = await this.executeQuery(LINEAR_MUTATIONS.GET_NEXT_CYCLE, { 
       teamId
     });
     
     if (!data || !data.team || !data.team.cycles?.nodes?.length) {
-      console.log('[LinearMutations] No next cycle found');
       return null;
     }
     
@@ -465,8 +425,6 @@ export class LinearMutations {
     movedIssues: string[];
     message: string;
   }> {
-    console.log(`[LinearMutations] Partial approving issue: ${params.issueId}`);
-    
     try {
       // Step 1: Create/find "Partial Approved" label
       const teamConfigResponse = await this.executeQuery(`
@@ -490,7 +448,6 @@ export class LinearMutations {
       );
       
       if (!partialApprovedLabel) {
-        console.log('[Partial Approve] Creating "Partial Approved" label');
         partialApprovedLabel = await this.createLabel({
           teamId: params.teamId,
           name: 'Partial Approved',
@@ -501,17 +458,12 @@ export class LinearMutations {
       
       // Step 2: Add label to parent issue
       await this.addLabel(params.issueId, partialApprovedLabel.id);
-      console.log('[Partial Approve] Label added to parent issue');
-      
       // Step 3: Filter unfinished sub-issues (not in "Release Ready" or completed)
       const unfinishedSubIssues = params.subIssues.filter((sub: any) => {
         const stateName = sub.state?.name;
         const stateType = sub.state?.type;
         return stateName !== 'Release Ready' && stateType !== 'completed';
       });
-      
-      console.log(`[Partial Approve] Found ${unfinishedSubIssues.length} unfinished sub-issues`);
-      
       if (unfinishedSubIssues.length === 0) {
         return {
           success: true,
@@ -537,7 +489,6 @@ export class LinearMutations {
       const currentCycle = currentIssue?.issue?.cycle;
       
       if (!currentCycle) {
-        console.log('[Partial Approve] No current cycle - cannot move to next cycle');
         return {
           success: true,
           movedIssues: [],
@@ -548,23 +499,18 @@ export class LinearMutations {
       const nextCycle = await this.getNextCycle(params.teamId, currentCycle.endsAt);
       
       if (!nextCycle) {
-        console.log('[Partial Approve] No next cycle available');
         return {
           success: true,
           movedIssues: [],
           message: 'Partial approved (no next cycle available)'
         };
       }
-      
-      console.log(`[Partial Approve] Moving ${unfinishedSubIssues.length} issues to next cycle: ${nextCycle.name}`);
-      
       // Step 5: Move unfinished sub-issues to next cycle
       const movedIssues: string[] = [];
       for (const subIssue of unfinishedSubIssues) {
         try {
           await this.updateIssueCycle(subIssue.id, nextCycle.id);
           movedIssues.push(subIssue.identifier);
-          console.log(`[Partial Approve] Moved ${subIssue.identifier} to ${nextCycle.name}`);
         } catch (error) {
           console.error(`[Partial Approve] Failed to move ${subIssue.identifier}:`, error);
         }

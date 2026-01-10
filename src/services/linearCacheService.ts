@@ -315,7 +315,6 @@ class LinearCacheService {
     });
     
     if (removed > 0) {
-      console.log(`[LinearCache] Cleaned up ${removed} expired cache entries`);
       this.stats.size = this.cache.size;
     }
   }
@@ -358,7 +357,6 @@ class LinearCacheService {
           if (key.includes('issues-by-state') || key.includes('issue-detail')) {
             localStorage.removeItem(key);
             cleaned++;
-            console.log(`[LinearCache] Cleaned stale issue cache from localStorage: ${key}`);
             return;
           }
           
@@ -382,10 +380,8 @@ class LinearCacheService {
       });
       
       if (loaded > 0) {
-        console.log(`[LinearCache] Loaded ${loaded} cache entries from localStorage`);
       }
       if (cleaned > 0) {
-        console.log(`[LinearCache] Cleaned ${cleaned} stale/invalid cache entries from localStorage`);
       }
       this.stats.size = this.cache.size;
     } catch (error) {
@@ -573,8 +569,6 @@ class LinearCacheService {
    * AGGRESSIVE: Clear both memory + localStorage + pendingRequests immediately
    */
   invalidateIssues(teamId?: string): void {
-    console.log(`[LinearCache] Invalidating issues cache for team: ${teamId || 'all'}`);
-    
     if (teamId) {
       // Clear specific team's issues - FIX: Match getCacheKey format
       // Key format: linear:issues-by-state:teamId:<id>
@@ -589,7 +583,6 @@ class LinearCacheService {
       pendingKeys.forEach(key => {
         if (key.includes(`teamId:${teamId}`) || key.includes('issue-detail')) {
           this.pendingRequests.delete(key);
-          console.log(`[LinearCache] Cleared pending request: ${key}`);
         }
       });
     } else {
@@ -602,12 +595,9 @@ class LinearCacheService {
       pendingKeys.forEach(key => {
         if (key.includes('issues-by-state') || key.includes('issue-detail')) {
           this.pendingRequests.delete(key);
-          console.log(`[LinearCache] Cleared pending request: ${key}`);
         }
       });
     }
-    
-    console.log(`[LinearCache] Issues cache invalidated successfully`);
   }
   
   /**
@@ -638,9 +628,6 @@ class LinearCacheService {
     this.cache.delete(key);
     this.pendingRequests.delete(key);
     localStorage.removeItem(key);
-    
-    console.log(`[LinearCache] Network-only fetch: ${key}`);
-    
     // Fetch fresh data (will be cached automatically)
     const ttl = endpoint.includes('issues') 
       ? this.TTL.ISSUES_BY_STATE 

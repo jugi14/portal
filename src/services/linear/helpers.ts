@@ -294,9 +294,6 @@ export function extractPortalMetadata(body: string): PortalMetadata | null {
     const userName = singleLineMatch[1].trim();
     const userEmail = singleLineMatch[2].trim();
     const timestamp = singleLineMatch[3].trim();
-    
-    console.log('[extractPortalMetadata] SINGLE-LINE match:', { userName, userEmail, timestamp });
-    
     // Generate initials from name (e.g., "David Hoang" -> "DH")
     const userInitials = userName
       .split(' ')
@@ -325,9 +322,6 @@ export function extractPortalMetadata(body: string): PortalMetadata | null {
     const userName = multiLineUserMatch[1].trim();
     const userEmail = multiLineUserMatch[2].trim();
     const timestamp = multiLineTimeMatch[1].trim();
-    
-    console.log('[extractPortalMetadata] MULTI-LINE match:', { userName, userEmail, timestamp });
-    
     const userInitials = userName
       .split(' ')
       .map(word => word[0])
@@ -342,7 +336,5 @@ export function extractPortalMetadata(body: string): PortalMetadata | null {
       userInitials
     };
   }
-  
-  console.log('[extractPortalMetadata] NO MATCH - returning null');
   return null;
 }

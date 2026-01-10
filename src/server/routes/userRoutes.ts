@@ -31,16 +31,9 @@ userRoutes.get("/user/teams", authMiddleware, async (c) => {
     const role = c.get("role");
     const isSuperAdmin = c.get("isSuperAdmin");
 
-    console.log(
-      `[UserRoutes] Fetching teams for user: ${userEmail} (${role})`,
-    );
 
     // Superadmin/Admin gets ALL teams
     if (isSuperAdmin || role === "admin") {
-      console.log(
-        "[UserRoutes] Admin/Superadmin - returning all teams",
-      );
-
       // Get all teams from KV
       const cachedHierarchy = await kv.get("linear_teams:all");
 
@@ -69,12 +62,6 @@ userRoutes.get("/user/teams", authMiddleware, async (c) => {
     // Get user's customer assignments
     const userCustomers =
       (await kv.get(`user:${userId}:customers`)) || [];
-    console.log(
-      `[UserRoutes] User assigned to ${userCustomers.length} customers:`,
-      userCustomers,
-    );
-    console.log(`   KV key: user:${userId}:customers`);
-
     if (userCustomers.length === 0) {
       return c.json({
         success: true,
@@ -90,22 +77,10 @@ userRoutes.get("/user/teams", authMiddleware, async (c) => {
     //CRITICAL FIX: Check team-level membership for granular access control
     const accessibleTeams = new Set();
     const teamMembershipMap = new Map(); // Track which customer each team belongs to
-
-    console.log(
-      `[UserRoutes] Checking team-level access for user ${userId}...`,
-    );
-
     for (const customerId of userCustomers) {
-      console.log(`\n[UserRoutes] Customer: ${customerId}`);
-      console.log(`   KV key: customer:${customerId}:teams`);
 
       const customerTeams =
         (await kv.get(`customer:${customerId}:teams`)) || [];
-      console.log(
-        `   → Customer has ${customerTeams.length} teams:`,
-        customerTeams,
-      );
-
       if (customerTeams.length === 0) {
         console.warn(`   ️ No teams assigned to this customer`);
         continue;
@@ -114,37 +89,18 @@ userRoutes.get("/user/teams", authMiddleware, async (c) => {
       // Check team-level membership for each team
       for (const teamId of customerTeams) {
         const teamMembersKey = `customer:${customerId}:team:${teamId}:members`;
-        console.log(`\n   ️ [UserRoutes] Team: ${teamId}`);
-        console.log(`      KV key: ${teamMembersKey}`);
 
         const teamMembers =
           (await kv.get(teamMembersKey)) || [];
-        console.log(
-          `      → ${teamMembers.length} members:`,
-          teamMembers,
-        );
-        console.log(
-          `      → User ${userId} in list: ${teamMembers.includes(userId)}`,
-        );
 
         // Only add team if user is explicit member
         if (teamMembers.includes(userId)) {
           accessibleTeams.add(teamId);
           teamMembershipMap.set(teamId, customerId);
-          console.log(`     ACCESS GRANTED`);
         } else {
-          console.log(`     ACCESS DENIED`);
         }
       }
     }
-
-    console.log(
-      `\n[UserRoutes] SUMMARY: User has access to ${accessibleTeams.size} teams`,
-    );
-    console.log(
-      `   Accessible team IDs:`,
-      Array.from(accessibleTeams),
-    );
 
     //Debug: If no teams found, provide detailed diagnosis
     if (accessibleTeams.size === 0) {
@@ -267,11 +223,6 @@ userRoutes.get(
       const role = c.get("role");
       const isSuperAdmin = c.get("isSuperAdmin");
       const teamId = c.req.param("teamId");
-
-      console.log(
-        `[UserRoutes] Checking access for ${userEmail} to team ${teamId}`,
-      );
-
       //FIX: Get team name from Linear cache OR fallback to Linear API
       const getTeamName = async (
         id: string,
@@ -292,17 +243,11 @@ userRoutes.get(
         }
 
         if (team?.name) {
-          console.log(
-            `[UserRoutes] Team name from cache: ${team.name}`,
-          );
           return team.name;
         }
 
         //FALLBACK: Try Linear API if not in cache
         try {
-          console.log(
-            `[UserRoutes] Team not in cache, fetching from Linear API...`,
-          );
           const { LinearTeamService } = await import(
             "../services/linearTeamService"
           );
@@ -310,10 +255,6 @@ userRoutes.get(
           const teamData = await linearService.getTeamById(id);
 
           if (teamData?.name) {
-            console.log(
-              `[UserRoutes] Team name from Linear API: ${teamData.name}`,
-            );
-
             //Cache the team for future requests
             await kv.set(`linear_teams:${id}`, teamData);
 
@@ -350,24 +291,11 @@ userRoutes.get(
       // Get user's customer assignments
       const userCustomers =
         (await kv.get(`user:${userId}:customers`)) || [];
-      console.log(
-        `[UserRoutes] User customers:`,
-        userCustomers,
-      );
-
       // Check if any of user's customers has access to this team
       for (const customerId of userCustomers) {
         const customerTeams =
           (await kv.get(`customer:${customerId}:teams`)) || [];
-        console.log(
-          `[UserRoutes] Customer ${customerId} teams:`,
-          customerTeams,
-        );
-
         if (customerTeams.includes(teamId)) {
-          console.log(
-            `[UserRoutes] User has access via customer ${customerId}`,
-          );
           const teamName = await getTeamName(teamId);
 
           return c.json({
@@ -383,10 +311,6 @@ userRoutes.get(
       }
 
       // No access found
-      console.log(
-        `[UserRoutes] User does not have access to team ${teamId}`,
-      );
-
       return c.json({
         success: true,
         hasAccess: false,
@@ -430,30 +354,16 @@ userRoutes.get(
     try {
       const userId = c.get("userId");
       const teamId = c.req.param("teamId");
-
-      console.log(
-        `[UserRoutes] GET Kanban settings for user ${userId}, team ${teamId}`,
-      );
-
       // Get settings from KV
       const settingsKey = `user:${userId}:team:${teamId}:kanban_settings`;
       const settings = await kv.get(settingsKey);
 
       if (!settings) {
-        console.log(
-          `ℹ️ [UserRoutes] No Kanban settings found for user ${userId}, team ${teamId}`,
-        );
         return c.json(
           { success: true, data: null },
           { status: 404 },
         );
       }
-
-      console.log(`[UserRoutes] Kanban settings retrieved:`, {
-        columnsCount: settings.columnsOrder?.length,
-        visibleCount: settings.visibleColumns?.length,
-      });
-
       return c.json({
         success: true,
         data: settings,
@@ -493,16 +403,6 @@ userRoutes.put(
       const userId = c.get("userId");
       const teamId = c.req.param("teamId");
       const settings = await c.req.json();
-
-      console.log(
-        `[UserRoutes] PUT Kanban settings for user ${userId}, team ${teamId}:`,
-        {
-          columnsCount: settings.columnsOrder?.length,
-          visibleCount: settings.visibleColumns?.length,
-          hideEmptyColumns: settings.hideEmptyColumns,
-        },
-      );
-
       // Validate settings structure
       if (
         !settings.columnsOrder ||
@@ -529,11 +429,6 @@ userRoutes.put(
       // Save to KV
       const settingsKey = `user:${userId}:team:${teamId}:kanban_settings`;
       await kv.set(settingsKey, settingsWithMetadata);
-
-      console.log(
-        `[UserRoutes] Kanban settings saved successfully`,
-      );
-
       return c.json({
         success: true,
         message: "Kanban settings saved successfully",
@@ -571,19 +466,9 @@ userRoutes.delete(
     try {
       const userId = c.get("userId");
       const teamId = c.req.param("teamId");
-
-      console.log(
-        `️ [UserRoutes] DELETE Kanban settings for user ${userId}, team ${teamId}`,
-      );
-
       // Delete from KV
       const settingsKey = `user:${userId}:team:${teamId}:kanban_settings`;
       await kv.del(settingsKey);
-
-      console.log(
-        `[UserRoutes] Kanban settings deleted successfully`,
-      );
-
       return c.json({
         success: true,
         message: "Kanban settings deleted successfully",

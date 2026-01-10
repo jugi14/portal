@@ -73,16 +73,6 @@ class KanbanSettingsService {
       if (!cached) return null;
 
       const settings = JSON.parse(cached);
-      console.log(
-        "[Kanban Settings] Retrieved from localStorage:",
-        {
-          teamId,
-          columnsCount: settings.columnsOrder?.length,
-          visibleCount: settings.visibleColumns?.length,
-          hideEmptyColumns: settings.hideEmptyColumns,
-        },
-      );
-
       return settings;
     } catch (error) {
       console.error(
@@ -103,11 +93,6 @@ class KanbanSettingsService {
     try {
       const key = this.getLocalStorageKey(teamId);
       localStorage.setItem(key, JSON.stringify(settings));
-      console.log("[Kanban Settings] Saved to localStorage:", {
-        teamId,
-        columnsCount: settings.columnsOrder?.length,
-        visibleCount: settings.visibleColumns?.length,
-      });
     } catch (error) {
       console.error(
         "[Kanban Settings] localStorage write error:",
@@ -123,10 +108,6 @@ class KanbanSettingsService {
     try {
       const key = this.getLocalStorageKey(teamId);
       localStorage.removeItem(key);
-      console.log(
-        "️ [Kanban Settings] Deleted from localStorage:",
-        teamId,
-      );
     } catch (error) {
       console.error(
         "[Kanban Settings] localStorage delete error:",
@@ -159,11 +140,6 @@ class KanbanSettingsService {
       );
       return null;
     }
-
-    console.log(
-      `[${requestId}] [Kanban Settings] GET for team ${teamId}`,
-    );
-
     try {
       // Get authorization headers with user access token
       const headers = await this.getHeaders();
@@ -217,24 +193,12 @@ class KanbanSettingsService {
 
       // If no backend settings, return null (don't use localStorage)
       if (!backendSettings) {
-        console.log(`[${requestId}] No backend settings data`);
         this.deleteLocalSettings(teamId);
         return null;
       }
 
       //SUCCESS: Update localStorage with fresh backend settings
       this.saveLocalSettings(teamId, backendSettings);
-
-      console.log(
-        `[${requestId}] Kanban settings retrieved from backend:`,
-        {
-          source: "backend",
-          columnsCount: backendSettings.columnsOrder?.length,
-          visibleCount: backendSettings.visibleColumns?.length,
-          hideEmptyColumns: backendSettings.hideEmptyColumns,
-        },
-      );
-
       return backendSettings;
     } catch (error) {
       //FALLBACK: Only now try localStorage as last resort
@@ -242,10 +206,6 @@ class KanbanSettingsService {
         `[${requestId}] Backend fetch failed:`,
         error,
       );
-      console.log(
-        `[${requestId}] Attempting localStorage fallback...`,
-      );
-
       const localSettings = this.getLocalSettings(teamId);
 
       if (localSettings) {
@@ -256,9 +216,6 @@ class KanbanSettingsService {
       }
 
       // Ultimate fallback: return null, let hook build initial settings
-      console.log(
-        `🆕 [${requestId}] No settings available, will use defaults`,
-      );
       return null;
     }
   }
@@ -273,10 +230,6 @@ class KanbanSettingsService {
     settings: KanbanBoardSettings,
   ): Promise<boolean> {
     const requestId = Math.random().toString(36).substr(2, 6);
-    console.log(
-      `[${requestId}] [Kanban Settings] SAVE for team ${teamId}`,
-    );
-
     // Immediate localStorage update for instant feedback
     this.saveLocalSettings(teamId, settings);
 
@@ -307,12 +260,6 @@ class KanbanSettingsService {
           result.error || "Failed to save settings",
         );
       }
-
-      console.log(`[${requestId}] Settings saved to backend:`, {
-        columnsCount: settings.columnsOrder?.length,
-        visibleCount: settings.visibleColumns?.length,
-      });
-
       return true;
     } catch (error) {
       console.error(
@@ -332,11 +279,6 @@ class KanbanSettingsService {
     updates: KanbanSettingsUpdatePayload,
   ): Promise<boolean> {
     const requestId = Math.random().toString(36).substr(2, 6);
-    console.log(
-      `[${requestId}] [Kanban Settings] UPDATE for team ${teamId}:`,
-      updates,
-    );
-
     // Get current settings
     const currentSettings = await this.getSettings(teamId);
 
@@ -363,10 +305,6 @@ class KanbanSettingsService {
    */
   async resetSettings(teamId: string): Promise<boolean> {
     const requestId = Math.random().toString(36).substr(2, 6);
-    console.log(
-      `[${requestId}] [Kanban Settings] RESET for team ${teamId}`,
-    );
-
     // Delete from localStorage
     this.deleteLocalSettings(teamId);
 
@@ -393,8 +331,6 @@ class KanbanSettingsService {
           result.error || "Failed to reset settings",
         );
       }
-
-      console.log(`[${requestId}] Settings reset successfully`);
       return true;
     } catch (error) {
       console.error(

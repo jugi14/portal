@@ -55,15 +55,10 @@ class InitializationService {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseUrl}${endpoint}`;
-      console.log(`[Init] API Request: ${options.method || 'GET'} ${url}`);
-
       const response = await fetch(url, {
         headers: this.defaultHeaders,
         ...options,
       });
-
-      console.log(`[Init] Response status: ${response.status} ${response.statusText}`);
-
       const data = await response.json();
       
       if (!response.ok) {
@@ -73,9 +68,6 @@ class InitializationService {
           error: data.error || `HTTP ${response.status}: ${response.statusText}`
         };
       }
-
-      console.log(`[Init] API Response:`, data);
-
       return {
         success: data.success !== false,
         data: data.data || data,
@@ -86,12 +78,6 @@ class InitializationService {
     } catch (error) {
       // Log network issues as info rather than error (offline mode is expected)
       if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        console.log('[Init] Server connection unavailable - will use offline mode');
-        console.log('[Init] This is normal if:');
-        console.log('[Init] - Server is not deployed yet');
-        console.log('[Init] - Network is offline');
-        console.log('[Init] - Running in development without backend');
-        console.log('[Init] App will function using cached data and local state.');
       } else {
         // Only log unexpected errors
         console.warn('[Init] API request failed:', error);
@@ -133,13 +119,10 @@ class InitializationService {
     cleanup?: CleanupResponse;
   }>> {
     try {
-      console.log('[Init] Starting application initialization...');
-
       // 1. Health check first
       const healthResult = await this.healthCheck();
       if (!healthResult.success) {
         // Return error instead of throwing - let caller handle fallback
-        console.log('[Init] Health check unsuccessful, returning error for fallback handling');
         return {
           success: false,
           error: healthResult.error || 'Health check failed'
@@ -150,12 +133,8 @@ class InitializationService {
       // Cleanup is now handled manually via Admin panel if needed
       const shouldCleanup = localStorage.getItem('app-init-cleanup') === 'true';
       if (shouldCleanup) {
-        console.log('[Init] Cleanup flag detected but cleanup is deprecated - removing flag');
         localStorage.removeItem('app-init-cleanup');
       }
-
-      console.log('[Init] Application initialization completed successfully');
-
       return {
         success: true,
         data: {
@@ -210,8 +189,6 @@ class InitializationService {
       }
 
       // Try health check only
-      console.log('[Init] Full initialization failed, trying health check only...');
-      
       const healthResult = await this.healthCheck();
       if (healthResult.success) {
         console.log('[Init] Health check successful (partial mode)');
@@ -249,7 +226,6 @@ class InitializationService {
    */
   scheduleCleanup(): void {
     localStorage.setItem('app-init-cleanup', 'true');
-    console.log('Data cleanup scheduled for next app initialization');
   }
 
   /**
@@ -257,7 +233,6 @@ class InitializationService {
    */
   cancelScheduledCleanup(): void {
     localStorage.removeItem('app-init-cleanup');
-    console.log('Scheduled cleanup cancelled');
   }
 
   /**

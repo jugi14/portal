@@ -1,15 +1,15 @@
 /**
  * API Client V2 - Centralized HTTP Client
- * 
+ *
  * Clean, type-safe API client for Backend V2
  * Handles authentication, errors, and retries
- * 
+ *
  * Version: 2.1.0
  * Date: 2025-01-16
  */
 
-import { projectId, publicAnonKey } from '../utils/supabase/info';
-import { secureTokenStorage } from './secureTokenStorage';
+import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { secureTokenStorage } from "./secureTokenStorage";
 
 export interface APIResponse<T = any> {
   success: boolean;
@@ -17,7 +17,7 @@ export interface APIResponse<T = any> {
   error?: string;
   message?: string;
   code?: string;
-  source?: 'cache' | 'api' | 'kv' | string;
+  source?: "cache" | "api" | "kv" | string;
 }
 
 export interface APIError {
@@ -35,18 +35,32 @@ class APIClient {
     // Auto-detect API URL based on environment
     const isDevelopment = import.meta.env.DEV;
     const customApiUrl = import.meta.env.VITE_API_BASE_URL;
-    
+
     if (customApiUrl) {
       // Use custom API URL (for local development)
-      this.baseURL = `${customApiUrl}/make-server-7f0d90fb`;
+      // Ensure it ends with /api
+      this.baseURL = customApiUrl.endsWith("/api")
+        ? customApiUrl
+        : `${customApiUrl}/api`;
     } else if (isDevelopment) {
-      // Development: use local backend
-      this.baseURL = 'http://localhost:3001/make-server-7f0d90fb';
+      // Development: use local backend with /api prefix
+      // Auto-detect port from VITE_API_BASE_URL or use default 3001
+      // If VITE_API_BASE_URL is set but doesn't include port, extract from it
+      const customUrl = import.meta.env.VITE_API_BASE_URL;
+      if (customUrl && customUrl.includes("localhost:")) {
+        // Extract port from VITE_API_BASE_URL if provided
+        const portMatch = customUrl.match(/localhost:(\d+)/);
+        const backendPort = portMatch ? portMatch[1] : "3001";
+        this.baseURL = `http://localhost:${backendPort}/api`;
+      } else {
+        // Use VITE_BACKEND_PORT or default to 3001
+        const backendPort = import.meta.env.VITE_BACKEND_PORT || "3001";
+        this.baseURL = `http://localhost:${backendPort}/api`;
+      }
     } else {
-      // Production: use Vercel serverless function or Supabase Functions
-      // Vercel sẽ tự động route /make-server-7f0d90fb/* to /api/server.ts
-      // Fallback to Supabase Functions if not on Vercel
-      this.baseURL = `/make-server-7f0d90fb`;
+      // Production: use Vercel serverless function
+      // Vercel sẽ tự động route /api/* to /api/server.ts
+      this.baseURL = "/api";
     }
   }
 
@@ -57,7 +71,7 @@ class APIClient {
   setAccessToken(token: string | null, expiresAt?: number) {
     if (token) {
       // Use secure token storage with expiry
-      const expiry = expiresAt || (Date.now() + 60 * 60 * 1000); // Default 1 hour
+      const expiry = expiresAt || Date.now() + 60 * 60 * 1000; // Default 1 hour
       secureTokenStorage.setToken(token, expiry);
       // SECURITY: Do not log token information
     } else {
@@ -74,7 +88,7 @@ class APIClient {
   getAccessToken(): string | null {
     return secureTokenStorage.getToken();
   }
-  
+
   /**
    * Get current access token (alias for getAccessToken)
    * Automatically validates expiration
@@ -95,14 +109,14 @@ class APIClient {
 
     try {
       const headers: HeadersInit = {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       };
 
       // Add auth token from secure storage (validates expiry)
       const token = this.getAccessToken();
       if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+        headers["Authorization"] = `Bearer ${token}`;
       }
 
       const response = await fetch(url, {
@@ -111,15 +125,15 @@ class APIClient {
       });
 
       // CRITICAL: Check if response has content before parsing
-      const contentType = response.headers.get('content-type');
-      const hasJsonContent = contentType?.includes('application/json');
-      
+      const contentType = response.headers.get("content-type");
+      const hasJsonContent = contentType?.includes("application/json");
+
       let data: any;
-      
+
       // Try to parse response body
       try {
         const text = await response.text();
-        
+
         // Only parse as JSON if content-type is JSON and text is not empty
         if (text && hasJsonContent) {
           data = JSON.parse(text);
@@ -127,21 +141,24 @@ class APIClient {
           // Non-JSON response - wrap in error structure
           data = {
             success: false,
-            error: text || 'Server returned non-JSON response',
+            error: text || "Server returned non-JSON response",
           };
         } else {
           // Empty response
           data = {
             success: false,
-            error: 'Server returned empty response',
+            error: "Server returned empty response",
           };
         }
       } catch (parseError) {
-        console.error(`[APIClient] Failed to parse response from ${endpoint}:`, parseError);
+        console.error(
+          `[APIClient] Failed to parse response from ${endpoint}:`,
+          parseError
+        );
         return {
           success: false,
-          error: 'Invalid response format from server',
-          code: 'PARSE_ERROR',
+          error: "Invalid response format from server",
+          code: "PARSE_ERROR",
         };
       }
 
@@ -150,7 +167,7 @@ class APIClient {
           `[APIClient] ${response.status} ${endpoint}`,
           data.error || data.message
         );
-        
+
         return {
           success: false,
           error: data.error || `Request failed with status ${response.status}`,
@@ -160,11 +177,11 @@ class APIClient {
       return data;
     } catch (error) {
       console.error(`[APIClient] Network error ${endpoint}:`, error);
-      
+
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Network error',
-        code: 'NETWORK_ERROR',
+        error: error instanceof Error ? error.message : "Network error",
+        code: "NETWORK_ERROR",
       };
     }
   }
@@ -174,7 +191,7 @@ class APIClient {
    */
   async get<T>(endpoint: string): Promise<APIResponse<T>> {
     return this.request<T>(endpoint, {
-      method: 'GET',
+      method: "GET",
     });
   }
 
@@ -183,7 +200,7 @@ class APIClient {
    */
   async post<T>(endpoint: string, body?: any): Promise<APIResponse<T>> {
     return this.request<T>(endpoint, {
-      method: 'POST',
+      method: "POST",
       body: body ? JSON.stringify(body) : undefined,
     });
   }
@@ -193,7 +210,7 @@ class APIClient {
    */
   async put<T>(endpoint: string, body?: any): Promise<APIResponse<T>> {
     return this.request<T>(endpoint, {
-      method: 'PUT',
+      method: "PUT",
       body: body ? JSON.stringify(body) : undefined,
     });
   }
@@ -203,7 +220,7 @@ class APIClient {
    */
   async delete<T>(endpoint: string): Promise<APIResponse<T>> {
     return this.request<T>(endpoint, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
@@ -211,7 +228,10 @@ class APIClient {
    * File upload request (for FormData)
    * CRITICAL: Does not set Content-Type - browser sets it with boundary
    */
-  async upload<T>(endpoint: string, formData: FormData): Promise<APIResponse<T>> {
+  async upload<T>(
+    endpoint: string,
+    formData: FormData
+  ): Promise<APIResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
 
     try {
@@ -220,14 +240,14 @@ class APIClient {
       // Add auth token from secure storage (validates expiry)
       const token = this.getAccessToken();
       if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+        headers["Authorization"] = `Bearer ${token}`;
       }
 
       // CRITICAL: Do NOT set Content-Type for FormData
       // Browser automatically sets it with boundary parameter
 
       const response = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers,
         body: formData,
       });
@@ -239,7 +259,7 @@ class APIClient {
           `[APIClient] ${response.status} ${endpoint}`,
           data.error || data.message
         );
-        
+
         return {
           success: false,
           error: data.error || `Upload failed with status ${response.status}`,
@@ -250,11 +270,11 @@ class APIClient {
       return data;
     } catch (error) {
       console.error(`[APIClient] Upload error ${endpoint}:`, error);
-      
+
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Upload failed',
-        code: 'UPLOAD_ERROR',
+        error: error instanceof Error ? error.message : "Upload failed",
+        code: "UPLOAD_ERROR",
       };
     }
   }
@@ -272,38 +292,40 @@ class APIClient {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const result = await this.request<T>(endpoint, options);
-        
+
         if (result.success) {
           return result;
         }
 
         // Don't retry client errors (4xx)
-        if (result.code === 'UNAUTHORIZED' || result.code === 'FORBIDDEN' || result.code === 'NOT_FOUND') {
+        if (
+          result.code === "UNAUTHORIZED" ||
+          result.code === "FORBIDDEN" ||
+          result.code === "NOT_FOUND"
+        ) {
           return result;
         }
 
         lastError = result;
-        
+
         if (attempt < maxRetries) {
           const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-          console.log(`[APIClient] Retry ${attempt}/${maxRetries} after ${delay}ms`);
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
       } catch (error) {
         lastError = error;
-        
+
         if (attempt < maxRetries) {
           const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-          console.log(`[APIClient] Retry ${attempt}/${maxRetries} after ${delay}ms`);
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
     }
 
     return {
       success: false,
-      error: lastError?.error || 'Request failed after retries',
-      code: 'MAX_RETRIES_EXCEEDED',
+      error: lastError?.error || "Request failed after retries",
+      code: "MAX_RETRIES_EXCEEDED",
     };
   }
 }
@@ -312,6 +334,6 @@ class APIClient {
 export const apiClient = new APIClient();
 
 // Export for debugging
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   (window as any).apiClient = apiClient;
 }

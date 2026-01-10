@@ -44,8 +44,6 @@ linearMaintenanceRoutes.post("/linear/cleanup-orphaned-mappings", async (c) => {
       );
     }
 
-    console.log(`[Linear Cleanup] User: ${user.email} (role: ${role})`);
-    console.log('[Linear Cleanup] Finding orphaned team mappings...');
 
     const supabase = createClient(
       process.env.SUPABASE_URL!,
@@ -77,7 +75,6 @@ linearMaintenanceRoutes.post("/linear/cleanup-orphaned-mappings", async (c) => {
       (teamsValue.teams || []).map((t: any) => t.id)
     );
 
-    console.log(`[Linear Cleanup] Found ${validTeamIds.size} valid teams in Linear`);
 
     // Get all customer-team mappings
     const { data: customerMappings, error: mappingsError } = await supabase
@@ -107,7 +104,6 @@ linearMaintenanceRoutes.post("/linear/cleanup-orphaned-mappings", async (c) => {
       });
     }
 
-    console.log(`[Linear Cleanup] Checking ${customerMappings.length} customer mappings...`);
 
     let totalOrphanedRemoved = 0;
     let customersUpdated = 0;
@@ -127,8 +123,6 @@ linearMaintenanceRoutes.post("/linear/cleanup-orphaned-mappings", async (c) => {
       const orphanedTeams = teamIds.filter((teamId: string) => !validTeamIds.has(teamId));
 
       if (orphanedTeams.length > 0) {
-        console.log(`[Linear Cleanup] Customer ${customerId}: Removing ${orphanedTeams.length} orphaned teams`);
-        console.log(`[Linear Cleanup] Orphaned team IDs:`, orphanedTeams);
 
         // Update customer mapping with only valid teams
         await supabase
@@ -149,7 +143,6 @@ linearMaintenanceRoutes.post("/linear/cleanup-orphaned-mappings", async (c) => {
       }
     }
 
-    console.log(`[Linear Cleanup] Complete! Removed ${totalOrphanedRemoved} orphaned mappings from ${customersUpdated} customers`);
 
     return c.json({
       success: true,
@@ -204,8 +197,6 @@ linearMaintenanceRoutes.get("/linear/validate-mappings", async (c) => {
       );
     }
 
-    console.log(`[Linear Validate] User: ${user.email} (role: ${role})`);
-    console.log('[Linear Validate] Checking team mappings...');
 
     const supabase = createClient(
       process.env.SUPABASE_URL!,
@@ -298,7 +289,6 @@ linearMaintenanceRoutes.get("/linear/validate-mappings", async (c) => {
       }
     }
 
-    console.log(`[Linear Validate] Found ${totalOrphaned} orphaned mappings in ${issues.length} customers`);
 
     return c.json({
       success: true,

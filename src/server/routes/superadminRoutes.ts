@@ -98,7 +98,6 @@ superadminRoutes.post("/superadmin/initialize", async (c) => {
       count: validEmails.length
     });
     
-    console.log(`[SuperadminRoutes] Initialized with ${validEmails.length} superadmins`);
     
     return c.json({
       success: true,
@@ -135,7 +134,6 @@ superadminRoutes.get("/superadmin/check", async (c) => {
     // Check if current user is superadmin
     const isSuperAdmin = await checkIsSuperAdmin(userEmail);
     
-    console.log(`[SuperadminRoutes] Check by ${userEmail}: ${isSuperAdmin}`);
     
     return c.json({
       success: true,
@@ -179,7 +177,6 @@ superadminRoutes.get("/superadmin/list", async (c) => {
     
     if (!isSuperAdmin) {
       // Return empty array for non-superadmins (not an error)
-      console.log(`[SuperadminRoutes] Non-superadmin ${userEmail} checked list - returning empty`);
       return c.json({
         success: true,
         data: { 
@@ -191,7 +188,6 @@ superadminRoutes.get("/superadmin/list", async (c) => {
     }
     
     // Return full list for superadmins
-    console.log(`[SuperadminRoutes] List fetched by superadmin ${userEmail}, count: ${superadmins.length}`);
     
     return c.json({
       success: true,
@@ -277,7 +273,6 @@ superadminRoutes.post("/superadmin/add", async (c) => {
     // Clear caches
     await kv.mdel(["system:superadmins:cache", "system:superadmin:audit:cache"]);
     
-    console.log(`[SuperadminRoutes] Added: ${normalizedEmail} by ${user.email}`);
     
     return c.json({
       success: true,
@@ -370,7 +365,6 @@ superadminRoutes.delete("/superadmin/remove/:email", async (c) => {
     // Clear caches
     await kv.mdel(["system:superadmins:cache", "system:superadmin:audit:cache"]);
     
-    console.log(`[SuperadminRoutes] Removed: ${emailToRemove} by ${user.email}`);
     
     return c.json({
       success: true,
@@ -425,7 +419,6 @@ superadminRoutes.get("/superadmin/audit", async (c) => {
       const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
       
       if (cacheAge < CACHE_TTL) {
-        console.log(`[SuperadminRoutes] Audit cache hit by ${user.email}`);
         return c.json({
           success: true,
           data: { 
@@ -441,7 +434,6 @@ superadminRoutes.get("/superadmin/audit", async (c) => {
     const auditKeys = await kv.getByPrefix("audit:superadmin:");
     
     if (!auditKeys || auditKeys.length === 0) {
-      console.log(`[SuperadminRoutes] No audit logs found`);
       return c.json({
         success: true,
         data: { 
@@ -471,7 +463,6 @@ superadminRoutes.get("/superadmin/audit", async (c) => {
       ttl: 5 * 60 * 1000
     });
     
-    console.log(`[SuperadminRoutes] Audit fetched by ${user.email}, count: ${limitedLogs.length} (total: ${validLogs.length})`);
     
     return c.json({
       success: true,

@@ -30,7 +30,6 @@ issueRoutes.get("/issues/team/:teamId", async (c) => {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
 
-    console.log(`[Issues] Fetching issues for team ${teamId}`);
 
     // Check team access
     const accessCheck = await teamMethodsV2.checkUserTeamAccess(
@@ -75,11 +74,6 @@ issueRoutes.get("/issues/team/:teamId/by-state", async (c) => {
   try {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
-
-    console.log(
-      `[Issues] Fetching issues by state for team ${teamId}`,
-    );
-
     // Check team access
     const accessCheck = await teamMethodsV2.checkUserTeamAccess(
       user.id,
@@ -132,7 +126,6 @@ issueRoutes.get("/issues/:issueId", async (c) => {
     const user = c.get("user");
     const issueId = c.req.param("issueId");
 
-    console.log(`[Issues] Fetching issue ${issueId}`);
 
     const issue =
       await linearTeamIssuesService.getIssueDetail(issueId);
@@ -152,15 +145,6 @@ issueRoutes.get("/issues/:issueId", async (c) => {
         issue: issue
       },
     };
-    
-    console.log(`[Issues] Returning issue response:`, {
-      success: response.success,
-      hasData: !!response.data,
-      hasIssue: !!response.data.issue,
-      issueId: response.data.issue?.id,
-      issueIdentifier: response.data.issue?.identifier
-    });
-
     return c.json(response);
   } catch (error) {
     console.error("[Issues] Get issue error:", error);
@@ -185,11 +169,6 @@ issueRoutes.put("/issues/:issueId/state", async (c) => {
     const issueId = c.req.param("issueId");
     const body = await c.req.json();
     const { stateId } = body;
-
-    console.log(
-      `[Issues] Updating issue ${issueId} state to ${stateId}`,
-    );
-
     if (!stateId) {
       return c.json(
         { success: false, error: "stateId is required" },
@@ -242,13 +221,6 @@ issueRoutes.post("/issues/create", async (c) => {
       labelIds,
       cycleId,
     } = body;
-
-    console.log(`[Issues] Creating issue in team ${teamId}`, {
-      title,
-      hasCycleId: !!cycleId,
-      hasLabels: !!labelIds?.length,
-    });
-
     if (!teamId || !title) {
       return c.json(
         {
@@ -306,7 +278,6 @@ issueRoutes.post("/issues/:parentIssueId/sub-issues", async (c) => {
     const body = await c.req.json();
     const { title, description } = body;
 
-    console.log(`[Issues] Creating sub-issue for parent ${parentIssueId}`);
 
     if (!title) {
       return c.json(
@@ -321,12 +292,6 @@ issueRoutes.post("/issues/:parentIssueId/sub-issues", async (c) => {
       title,
       description,
     );
-
-    console.log(`[Issues] Sub-issue created:`, {
-      issueId: result?.id,
-      identifier: result?.identifier
-    });
-
     return c.json({
       success: true,
       data: result,
@@ -353,11 +318,6 @@ issueRoutes.post("/issues/cache/invalidate", async (c) => {
     const user = c.get("user");
     const body = await c.req.json();
     const { teamId } = body;
-
-    console.log(
-      `[Issues] Invalidating cache for team ${teamId}`,
-    );
-
     const result =
       await linearTeamIssuesService.invalidateCache(teamId);
 
@@ -391,7 +351,6 @@ issueRoutes.get("/issues/cache/stats", async (c) => {
       );
     }
 
-    console.log(`[Issues] Fetching cache stats`);
 
     const result =
       await linearTeamIssuesService.getCacheStats();

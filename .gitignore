@@ -1,0 +1,103 @@
+# ============================================
+# Dependencies
+# ============================================
+node_modules/
+.pnp
+.pnp.js
+
+# ============================================
+# Environment Variables (SECURITY)
+# ============================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Note: .env.example should be committed (it's a template)
+
+# ============================================
+# Build Output
+# ============================================
+build/
+dist/
+*.tsbuildinfo
+
+# ============================================
+# Logs
+# ============================================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ============================================
+# Editor & IDE
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# OS Files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ============================================
+# Testing
+# ============================================
+coverage/
+.nyc_output/
+*.lcov
+
+# ============================================
+# Vercel
+# ============================================
+.vercel
+
+# ============================================
+# TypeScript
+# ============================================
+*.tsbuildinfo
+
+# ============================================
+# Temporary Files
+# ============================================
+*.tmp
+*.temp
+.cache/
+
+# ============================================
+# Package Manager
+# ============================================
+# package-lock.json - Keep this for npm projects (committed)
+yarn.lock
+pnpm-lock.yaml
+
+# ============================================
+# Debug
+# ============================================
+.vscode/launch.json
+.vscode/tasks.json
+
+# ============================================
+# Local Development
+# ============================================
+.local/
+local/
+

@@ -86,9 +86,6 @@ class LinearTeamService {
   > {
     // ️ Skip if page is hidden (save API calls)
     if (typeof document !== "undefined" && document.hidden) {
-      console.log(
-        "⏸️ [LinearTeamService] Skipping test connection - page hidden",
-      );
       return { success: false, error: "Page hidden" };
     }
 
@@ -104,9 +101,6 @@ class LinearTeamService {
   > {
     // ️ Skip if page is hidden
     if (typeof document !== "undefined" && document.hidden) {
-      console.log(
-        "⏸️ [LinearTeamService] Skipping health check - page hidden",
-      );
       return { success: false, error: "Page hidden" };
     }
 
@@ -168,10 +162,6 @@ class LinearTeamService {
       parent?: { id: string; name: string } | null;
     }>,
   ): ProcessedTeam[] {
-    console.log(
-      `[LinearTeamService] Building hierarchy from ${rawTeams.length} teams`,
-    );
-
     // Create map: team.id → team object with children array
     const teamsMap = new Map<string, ProcessedTeam>();
 
@@ -188,11 +178,6 @@ class LinearTeamService {
         totalDescendants: 0,
       });
     }
-
-    console.log(
-      `[LinearTeamService] Created teams map with ${teamsMap.size} entries`,
-    );
-
     // Attach children by iterating through all teams
     for (const team of rawTeams) {
       if (team.parent?.id && teamsMap.has(team.parent.id)) {
@@ -200,9 +185,6 @@ class LinearTeamService {
         const childTeam = teamsMap.get(team.id);
         if (parentTeam && childTeam) {
           parentTeam.children.push(childTeam);
-          console.log(
-            `  ↳ [LinearTeamService] Attached "${childTeam.name}" to parent "${parentTeam.name}"`,
-          );
         }
       }
     }
@@ -229,26 +211,13 @@ class LinearTeamService {
       .filter((t) => !t.parent || !t.parent.id)
       .map((t) => teamsMap.get(t.id))
       .filter((t): t is ProcessedTeam => t !== undefined);
-
-    console.log(
-      `[LinearTeamService] Found ${roots.length} root teams`,
-    );
-
     // Calculate metrics for all root teams and their descendants
     for (const root of roots) {
       calculateMetrics(root, 0);
-      console.log(
-        ` [LinearTeamService] Root: "${root.name}" [${root.key}] - ${root.childCount} direct children, ${root.totalDescendants} total descendants`,
-      );
     }
 
     // Sort roots alphabetically
     roots.sort((a, b) => a.name.localeCompare(b.name));
-
-    console.log(
-      `[LinearTeamService] Built hierarchy: ${roots.length} root teams with full tree structure`,
-    );
-
     return roots;
   }
 

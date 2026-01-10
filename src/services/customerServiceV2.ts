@@ -237,9 +237,6 @@ export const customerServiceV2 = {
     );
     
     console.log(`[CustomerService] RAW RESPONSE:`, JSON.stringify(response, null, 2));
-    console.log(`[CustomerService] response.data:`, response.data);
-    console.log(`[CustomerService] response.data?.teams:`, response.data?.teams);
-    
     if (!response.success) {
       console.error(`[CustomerService] Failed to fetch teams for customer ${customerId}:`, response.error);
       return [];
@@ -247,9 +244,6 @@ export const customerServiceV2 = {
     
     // Backend returns: { success: true, data: { teams: [...], count: N } }
     const teams = response.data?.teams || [];
-    console.log(`[CustomerService] Fetched ${teams.length} teams:`, teams);
-    console.log(`[CustomerService] First team:`, teams[0]);
-    
     return teams;
   },
 

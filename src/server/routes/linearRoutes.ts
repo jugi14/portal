@@ -35,10 +35,6 @@ const linearService = new LinearTeamService();
 linearRoutes.get("/linear/test", async (c) => {
   try {
     const user = c.get("user");
-    console.log(
-      `[Linear] Testing connection for user: ${user.email}`,
-    );
-
     const result = await linearService.testConnection();
 
     return c.json({
@@ -74,10 +70,6 @@ linearRoutes.get("/linear/test", async (c) => {
 linearRoutes.get("/linear/hierarchy", async (c) => {
   try {
     const user = c.get("user");
-    console.log(
-      `[Linear] Fetching team hierarchy for user: ${user.email}`,
-    );
-
     // Try to get from KV store first
     const { data: kvData, error: kvError } = await createClient(
       process.env.SUPABASE_URL!,
@@ -89,9 +81,6 @@ linearRoutes.get("/linear/hierarchy", async (c) => {
       .single();
 
     if (kvError) {
-      console.log(
-        `[Linear] KV cache miss for linear_teams:all - Error: ${kvError.message}`,
-      );
     }
 
     if (!kvError && kvData?.value) {
@@ -99,14 +88,6 @@ linearRoutes.get("/linear/hierarchy", async (c) => {
         typeof kvData.value === "string"
           ? JSON.parse(kvData.value)
           : kvData.value;
-
-      console.log(
-        `[Linear] Loaded ${hierarchyData.teams?.length || 0} teams from KV cache`,
-      );
-      console.log(
-        `[Linear] Cache age: ${hierarchyData.syncedAt}`,
-      );
-      
       // Validate data structure
       if (!hierarchyData.teams || !Array.isArray(hierarchyData.teams)) {
         console.error('[Linear] Invalid KV cache data structure:', {
@@ -125,9 +106,6 @@ linearRoutes.get("/linear/hierarchy", async (c) => {
     }
 
     // Fallback: fetch from Linear API
-    console.log(
-      "️ [Linear] No cached data, fetching from API...",
-    );
     const result = await linearService.listTeams();
 
     if (!result.success) {
@@ -172,10 +150,6 @@ linearRoutes.get("/linear/hierarchy", async (c) => {
 linearRoutes.get("/linear/teams", async (c) => {
   try {
     const user = c.get("user");
-    console.log(
-      `[Linear] Fetching teams for user: ${user.email}`,
-    );
-
     const result = await linearService.listTeams();
 
     if (!result.success) {
@@ -229,8 +203,6 @@ linearRoutes.post("/linear/clear-cache", async (c) => {
       );
     }
 
-    console.log(`[Linear Cache Clear] User: ${user.email} (role: ${role})`);
-    console.log('[Linear Cache Clear] Clearing all Linear-related KV data...');
 
     const supabase = createClient(
       process.env.SUPABASE_URL!,
@@ -255,7 +227,6 @@ linearRoutes.post("/linear/clear-cache", async (c) => {
       
       if (!error) {
         deletedCount++;
-        console.log(`[Linear Cache Clear] Deleted: ${key}`);
       }
     }
 
@@ -268,14 +239,12 @@ linearRoutes.post("/linear/clear-cache", async (c) => {
         .like('key', `${prefix}%`);
       
       if (!error) {
-        console.log(`[Linear Cache Clear] Deleted keys with prefix: ${prefix}`);
       }
     }
 
     // Invalidate team cache
     await teamMethodsV2.invalidateCache();
 
-    console.log(`[Linear Cache Clear] Complete! Cleared ${deletedCount} specific keys + all prefixed keys`);
 
     return c.json({
       success: true,
@@ -307,12 +276,8 @@ linearRoutes.post("/linear/sync-hierarchy", async (c) => {
     const role = c.get("role"); //Get role from auth context (set by authMiddleware)
     const isSuperAdmin = c.get("isSuperAdmin");
 
-    console.log(
-      `[Linear] Syncing hierarchy for user: ${user.email} (role: ${role})`,
-    );
 
     //CRITICAL: Invalidate ALL caches before sync
-    console.log('[Linear] Invalidating all caches before sync...');
     await teamMethodsV2.invalidateCache();
     
     // CRITICAL: Also invalidate organization cache and linear teams cache
@@ -327,16 +292,12 @@ linearRoutes.post("/linear/sync-hierarchy", async (c) => {
       .delete()
       .or('key.eq.linear:organization,key.eq.team_ownership_map:all,key.like.cache:linear-teams%');
     
-    console.log('[Linear] All Linear caches invalidated');
 
     //FIXED: Check role from context instead of user.user_metadata
     if (
       !["superadmin", "admin"].includes(role) &&
       !isSuperAdmin
     ) {
-      console.log(
-        `[Linear] Authorization failed - role: ${role}, isSuperAdmin: ${isSuperAdmin}`,
-      );
       return c.json(
         {
           success: false,
@@ -361,12 +322,6 @@ linearRoutes.post("/linear/sync-hierarchy", async (c) => {
     }
     
     // CRITICAL: Log sync results for debugging
-    console.log('[Linear] Sync completed successfully:', {
-      totalTeams: result.data?.teamsCount || 0,
-      rootTeams: result.data?.rootTeamsCount || 0,
-      syncedAt: result.data?.syncedAt
-    });
-
     return c.json({
       success: true,
       message: result.message,
@@ -398,11 +353,6 @@ linearRoutes.get("/linear/teams/:teamId", async (c) => {
 
   try {
     const user = c.get("user");
-
-    console.log(
-      `[Linear] Fetching team ${teamId} for user: ${user.email}`,
-    );
-
     const result = await linearService.getTeamById(teamId);
 
     if (!result) {
@@ -462,11 +412,6 @@ linearRoutes.get("/linear/teams/:teamId/config", async (c) => {
 
   try {
     const user = c.get("user");
-
-    console.log(
-      `[Linear] Fetching config for team ${teamId}`,
-    );
-
     const result =
       await linearTeamIssuesService.getTeamConfig(teamId);
 
@@ -539,11 +484,6 @@ linearRoutes.get(
           { status: 400 },
         );
       }
-
-      console.log(
-        `[Linear] Getting state ID for "${stateName}" in team ${teamId}`,
-      );
-
       const stateId =
         await linearTeamIssuesService.getStateIdByName(
           teamId,
@@ -607,11 +547,6 @@ linearRoutes.get(
 
     try {
       const user = c.get("user");
-
-      console.log(
-        `[Linear] Fetching issues by state for team ${teamId}`,
-      );
-
       const result =
         await linearTeamIssuesService.getTeamIssuesByState(
           teamId,
@@ -682,7 +617,6 @@ linearRoutes.get("/linear/teams/:teamId/issues", async (c) => {
   try {
     const user = c.get("user");
 
-    console.log(`[Linear] Fetching issues for team ${teamId}`);
 
     // Check team access (optional - depends on your access control)
     // const accessCheck = await teamMethodsV2.checkUserTeamAccess(user.id, teamId);
@@ -752,11 +686,6 @@ linearRoutes.get(
     try {
       const user = c.get("user");
       const teamId = c.req.param("teamId");
-
-      console.log(
-        `[Linear] Fetching issues grouped by state for team ${teamId}`,
-      );
-
       const result =
         await linearTeamIssuesService.getTeamIssuesByState(
           teamId,
@@ -804,17 +733,6 @@ linearRoutes.post("/linear/graphql", async (c) => {
     const { query, variables } = body;
 
     // CRITICAL DEBUG: Check if variables is already stringified
-    console.log(`[Linear] GraphQL variables type check:`, {
-      variablesType: typeof variables,
-      isString: typeof variables === 'string',
-      variablesValue: variables,
-    });
-
-    console.log(`[Linear] Executing GraphQL:`, {
-      user: user.email,
-      query: query?.trim().split("\n")[1]?.trim() || "Unknown",
-      variables,
-    });
 
     // Validate input
     if (!query) {
@@ -862,7 +780,6 @@ linearRoutes.get("/linear/issues/:issueId", async (c) => {
     const user = c.get("user");
     const issueId = c.req.param("issueId");
 
-    console.log(`[Linear] Fetching issue ${issueId}`);
 
     const result =
       await linearTeamIssuesService.getIssueDetail(issueId);
@@ -906,16 +823,6 @@ linearRoutes.post(
       const parentIssueId = c.req.param("parentIssueId");
       const body = await c.req.json();
       const { title, description } = body;
-
-      console.log(
-        `[Linear] Creating sub-issue for parent ${parentIssueId}:`,
-        {
-          user: user.email,
-          title,
-          hasDescription: !!description,
-        },
-      );
-
       // Validate input
       if (!title || !title.trim()) {
         return c.json(
@@ -944,11 +851,6 @@ linearRoutes.post(
           { status: 500 },
         );
       }
-
-      console.log(
-        `[Linear] Sub-issue created successfully: ${result.issue?.identifier}`,
-      );
-
       return c.json({
         success: true,
         data: result,
@@ -981,11 +883,6 @@ linearRoutes.put("/linear/issues/:issueId/state", async (c) => {
     const issueId = c.req.param("issueId");
     const body = await c.req.json();
     const { stateId } = body;
-
-    console.log(
-      `[Linear] Updating issue ${issueId} state to ${stateId}`,
-    );
-
     if (!stateId) {
       return c.json(
         { success: false, error: "stateId is required" },
@@ -1047,14 +944,6 @@ linearRoutes.post("/linear/issues/create", async (c) => {
       labelIds,
       cycleId,
     } = body;
-
-    console.log(`[Linear] Creating issue in team ${teamId}`, {
-      user: user.email,
-      title,
-      hasCycleId: !!cycleId,
-      hasLabels: !!labelIds?.length,
-    });
-
     // Validate required fields
     if (!teamId || !title) {
       return c.json(
@@ -1099,11 +988,6 @@ linearRoutes.post("/linear/issues/create", async (c) => {
         { status: 500 },
       );
     }
-
-    console.log(
-      `[Linear] Issue created successfully: ${result.data.identifier}`,
-    );
-
     return c.json({
       success: true,
       data: result.data,
@@ -1138,11 +1022,6 @@ linearRoutes.post("/linear/cache/invalidate", async (c) => {
     const user = c.get("user");
     const body = await c.req.json();
     const { teamId } = body;
-
-    console.log(
-      `[Linear] Invalidating cache for team ${teamId || "all"}`,
-    );
-
     const result =
       await linearTeamIssuesService.invalidateCache(teamId);
 
@@ -1179,7 +1058,6 @@ linearRoutes.get("/linear/cache/stats", async (c) => {
       );
     }
 
-    console.log(`[Linear] Fetching cache stats`);
 
     const result =
       await linearTeamIssuesService.getCacheStats();
@@ -1213,7 +1091,6 @@ linearRoutes.get("/linear/teams/:teamId/states", async (c) => {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
 
-    console.log(`[Linear] Fetching states for team ${teamId}`);
 
     const config =
       await linearTeamIssuesService.getTeamConfig(teamId);
@@ -1259,11 +1136,6 @@ linearRoutes.get("/linear/teams/:teamId/labels", async (c) => {
   try {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
-
-    console.log(
-      `️ [Linear] Fetching labels for team ${teamId}`,
-    );
-
     const config =
       await linearTeamIssuesService.getTeamConfig(teamId);
 
@@ -1309,7 +1181,6 @@ linearRoutes.get("/linear/teams/:teamId/members", async (c) => {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
 
-    console.log(`[Linear] Fetching members for team ${teamId}`);
 
     const config =
       await linearTeamIssuesService.getTeamConfig(teamId);
@@ -1357,11 +1228,6 @@ linearRoutes.get(
     try {
       const user = c.get("user");
       const teamId = c.req.param("teamId");
-
-      console.log(
-        `[Linear] Fetching projects for team ${teamId}`,
-      );
-
       const config =
         await linearTeamIssuesService.getTeamConfig(teamId);
 
@@ -1412,14 +1278,8 @@ linearRoutes.post(
   async (c) => {
     try {
       const issueId = c.req.param("issueId");
-
-      console.log(
-        `[Linear Routes] File upload request for issue: ${issueId}`,
-      );
-      
       // Debug headers
       const contentType = c.req.header('Content-Type');
-      console.log('[Linear Routes] Content-Type:', contentType);
 
       // Get multipart form data
       const formData = await c.req.formData();
@@ -1433,10 +1293,6 @@ linearRoutes.post(
         );
       }
 
-      console.log(
-        `[Linear Routes] Received ${files.length} files:`,
-        files.map(f => ({ name: f.name, size: f.size, type: f.type }))
-      );
 
       // Validate files are actual File objects
       const validFiles = files.filter(f => f instanceof File);
@@ -1463,7 +1319,6 @@ linearRoutes.post(
         );
       }
 
-      console.log(`[Linear Routes] Successfully uploaded ${attachments.length} files`);
 
       return c.json({
         success: true,

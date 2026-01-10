@@ -55,7 +55,6 @@ systemRoutes.post("/auth/user-login", async (c) => {
     const name = user.user_metadata?.name || user.user_metadata?.full_name || email.split("@")[0];
     const avatar_url = user.user_metadata?.avatar_url || null;
 
-    console.log(`[Auth] Login successful: ${email} with role ${role}`);
 
     // Schema V2.0: Use user ID from auth (already validated by checkAuthPermissions)
     const userId = user.id;
@@ -66,7 +65,6 @@ systemRoutes.post("/auth/user-login", async (c) => {
     
     if (userData) {
       // Existing user - update
-      console.log(`[Auth] Existing user: ${email} - KV role: ${userData.role}`);
       
       userData.name = name;
       userData.avatar_url = avatar_url;
@@ -77,7 +75,6 @@ systemRoutes.post("/auth/user-login", async (c) => {
       await kv.set(`user:${userId}`, userData);
     } else {
       // New user - create with role from authHelpers
-      console.log(`[Auth] New user: ${email} with role ${role}`);
       
       userData = {
         id: userId,
@@ -103,7 +100,6 @@ systemRoutes.post("/auth/user-login", async (c) => {
     const roleDefinition = authHelpers.ENHANCED_ROLE_DEFINITIONS[finalRole];
     const permissions = roleDefinition?.permissions || [];
 
-    console.log(`[Auth] Returning role: ${finalRole} with ${permissions.length} permissions`);
 
     // Return standardized response (matches PermissionContext expectations)
     return c.json({
@@ -224,7 +220,6 @@ systemRoutes.get("/debug/kv/:key", async (c) => {
     const encodedKey = c.req.param("key");
     const key = decodeURIComponent(encodedKey);
     
-    console.log(`[Debug] Getting KV key: ${key}`);
     
     const value = await kv.get(key);
     
@@ -265,7 +260,6 @@ systemRoutes.put("/debug/kv/:key", async (c) => {
     const key = decodeURIComponent(encodedKey);
     const { value } = await c.req.json();
     
-    console.log(`[Debug] Updating KV key: ${key}`);
     
     await kv.set(key, value);
     
@@ -297,7 +291,6 @@ systemRoutes.delete("/debug/kv/:key", async (c) => {
     const encodedKey = c.req.param("key");
     const key = decodeURIComponent(encodedKey);
     
-    console.log(`[Debug] Deleting KV key: ${key}`);
     
     await kv.del(key);
     
@@ -326,7 +319,6 @@ systemRoutes.delete("/debug/kv/:key", async (c) => {
  */
 systemRoutes.get("/debug/kv-all", async (c) => {
   try {
-    console.log('[Debug] Getting all KV keys...');
     
     // Get all keys with common prefixes
     const prefixes = ['user:', 'customer:', 'team:', 'linear_', 'user_permissions:', 'admin_'];
@@ -342,7 +334,6 @@ systemRoutes.get("/debug/kv-all", async (c) => {
     // Remove duplicates
     const uniqueKeys = [...new Set(allKeys)];
     
-    console.log(`[Debug] Found ${uniqueKeys.length} KV keys`);
     
     return c.json({
       success: true,
@@ -371,7 +362,6 @@ systemRoutes.get("/debug/kv-check", async (c) => {
   try {
     const key = c.req.query("key") || "linear_teams:all";
     
-    console.log(`[Debug] Checking KV key: ${key}`);
     
     const rawValue = await kv.get(key);
     
@@ -383,7 +373,6 @@ systemRoutes.get("/debug/kv-check", async (c) => {
     if (typeof rawValue === 'string') {
       try {
         parsed = JSON.parse(rawValue);
-        console.log('[Debug] Successfully parsed JSON string');
       } catch (err) {
         parseError = err instanceof Error ? err.message : 'Parse error';
         console.error('[Debug] Failed to parse:', err);
@@ -459,7 +448,6 @@ systemRoutes.post("/migrate/schema-v2", async (c) => {
       );
     }
 
-    console.log(`[Migration] Starting Schema v2 migration by ${user.email}`);
 
     const result = await migrationService.migrateToSchemaV2();
 
