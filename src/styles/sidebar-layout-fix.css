@@ -1,0 +1,510 @@
+/* Sidebar Layout Fix - Fixed Sidebar with Proper Scrolling & Clickability */
+
+/* ===============================================
+   DESKTOP FIXED SIDEBAR - Always Clickable
+   =============================================== */
+
+/* Desktop sidebar - Fixed position with full height scrolling */
+aside[data-sidebar-container] {
+  position: fixed !important;
+  left: 0;
+  top: 64px; /* Below header (h-16 = 64px) */
+  bottom: 0;
+  height: calc(100vh - 64px);
+  z-index: 40 !important;
+  background: var(--color-sidebar-bg);
+  border-right: 1px solid var(--color-sidebar-border);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto !important;
+}
+
+/* Sidebar width states */
+aside[data-sidebar-container][data-collapsed="false"] {
+  width: 20rem;
+}
+
+aside[data-sidebar-container][data-collapsed="true"] {
+  width: 4rem; /* 64px - md:ml-16 equivalent */
+}
+
+/* Sidebar inner content with proper scrolling */
+aside[data-sidebar-container] > div {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ScrollArea wrapper - Must flex properly */
+aside[data-sidebar-container] [data-sidebar-scroll] {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* CRITICAL: All sidebar children are clickable */
+aside[data-sidebar-container] * {
+  pointer-events: auto !important;
+}
+
+/* CRITICAL: All buttons in sidebar are clickable */
+aside[data-sidebar-container] button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* CRITICAL: All links in sidebar are clickable */
+aside[data-sidebar-container] a {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Sidebar scrollable area */
+aside[data-sidebar-container]
+  [data-radix-scroll-area-viewport] {
+  flex: 1;
+  max-height: 100%;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  pointer-events: auto !important;
+}
+
+/* Team list collapsible content - Must be scrollable */
+aside[data-sidebar-container] [data-radix-collapsible-content] {
+  max-height: 60vh;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Scrollbar for team list */
+aside[data-sidebar-container] [data-radix-collapsible-content]::-webkit-scrollbar {
+  width: 4px;
+}
+
+aside[data-sidebar-container] [data-radix-collapsible-content]::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+aside[data-sidebar-container] [data-radix-collapsible-content]::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.dark aside[data-sidebar-container] [data-radix-collapsible-content]::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Enhanced scrollbar for sidebar */
+aside[data-sidebar-container]
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar {
+  width: 6px;
+}
+
+aside[data-sidebar-container]
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0;
+}
+
+aside[data-sidebar-container]
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+aside[data-sidebar-container]
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.dark
+  aside[data-sidebar-container]
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dark
+  aside[data-sidebar-container]
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Firefox scrollbar */
+aside[data-sidebar-container]
+  [data-radix-scroll-area-viewport] {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+.dark
+  aside[data-sidebar-container]
+  [data-radix-scroll-area-viewport] {
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+/* ===============================================
+   MAIN CONTENT - Positioned next to fixed sidebar
+   =============================================== */
+
+/* Main content positioned absolutely to work with fixed sidebar */
+main {
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0 !important; /* Mobile default */
+  width: 100vw !important; /* Mobile default - full viewport width */
+  max-width: 100vw !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  box-sizing: border-box !important;
+  z-index: 10 !important;
+  pointer-events: auto !important;
+}
+
+/* Desktop: Main content offset by sidebar */
+@media (min-width: 768px) {
+  /* When sidebar is expanded (20rem = 320px) */
+  main.md\\:ml-80 {
+    left: 20rem !important;
+    width: calc(100vw - 20rem) !important;
+    max-width: calc(100vw - 20rem) !important;
+    margin-left: 0 !important; /* Override Tailwind margin-left classes */
+  }
+
+  /* When sidebar is collapsed (4rem = 64px) */
+  main.md\\:ml-16 {
+    left: 4rem !important;
+    width: calc(100vw - 4rem) !important;
+    max-width: calc(100vw - 4rem) !important;
+    margin-left: 0 !important; /* Override Tailwind margin-left classes */
+  }
+}
+
+/* Main content scrollbar */
+main::-webkit-scrollbar {
+  width: 8px;
+}
+
+main::-webkit-scrollbar-track {
+  background: var(--color-muted) / 30;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+main::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.dark main::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark main::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ===============================================
+   MOBILE SIDEBAR - Overlay Sheet
+   =============================================== */
+
+/* Mobile sidebar sheet (already handled by Sheet component) */
+@media (max-width: 767px) {
+  /* Hide desktop sidebar on mobile */
+  aside[data-sidebar-container] {
+    display: none !important;
+  }
+
+  /* Main content full width on mobile */
+  main {
+    left: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+}
+
+/* Mobile sheet sidebar content */
+[data-sidebar-mobile] {
+  width: 288px !important;
+  max-width: 90vw !important;
+  pointer-events: auto !important;
+  z-index: 50 !important;
+}
+
+/* All elements in mobile sidebar are clickable */
+[data-sidebar-mobile] * {
+  pointer-events: auto !important;
+}
+
+[data-sidebar-mobile] button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Ensure mobile sheet has proper scrolling */
+[data-sidebar-mobile] [data-radix-scroll-area-viewport] {
+  max-height: calc(100vh - 60px);
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  pointer-events: auto !important;
+}
+
+/* ===============================================
+   COLLAPSE TOGGLE BUTTON - NO LONGER NEEDED
+   =============================================== 
+   Button is now rendered outside sidebar container
+   for better z-index control and no overlap issues
+*/
+
+/* ===============================================
+   CONTENT SECTIONS
+   =============================================== */
+
+/* User profile section - Fixed at top */
+aside[data-sidebar-container] > div > div:first-child {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--color-sidebar-border);
+}
+
+/* Navigation section - Scrollable */
+aside[data-sidebar-container] > div > div:nth-child(2) {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Footer section - Fixed at bottom */
+aside[data-sidebar-container] > div > div:last-child {
+  flex-shrink: 0;
+  border-top: 1px solid var(--color-sidebar-border);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--color-muted) / 20 100%
+  );
+}
+
+/* ===============================================
+   PREVENT INTERACTION DURING NAVIGATION
+   =============================================== */
+
+/* Only disable specific buttons during navigation, keep sidebar clickable */
+aside[data-sidebar-container][data-navigating="true"]
+  button:not([data-sidebar-logout]) {
+  opacity: 0.6;
+  cursor: wait !important;
+}
+
+/* BUT sidebar itself stays clickable */
+aside[data-sidebar-container][data-navigating="true"] {
+  pointer-events: auto !important;
+}
+
+/* Logout button always works */
+aside[data-sidebar-container] button[data-sidebar-logout] {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* ===============================================
+   SCROLL BEHAVIOR OPTIMIZATIONS
+   =============================================== */
+
+/* Prevent body scroll when sidebar is open on mobile */
+body:has([data-sidebar-mobile][data-state="open"]) {
+  overflow: hidden;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent horizontal scroll */
+aside[data-sidebar-container],
+aside[data-sidebar-container] * {
+  overflow-x: hidden !important;
+}
+
+/* Touch action optimization for mobile */
+@media (max-width: 767px) {
+  aside[data-sidebar-container]
+    [data-radix-scroll-area-viewport],
+  main {
+    touch-action: pan-y pinch-zoom;
+  }
+}
+
+/* ===============================================
+   TRANSITIONS & ANIMATIONS
+   =============================================== */
+
+/* Smooth transitions for sidebar state changes */
+aside[data-sidebar-container],
+main {
+  will-change: auto;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  aside[data-sidebar-container],
+  main {
+    transition: none !important;
+  }
+}
+
+/* ===============================================
+   Z-INDEX MANAGEMENT
+   =============================================== */
+
+/* Ensure proper stacking order */
+.layout-container {
+  position: relative;
+  z-index: 0;
+}
+
+aside[data-sidebar-container] {
+  z-index: 40 !important;
+}
+
+main {
+  z-index: 10 !important;
+}
+
+/* Header should be above sidebar */
+header {
+  z-index: 50 !important;
+  position: relative;
+}
+
+/* ===============================================
+   TABLET OPTIMIZATIONS
+   =============================================== */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Keep sidebar width consistent on tablets */
+  aside[data-sidebar-container][data-collapsed="false"] {
+    width: 20rem;
+  }
+
+  main.md\\:ml-80 {
+    left: 20rem !important;
+    width: calc(100vw - 20rem) !important;
+  }
+}
+
+/* ===============================================
+   LOADING STATES
+   =============================================== */
+
+/* Sidebar stays clickable during loading */
+aside[data-sidebar-container][data-loading="true"] {
+  pointer-events: auto !important;
+  opacity: 0.7;
+}
+
+/* ===============================================
+   DARK MODE ENHANCEMENTS
+   =============================================== */
+
+.dark aside[data-sidebar-container] {
+  background: #000000;
+  border-right-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.dark main {
+  background: #000000;
+}
+
+/* ===============================================
+   PRINT STYLES
+   =============================================== */
+
+@media print {
+  aside[data-sidebar-container] {
+    display: none !important;
+  }
+
+  main {
+    left: 0 !important;
+    width: 100% !important;
+    position: static !important;
+  }
+}
+
+/* ===============================================
+   SAFE AREA INSETS (iOS Notch Support)
+   =============================================== */
+
+@supports (padding: max(0px)) {
+  aside[data-sidebar-container] {
+    padding-left: max(0px, env(safe-area-inset-left));
+  }
+
+  [data-sidebar-mobile] {
+    padding-left: max(0px, env(safe-area-inset-left));
+  }
+
+  main {
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* ===============================================
+   COLLAPSIBLE TRIGGERS - ALWAYS CLICKABLE
+   =============================================== */
+
+aside[data-sidebar-container] [data-radix-collapsible-trigger] {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 2;
+}
+
+/* ===============================================
+   NAVIGATION ITEMS - ALWAYS CLICKABLE
+   =============================================== */
+
+aside[data-sidebar-container] [data-sidebar-nav-item] {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 1;
+}
+
+aside[data-sidebar-container] [data-sidebar-team-item] {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 1;
+}
+
+/* ===============================================
+   ENSURE NO PSEUDO-ELEMENTS BLOCK CLICKS
+   =============================================== */
+
+aside[data-sidebar-container]::before,
+aside[data-sidebar-container]::after {
+  pointer-events: none !important;
+}
+
+aside[data-sidebar-container] *::before,
+aside[data-sidebar-container] *::after {
+  pointer-events: none !important;
+}

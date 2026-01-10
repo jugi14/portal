@@ -1,0 +1,64 @@
+/* 🎯 SIDEBAR CLICKABLE FIX - Force Pointer Events and Z-Index */
+
+/* ===============================================
+   CRITICAL FIX: Sidebar must be clickable
+   =============================================== */
+
+/* Force sidebar to be interactive */
+aside[data-sidebar-container] {
+  pointer-events: auto !important;
+  user-select: auto !important;
+  touch-action: auto !important;
+}
+
+/* Force all sidebar children to be clickable */
+aside[data-sidebar-container] * {
+  pointer-events: auto !important;
+}
+
+/* Force all buttons in sidebar to be clickable */
+aside[data-sidebar-container] button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  user-select: auto !important;
+}
+
+/* Force all links in sidebar to be clickable */
+aside[data-sidebar-container] a {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Force navigation items to be clickable */
+aside[data-sidebar-container] [data-sidebar-nav-item],
+aside[data-sidebar-container] [data-sidebar-team-item],
+aside[data-sidebar-container] [data-radix-collapsible-trigger] {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 1 !important;
+}
+
+/* Ensure pseudo-elements don't block clicks */
+aside[data-sidebar-container]::before,
+aside[data-sidebar-container]::after {
+  pointer-events: none !important;
+}
+
+aside[data-sidebar-container] *::before,
+aside[data-sidebar-container] *::after {
+  pointer-events: none !important;
+}
+
+/* Mobile sidebar in sheet */
+[data-sidebar-mobile] {
+  pointer-events: auto !important;
+}
+
+[data-sidebar-mobile] * {
+  pointer-events: auto !important;
+}
+
+[data-sidebar-mobile] button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}

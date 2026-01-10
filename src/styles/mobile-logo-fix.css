@@ -1,0 +1,183 @@
+/* 🎨 Mobile Logo Fix - Ensure FULL "teifi DIGITAL" Wordmark */
+
+/* ===============================================
+   MOBILE LOGO DISPLAY - COMPLETE WORDMARK
+   =============================================== */
+
+/* Force all logo paths to be visible on mobile */
+@media (max-width: 1023px) {
+  .login-page .logo-mobile-full,
+  .lg\\:hidden .logo-mobile-full {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-width: 240px;
+    max-width: 280px;
+  }
+  
+  .login-page .logo-mobile-full svg {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  .login-page .logo-mobile-full g {
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  .login-page .logo-mobile-full path {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Ensure SVG viewBox is respected */
+  .login-page .logo-mobile-full svg[viewBox] {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 480px) {
+  .login-page .logo-mobile-full {
+    min-width: 220px;
+    max-width: 260px;
+  }
+}
+
+/* ===============================================
+   LOGO CONTAINER SPACING
+   =============================================== */
+
+@media (max-width: 1023px) {
+  .login-page .lg\\:hidden {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    padding: 0 1rem;
+  }
+}
+
+/* ===============================================
+   DESKTOP LOGO (LEFT SIDE)
+   =============================================== */
+
+@media (min-width: 1024px) {
+  .login-page .logo-container {
+    max-width: 280px;
+  }
+  
+  .login-page .logo-container svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+/* ===============================================
+   ENSURE NO CSS HIDING PATHS
+   =============================================== */
+
+/* Override any potential hiding */
+.login-page svg path[d*="DIGITAL"],
+.login-page svg path[d*="digital"],
+.login-page svg g:has(path[fill="white"]) {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* ===============================================
+   PREVENT VIEWPORT CLIPPING
+   =============================================== */
+
+@media (max-width: 1023px) {
+  .login-page .logo-mobile-full,
+  .login-page .lg\\:hidden > div {
+    overflow: visible !important;
+  }
+  
+  .login-page .lg\\:hidden {
+    overflow: visible !important;
+  }
+}
+
+/* ===============================================
+   LOGO GLOW ON MOBILE (REDUCED)
+   =============================================== */
+
+@media (max-width: 768px) {
+  .login-page .logo-mobile-full svg {
+    filter: drop-shadow(0 0 12px rgba(0, 252, 243, 0.25));
+  }
+}
+
+/* ===============================================
+   ASPECT RATIO PRESERVATION
+   =============================================== */
+
+.login-page .logo-mobile-full svg {
+  aspect-ratio: 419 / 92; /* Original SVG ratio */
+  max-width: 100%;
+  height: auto;
+}
+
+/* ===============================================
+   DARK MODE LOGO VISIBILITY
+   =============================================== */
+
+.dark .login-page .logo-mobile-full path {
+  fill: white !important;
+}
+
+.dark .login-page .logo-mobile-full path[fill*="url("] {
+  /* Preserve gradient */
+}
+
+/* ===============================================
+   MOBILE LANDSCAPE OPTIMIZATION
+   =============================================== */
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .login-page .lg\\:hidden {
+    margin-bottom: 0.75rem;
+  }
+  
+  .login-page .logo-mobile-full {
+    max-width: 220px;
+    min-width: 200px;
+  }
+}
+
+/* ===============================================
+   ACCESSIBILITY - ENSURE VISIBLE TEXT
+   =============================================== */
+
+@media (max-width: 1023px) {
+  /* Force display of all text elements */
+  .login-page .logo-mobile-full svg text,
+  .login-page .logo-mobile-full svg tspan {
+    display: block !important;
+    visibility: visible !important;
+  }
+}
+
+/* ===============================================
+   FIX FOR POTENTIAL OVERFLOW HIDDEN
+   =============================================== */
+
+.login-page .form-container,
+.login-page .lg\\:hidden,
+.login-page .lg\\:hidden > div {
+  overflow: visible !important;
+}
+
+@media (max-width: 1023px) {
+  .login-page > div:last-child {
+    overflow-x: visible !important;
+  }
+}

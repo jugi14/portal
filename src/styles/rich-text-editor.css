@@ -1,0 +1,397 @@
+/**
+ * Rich Text Editor Styles
+ * Synchronized with Teifi Design System Typography
+ * 
+ * OPTIMIZED FOR UX:
+ * - Fixed height prevents layout shift when formatting
+ * - Smooth scrolling for long content
+ * - Consistent spacing regardless of content
+ * 
+ * Based on globals.css typography system:
+ * - Font family: Inter
+ * - Base font size: 14px (0.875rem)
+ * - Line height: 1.6
+ * - Font weight: 400 (normal)
+ */
+
+/* Editor Container - Prevents height jumping */
+.editor-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* TipTap Editor Container - Flexible height controlled by component */
+.ProseMirror {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 0.8125rem; /* 13px - slightly smaller for editor */
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--foreground);
+  outline: none;
+  padding: 12px;
+  
+  /* Minimum height for comfortable editing */
+  min-height: 200px;
+  
+  /* Enable scrolling for overflow content */
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+  
+  /* Better scroll aesthetics */
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-foreground) transparent;
+}
+
+/* Custom scrollbar for webkit browsers */
+.ProseMirror::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ProseMirror::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ProseMirror::-webkit-scrollbar-thumb {
+  background-color: var(--muted-foreground);
+  border-radius: 4px;
+  opacity: 0.5;
+}
+
+.ProseMirror::-webkit-scrollbar-thumb:hover {
+  background-color: var(--foreground);
+  opacity: 0.7;
+}
+
+/* Placeholder */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  height: 0;
+}
+
+/* Typography Elements */
+.ProseMirror p {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+  margin-bottom: 8px;
+}
+
+.ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+/* Bold */
+.ProseMirror strong {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Italic - Enhanced visibility with letter spacing and subtle opacity */
+.ProseMirror em {
+  font-style: italic;
+  font-weight: 500; /* Slightly bolder for better distinction */
+  letter-spacing: 0.015em; /* Slightly wider spacing for better distinction */
+}
+
+/* Headings */
+.ProseMirror h2 {
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  margin: 16px 0 8px 0 !important;
+  color: var(--foreground) !important;
+}
+
+.ProseMirror h3 {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  margin: 12px 0 6px 0 !important;
+  color: var(--foreground) !important;
+}
+
+.ProseMirror h2:first-child,
+.ProseMirror h3:first-child {
+  margin-top: 0 !important;
+}
+
+/* Add bottom spacing after headings */
+.ProseMirror h2 + p,
+.ProseMirror h3 + p {
+  margin-top: 4px !important;
+}
+
+/* Lists */
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 24px;
+  margin: 12px 0;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.ProseMirror li {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+
+.ProseMirror li:last-child {
+  margin-bottom: 0;
+}
+
+.ProseMirror li p {
+  margin-bottom: 4px;
+}
+
+.ProseMirror li p:last-child {
+  margin-bottom: 0;
+}
+
+/* Nested lists */
+.ProseMirror ul ul,
+.ProseMirror ol ul {
+  list-style-type: circle;
+  margin-top: 6px;
+}
+
+.ProseMirror ul ol,
+.ProseMirror ol ol {
+  list-style-type: lower-alpha;
+  margin-top: 6px;
+}
+
+/* Focus state */
+.ProseMirror:focus {
+  outline: none;
+}
+
+/* Selection */
+.ProseMirror ::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  opacity: 0.3;
+}
+
+/* Dark mode adjustments */
+.dark .ProseMirror {
+  color: var(--foreground);
+}
+
+.dark .ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--muted-foreground);
+}
+
+/* Ensure consistent spacing */
+.ProseMirror > * + * {
+  margin-top: 8px;
+}
+
+/* Remove extra spacing for nested elements */
+.ProseMirror li > p {
+  margin-top: 0;
+}
+
+/* Code inline (if needed later) */
+.ProseMirror code {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.75rem;
+  background-color: var(--muted);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* Code Block */
+.ProseMirror pre {
+  background-color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 12px 0;
+  overflow-x: auto;
+}
+
+.ProseMirror pre code {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.75rem;
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: var(--foreground);
+  display: block;
+  line-height: 1.5;
+}
+
+.ProseMirror pre:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror pre:last-child {
+  margin-bottom: 0;
+}
+
+/* Dark mode code block */
+.dark .ProseMirror pre {
+  background-color: var(--muted);
+  border-color: var(--border);
+}
+
+/* Images */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 12px 0;
+  display: block;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ProseMirror img:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode image adjustments */
+.dark .ProseMirror img {
+  border-color: var(--border);
+  opacity: 0.95;
+}
+
+.dark .ProseMirror img:hover {
+  opacity: 1;
+  border-color: var(--primary);
+}
+
+/* Image being uploaded (loading state) */
+.ProseMirror img[src^="data:"] {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .ProseMirror {
+    font-size: 0.875rem; /* 14px on mobile */
+    padding: 10px;
+  }
+  
+  .ProseMirror ul,
+  .ProseMirror ol {
+    padding-left: 16px;
+  }
+  
+  .ProseMirror img {
+    margin: 8px 0;
+    border-radius: 6px;
+  }
+}
+
+/* Task List (Checklist) */
+.ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+  margin: 12px 0;
+}
+
+.ProseMirror li[data-type="taskItem"] {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-left: 0;
+  list-style: none;
+}
+
+/* Task item label - align checkbox properly */
+.ProseMirror li[data-type="taskItem"] > label {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  cursor: pointer;
+}
+
+.ProseMirror li[data-type="taskItem"] > label > span {
+  display: none;
+}
+
+.ProseMirror li[data-type="taskItem"] > label > input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  border: 2px solid #000;
+  border-radius: 4px;
+  appearance: none;
+  background-color: #fff;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.ProseMirror li[data-type="taskItem"] > label > input[type="checkbox"]:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M13.485 3.515a1 1 0 0 1 0 1.414l-7 7a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L5.9 10.929l6.171-6.414a1 1 0 0 1 1.414 0z'/%3E%3C/svg%3E");
+  background-size: 14px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.ProseMirror li[data-type="taskItem"] > label > input[type="checkbox"]:hover {
+  border-color: var(--primary);
+}
+
+.ProseMirror li[data-type="taskItem"] > div {
+  flex: 1;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.ProseMirror li[data-type="taskItem"] > div > p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Checked task styling */
+.ProseMirror li[data-type="taskItem"][data-checked="true"] > div {
+  color: var(--muted-foreground);
+  text-decoration: line-through;
+  opacity: 0.65;
+}
+
+/* Nested task lists */
+.ProseMirror li[data-type="taskItem"] ul[data-type="taskList"] {
+  margin-top: 6px;
+  margin-left: 0;
+  padding-left: 26px;
+}
+
+/* Dark mode adjustments */
+.dark .ProseMirror li[data-type="taskItem"] > label > input[type="checkbox"] {
+  border-color: #000;
+  background-color: #fff;
+}
+
+.dark .ProseMirror li[data-type="taskItem"] > label > input[type="checkbox"]:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}

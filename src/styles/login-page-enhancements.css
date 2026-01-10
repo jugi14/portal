@@ -1,0 +1,451 @@
+/* Professional Login Page - Teifi Digital */
+/* Synchronized Dark & Light Mode Styling */
+
+/* ===============================================
+   BASE - Consistent Between Modes
+   =============================================== */
+
+.login-page-light {
+  font-family: var(--font-family-primary);
+}
+
+/* ===============================================
+   LOGO - Force All Paths Visible
+   =============================================== */
+
+/* CRITICAL: Ensure ALL logo paths display */
+.login-page-light svg[viewBox="0 0 419 92"] {
+  display: block !important;
+  width: 100%;
+  height: auto;
+}
+
+.login-page-light svg[viewBox="0 0 419 92"] * {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Force all paths to show */
+.login-page-light svg[viewBox="0 0 419 92"] path {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.login-page-light svg[viewBox="0 0 419 92"] g {
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* ===============================================
+   THEME TOGGLE BUTTON - Synchronized
+   =============================================== */
+
+.login-page-light button[title*="Switch to"] {
+  width: 2.5rem;
+  height: 2.5rem;
+  transition: all 0.3s ease;
+}
+
+.login-page-light button[title*="Switch to"]:hover {
+  transform: scale(1.1);
+}
+
+.login-page-light button[title*="Switch to"] svg {
+  transition: transform 0.5s ease;
+}
+
+.login-page-light button[title*="Switch to"]:hover svg {
+  transform: rotate(180deg);
+}
+
+/* ===============================================
+   LEFT PANEL - Branding
+   =============================================== */
+
+/* Consistent logo size */
+.login-page-light .max-w-\\[300px\\] {
+  max-width: 300px;
+  min-width: 240px;
+}
+
+/* Consistent title size */
+.login-page-light h1 {
+  font-size: 2.25rem;
+  line-height: 1.2;
+}
+
+@media (min-width: 1024px) {
+  .login-page-light h1 {
+    font-size: 3rem;
+  }
+}
+
+/* Consistent subtitle */
+.login-page-light .text-lg,
+.login-page-light .text-xl {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+@media (min-width: 1024px) {
+  .login-page-light .text-lg,
+  .login-page-light .text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
+/* ===============================================
+   RIGHT PANEL - Form Section - SYNCHRONIZED
+   =============================================== */
+
+/* Consistent form container width */
+.login-page-light .max-w-md {
+  max-width: 28rem;
+  width: 100%;
+}
+
+/* Consistent form card padding */
+.light-professional .p-8.rounded-2xl {
+  padding: 2rem;
+}
+
+.dark .p-8 {
+  padding: 2rem;
+}
+
+/* ===============================================
+   BUTTONS - SYNCHRONIZED SIZE
+   =============================================== */
+
+/* All buttons h-12 = 3rem */
+.login-page-light button.h-12 {
+  height: 3rem !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0 1rem;
+}
+
+/* All buttons h-11 = 2.75rem */
+.login-page-light button.h-11 {
+  height: 2.75rem !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0 1rem;
+}
+
+/* Google button - consistent styling */
+.login-page-light button.bg-white {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.login-page-light button.bg-white:hover:not(:disabled) {
+  border-color: #1492FF;
+  box-shadow: 0 4px 12px rgba(20, 146, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Gradient buttons - consistent */
+.login-page-light button.bg-gradient-to-r {
+  background: linear-gradient(90deg, #1492FF, #00FFF3) !important;
+  color: #ffffff !important;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.login-page-light button.bg-gradient-to-r:hover:not(:disabled) {
+  opacity: 0.9;
+  box-shadow: 0 8px 24px rgba(20, 146, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Outline buttons - synchronized */
+.login-page-light button[class*="outline"] {
+  height: 3rem !important;
+  transition: all 0.2s ease;
+}
+
+/* Light mode outline */
+.light-professional button[class*="outline"] {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  color: #374151;
+}
+
+.light-professional button[class*="outline"]:hover:not(:disabled) {
+  border-color: #1492FF;
+  background: rgba(20, 146, 255, 0.08);
+  color: #1492FF;
+}
+
+/* Dark mode outline */
+.dark button[class*="outline"] {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.dark button[class*="outline"]:hover:not(:disabled) {
+  border-color: #60a5fa;
+  background: rgba(96, 165, 250, 0.15);
+  color: #ffffff;
+}
+
+/* ===============================================
+   INPUTS - SYNCHRONIZED SIZE
+   =============================================== */
+
+.login-page-light input.h-11 {
+  height: 2.75rem !important;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+/* Light mode inputs */
+.light-professional input.border-2 {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  color: #0c0c0c;
+}
+
+.light-professional input.border-2:focus {
+  border-color: #1492FF;
+  box-shadow: 0 0 0 3px rgba(20, 146, 255, 0.1);
+  outline: none;
+}
+
+/* Dark mode inputs */
+.dark input.border-2 {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.dark input.border-2:focus {
+  border-color: #60a5fa;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+  outline: none;
+}
+
+.dark input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ===============================================
+   SPACING - SYNCHRONIZED
+   =============================================== */
+
+.login-page-light .space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.login-page-light .space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.login-page-light .space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.login-page-light .sm\\:space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+@media (min-width: 640px) {
+  .login-page-light .sm\\:space-y-8 > * + * {
+    margin-top: 2rem;
+  }
+}
+
+/* ===============================================
+   SEPARATOR - SYNCHRONIZED
+   =============================================== */
+
+.light-professional [class*="Separator"] {
+  background: #e5e7eb;
+  height: 1px;
+}
+
+.dark [class*="Separator"] {
+  background: rgba(255, 255, 255, 0.2);
+  height: 1px;
+}
+
+/* "Or continue with" text */
+.light-professional span.bg-white {
+  background: #ffffff;
+}
+
+.dark span.bg-background {
+  background: #000000;
+}
+
+/* ===============================================
+   LABELS - SYNCHRONIZED
+   =============================================== */
+
+.login-page-light label.text-sm {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.light-professional label.text-sm {
+  color: #374151;
+}
+
+.dark label.text-sm {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ===============================================
+   FEATURE CARDS - SYNCHRONIZED
+   =============================================== */
+
+.login-page-light .w-10.h-10 {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.login-page-light .w-5.h-5 {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.light-professional .shadow-md {
+  box-shadow: 0 4px 12px rgba(20, 146, 255, 0.15);
+}
+
+.dark .shadow-md {
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.2);
+}
+
+/* ===============================================
+   MOBILE RESPONSIVE
+   =============================================== */
+
+@media (max-width: 1024px) {
+  .login-page-light .lg\\:hidden .max-w-\\[280px\\] {
+    max-width: 280px;
+    min-width: 240px;
+  }
+}
+
+@media (max-width: 640px) {
+  .login-page-light .fixed.top-6.right-6 {
+    top: 1rem;
+    right: 1rem;
+  }
+  
+  .login-page-light h1 {
+    font-size: 1.875rem;
+  }
+  
+  .login-page-light .max-w-\\[300px\\] {
+    max-width: 240px;
+  }
+  
+  /* Remove form card styling on mobile */
+  .light-professional .p-8.rounded-2xl {
+    padding: 1.5rem;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+/* ===============================================
+   FORM TITLE - SYNCHRONIZED
+   =============================================== */
+
+.login-page-light .text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+@media (min-width: 640px) {
+  .login-page-light .sm\\:text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+
+/* ===============================================
+   GRID PATTERN
+   =============================================== */
+
+.light-professional div[style*="backgroundImage"] {
+  animation: grid-subtle 20s linear infinite;
+}
+
+@keyframes grid-subtle {
+  0%, 100% { opacity: 0.05; }
+  50% { opacity: 0.08; }
+}
+
+.dark div[style*="backgroundImage"] {
+  opacity: 0.05;
+  animation: none;
+}
+
+/* ===============================================
+   LOADING SPINNER
+   =============================================== */
+
+@keyframes spinner-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.login-page-light .animate-spin {
+  animation: spinner-rotate 1s linear infinite;
+}
+
+/* ===============================================
+   MESSAGES - SYNCHRONIZED
+   =============================================== */
+
+.login-page-light .message-alert {
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* ===============================================
+   LINKS - SYNCHRONIZED
+   =============================================== */
+
+.light-professional a.underline {
+  color: #1492FF;
+}
+
+.light-professional a.underline:hover {
+  color: #1175dd;
+}
+
+.dark a.underline {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dark a.underline:hover {
+  color: #60a5fa;
+}
+
+/* ===============================================
+   ACCESSIBILITY
+   =============================================== */
+
+.login-page-light button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.login-page-light input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 0;
+}

@@ -1,0 +1,140 @@
+/* 🎨 Dark Mode Code Blocks - API Documentation Style */
+
+.dark .markdown-content code,
+.dark .ProseMirror code {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e5e5e5;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace;
+  font-size: 0.85em;
+}
+
+.dark .markdown-content pre,
+.dark .ProseMirror pre {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+  color: #e5e5e5;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.dark .markdown-content pre code,
+.dark .ProseMirror pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* Syntax highlighting for dark mode */
+.dark .markdown-content pre code .keyword {
+  color: #60a5fa; /* Blue */
+}
+
+.dark .markdown-content pre code .string {
+  color: #4ade80; /* Green */
+}
+
+.dark .markdown-content pre code .number {
+  color: #fbbf24; /* Yellow */
+}
+
+.dark .markdown-content pre code .comment {
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+}
+
+.dark .markdown-content pre code .function {
+  color: #c084fc; /* Purple */
+}
+
+/* Code block scrollbar */
+.dark .markdown-content pre::-webkit-scrollbar,
+.dark .ProseMirror pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.dark .markdown-content pre::-webkit-scrollbar-track,
+.dark .ProseMirror pre::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+.dark .markdown-content pre::-webkit-scrollbar-thumb,
+.dark .ProseMirror pre::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.dark .markdown-content pre::-webkit-scrollbar-thumb:hover,
+.dark .ProseMirror pre::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* API endpoint badges in dark mode */
+.dark .method-badge {
+  border-radius: 4px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dark .method-badge.get {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.dark .method-badge.post {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.dark .method-badge.put {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.dark .method-badge.delete {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+/* JSON response styling */
+.dark .json-response {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  color: #e5e5e5;
+}
+
+.dark .json-key {
+  color: #60a5fa;
+}
+
+.dark .json-string {
+  color: #4ade80;
+}
+
+.dark .json-number {
+  color: #fbbf24;
+}
+
+.dark .json-boolean {
+  color: #c084fc;
+}
+
+.dark .json-null {
+  color: rgba(255, 255, 255, 0.5);
+}

@@ -1,0 +1,442 @@
+/* 🎯 PAGE LAYOUT FIX - Ensure All Pages Work with Fixed Sidebar */
+
+/* ===============================================
+   DASHBOARD PAGE
+   =============================================== */
+
+/* Dashboard container */
+.dashboard-container {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Dashboard cards grid */
+.dashboard-container .grid {
+  max-width: 100%;
+}
+
+.dashboard-container .grid > * {
+  min-width: 0; /* Allow grid items to shrink */
+}
+
+/* ===============================================
+   TEAM DETAIL PAGE WITH TABS
+   =============================================== */
+
+/* Team page container */
+.team-detail-page {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Team header section */
+.team-detail-page > div:first-child {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Tabs container */
+[role="tablist"] {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+[role="tablist"]::-webkit-scrollbar {
+  display: none;
+}
+
+[role="tab"] {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Tab panels */
+[role="tabpanel"] {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Kanban board in tabs */
+[role="tabpanel"] .kanban-board-container {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* ===============================================
+   ADMIN PAGE
+   =============================================== */
+
+/* Admin container */
+.admin-page {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Admin tabs */
+.admin-page [role="tablist"] {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Admin content panels */
+.admin-page [role="tabpanel"] {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Admin tables */
+.admin-page table {
+  max-width: 100%;
+}
+
+.admin-page .overflow-x-auto {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* ===============================================
+   COMMON PAGE ELEMENTS
+   =============================================== */
+
+/* Page headers */
+.page-header {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Page content sections */
+.page-section {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Cards in all pages */
+[data-slot="card"] {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+[data-slot="card-content"] {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* ===============================================
+   FLEX CONTAINERS IN PAGES
+   =============================================== */
+
+/* All flex containers must respect width */
+.flex,
+[class*="flex"] {
+  max-width: 100%;
+}
+
+.flex > *,
+[class*="flex"] > * {
+  min-width: 0; /* Allow flex children to shrink */
+}
+
+/* ===============================================
+   GRID CONTAINERS IN PAGES
+   =============================================== */
+
+/* All grid containers must respect width */
+.grid,
+[class*="grid"] {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.grid > *,
+[class*="grid"] > * {
+  min-width: 0; /* Allow grid items to shrink */
+}
+
+/* ===============================================
+   TEXT CONTENT
+   =============================================== */
+
+/* All text must wrap properly */
+h1, h2, h3, h4, h5, h6, p, span, div {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Long text content */
+.prose,
+.markdown-content,
+.text-content {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* ===============================================
+   BUTTONS AND FORM ELEMENTS
+   =============================================== */
+
+/* Buttons */
+button {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Inputs and textareas */
+input,
+textarea,
+select {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Form groups */
+.form-group,
+[class*="space-y"] {
+  max-width: 100%;
+}
+
+/* ===============================================
+   IMAGES AND MEDIA
+   =============================================== */
+
+/* All images must be responsive */
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Avatar components */
+.avatar img {
+  max-width: 100%;
+}
+
+/* ===============================================
+   TABLES
+   =============================================== */
+
+/* Table wrappers */
+.table-wrapper,
+.overflow-x-auto {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Tables */
+table {
+  max-width: 100%;
+  table-layout: auto;
+}
+
+/* Table cells */
+td, th {
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+/* ===============================================
+   KANBAN BOARDS
+   =============================================== */
+
+/* Kanban container */
+.kanban-board-container,
+.issues-kanban-container {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Kanban columns */
+.kanban-column,
+.issues-kanban-column {
+  flex-shrink: 0;
+}
+
+/* Kanban cards */
+.kanban-card,
+.issues-kanban-card-compact {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* ===============================================
+   MODALS AND DIALOGS
+   =============================================== */
+
+/* Dialog content */
+[data-slot="dialog-content"] {
+  max-width: calc(100vw - 2rem);
+  box-sizing: border-box;
+}
+
+/* Desktop with sidebar */
+@media (min-width: 768px) {
+  main.md\:ml-80 [data-slot="dialog-content"] {
+    max-width: min(56rem, calc(100vw - 20rem - 2rem));
+  }
+  
+  main.md\:ml-16 [data-slot="dialog-content"] {
+    max-width: min(56rem, calc(100vw - 4rem - 2rem));
+  }
+}
+
+/* ===============================================
+   MOBILE OPTIMIZATIONS
+   =============================================== */
+
+@media (max-width: 767px) {
+  /* Full width on mobile */
+  .dashboard-container,
+  .team-detail-page,
+  .admin-page {
+    width: 100vw;
+    max-width: 100vw;
+    margin: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    box-sizing: border-box;
+  }
+  
+  /* Mobile grid adjustments */
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Mobile tabs scroll */
+  [role="tablist"] {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  /* Mobile kanban */
+  .kanban-board-container {
+    overflow-x: auto;
+  }
+}
+
+/* ===============================================
+   TABLET OPTIMIZATIONS
+   =============================================== */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Tablet grid adjustments */
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ===============================================
+   SCROLLBAR STYLING FOR PAGES
+   =============================================== */
+
+/* Horizontal scrollbars */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.dark .overflow-x-auto::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ===============================================
+   PRINT STYLES
+   =============================================== */
+
+@media print {
+  main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .kanban-board-container,
+  .overflow-x-auto {
+    overflow: visible !important;
+  }
+}
+
+/* ===============================================
+   ACCESSIBILITY
+   =============================================== */
+
+/* Focus states */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Skip to content */
+.skip-to-content {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: var(--color-primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  z-index: 100;
+  transition: top 0.3s ease;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* ===============================================
+   HIGH CONTRAST MODE
+   =============================================== */
+
+@media (prefers-contrast: high) {
+  * {
+    border-width: 2px !important;
+  }
+  
+  button,
+  a {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+/* ===============================================
+   REDUCED MOTION
+   =============================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,549 @@
+/**
+ * Mobile Viewport Stability - Device-Specific Optimizations
+ * 
+ * Handles viewport inconsistencies across:
+ * - iPhone SE (320px - 375px)
+ * - iPhone 12/13/14 Standard (390px)
+ * - iPhone 14 Pro Max (428px)
+ * - Android Small (360px)
+ * - Android Medium (375px - 414px)
+ * - Android Large (428px+)
+ * 
+ * Key Features:
+ * - Visual Viewport API support
+ * - Keyboard appearance handling
+ * - Safe area insets (notches, home indicators)
+ * - Scroll lock when modal open
+ * - Fixed positioning optimization
+ * - Layout shift prevention
+ */
+
+/* ================================================
+   ROOT VIEWPORT VARIABLES
+   Dynamic values updated by JS
+   ================================================ */
+
+:root {
+  /* Visual Viewport - Accurate height accounting for browser chrome */
+  --vh-unit: 1vh;
+  --visual-viewport-height: 100vh;
+  
+  /* Safe area insets */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  
+  /* Device-specific adjustments */
+  --header-height: 0px;
+  --footer-height: 0px;
+  --content-height: calc(100vh - var(--header-height) - var(--footer-height));
+}
+
+/* ================================================
+   GLOBAL MOBILE OPTIMIZATIONS
+   ================================================ */
+
+@media (max-width: 768px) {
+  /* Prevent zoom on iOS when focusing inputs */
+  html {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Smooth scrolling with momentum */
+  html,
+  body {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior-y: none; /* Prevent pull-to-refresh */
+  }
+  
+  /* Fix viewport height on mobile browsers */
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    position: relative;
+  }
+  
+  /* Prevent body scroll when modal open */
+  body.modal-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100vh !important;
+    height: var(--visual-viewport-height, 100vh) !important;
+  }
+}
+
+/* ================================================
+   ISSUE MODAL - FULL SCREEN STABILITY
+   ================================================ */
+
+@media (max-width: 768px) {
+  
+  .issue-modal [data-slot="dialog-content"] {
+    /* Use visual viewport height for stability */
+    height: 100vh !important;
+    height: calc(var(--vh-unit, 1vh) * 100) !important;
+    max-height: 100vh !important;
+    max-height: calc(var(--vh-unit, 1vh) * 100) !important;
+    
+    /* Full screen positioning */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    
+    /* Reset transforms that might cause layout shift */
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    
+    /* iOS safe areas */
+    padding-top: var(--safe-area-top) !important;
+    padding-bottom: var(--safe-area-bottom) !important;
+    
+    /* Prevent content overflow */
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow: hidden !important;
+    
+    /* Performance optimization */
+    will-change: transform;
+    contain: layout style paint;
+  }
+  
+  /* Ensure proper flex layout */
+  .issue-modal [data-slot="dialog-content"] {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Fixed header - stable positioning */
+  .issue-modal [data-slot="dialog-header"] {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    flex-shrink: 0 !important;
+    
+    /* Account for safe area */
+    padding-top: calc(1rem + var(--safe-area-top)) !important;
+    
+    /* Prevent layout shift */
+    min-height: auto !important;
+    overflow: visible !important;
+    
+    /* Performance */
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+  
+  /* Scrollable content area - contains scroll */
+  .issue-modal .flex-1.overflow-hidden,
+  .issue-modal [data-radix-scroll-area-viewport] {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important; /* Prevent pull-to-refresh */
+    
+    /* Stable height calculation */
+    max-height: calc(var(--visual-viewport-height, 100vh) - var(--header-height, 80px) - var(--footer-height, 0px)) !important;
+    
+    /* Performance */
+    will-change: scroll-position;
+    contain: layout style paint;
+  }
+  
+  /* Fixed footer (if present) - stable positioning */
+  .issue-modal [data-slot="dialog-footer"] {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 10 !important;
+    flex-shrink: 0 !important;
+    
+    /* Account for safe area */
+    padding-bottom: calc(1rem + var(--safe-area-bottom)) !important;
+    
+    /* Performance */
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+}
+
+/* ================================================
+   DEVICE-SPECIFIC BREAKPOINTS
+   ================================================ */
+
+/* iPhone SE, Small Android (320px - 374px) */
+@media (max-width: 374px) {
+  .issue-modal [data-slot="dialog-header"] {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  .issue-modal .px-6 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  /* Smaller badges on very small screens */
+  .issue-modal [data-slot="badge"],
+  .issue-modal .sub-issue-metadata [class*="badge"] {
+    font-size: 0.688rem !important; /* 11px */
+    padding: 0.188rem 0.375rem !important;
+  }
+  
+  /* Compact title */
+  .issue-modal .sub-issue-title {
+    font-size: 1rem !important; /* 16px */
+  }
+}
+
+/* iPhone 12/13/14, Medium Android (375px - 389px) */
+@media (min-width: 375px) and (max-width: 389px) {
+  .issue-modal .sub-issue-title {
+    font-size: 1.063rem !important; /* 17px */
+  }
+  
+  .issue-modal [data-slot="badge"] {
+    font-size: 0.75rem !important; /* 12px */
+  }
+}
+
+/* iPhone 12/13/14 Standard (390px - 427px) */
+@media (min-width: 390px) and (max-width: 427px) {
+  .issue-modal .sub-issue-title {
+    font-size: 1.125rem !important; /* 18px */
+  }
+  
+  .issue-modal [data-slot="dialog-header"] {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* iPhone 14 Pro Max, Large Android (428px+) */
+@media (min-width: 428px) and (max-width: 768px) {
+  .issue-modal .sub-issue-title {
+    font-size: 1.188rem !important; /* 19px */
+  }
+  
+  .issue-modal [data-slot="dialog-header"] {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+  
+  /* Show more content on larger mobile */
+  .issue-modal .px-6 {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+}
+
+/* ================================================
+   iOS-SPECIFIC OPTIMIZATIONS
+   ================================================ */
+
+/* iOS Safari viewport fix */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    .issue-modal [data-slot="dialog-content"] {
+      /* iOS-specific height */
+      height: -webkit-fill-available !important;
+      max-height: -webkit-fill-available !important;
+    }
+    
+    /* Prevent iOS zoom on input focus */
+    .issue-modal input[type="text"],
+    .issue-modal input[type="email"],
+    .issue-modal input[type="search"],
+    .issue-modal textarea {
+      font-size: 16px !important; /* Minimum to prevent zoom */
+    }
+    
+    /* iOS scroll momentum */
+    .issue-modal [data-radix-scroll-area-viewport] {
+      -webkit-overflow-scrolling: touch !important;
+    }
+  }
+}
+
+/* ================================================
+   ANDROID-SPECIFIC OPTIMIZATIONS
+   ================================================ */
+
+/* Android Chrome address bar handling */
+@media (max-width: 768px) and (pointer: coarse) {
+  .issue-modal [data-slot="dialog-content"] {
+    /* Account for address bar collapse */
+    height: 100dvh !important; /* Dynamic viewport height */
+    max-height: 100dvh !important;
+  }
+}
+
+/* ================================================
+   KEYBOARD APPEARANCE HANDLING
+   ================================================ */
+
+@media (max-width: 768px) {
+  /* When keyboard appears, adjust modal height */
+  .issue-modal.keyboard-visible [data-slot="dialog-content"] {
+    height: var(--visual-viewport-height, 100vh) !important;
+    max-height: var(--visual-viewport-height, 100vh) !important;
+  }
+  
+  /* Ensure focused input is visible */
+  .issue-modal input:focus,
+  .issue-modal textarea:focus {
+    scroll-margin-bottom: 200px; /* Space for keyboard */
+  }
+  
+  /* Scroll to focused input */
+  .issue-modal [data-radix-scroll-area-viewport]:has(input:focus),
+  .issue-modal [data-radix-scroll-area-viewport]:has(textarea:focus) {
+    scroll-behavior: smooth !important;
+  }
+}
+
+/* ================================================
+   LANDSCAPE ORIENTATION
+   ================================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Reduce padding in landscape for more content */
+  .issue-modal [data-slot="dialog-header"] {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+  
+  .issue-modal .px-6 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+  
+  /* Smaller title in landscape */
+  .issue-modal .sub-issue-title {
+    font-size: 1rem !important;
+    line-height: 1.3 !important;
+  }
+  
+  /* Compact badges */
+  .issue-modal [data-slot="badge"] {
+    font-size: 0.688rem !important; /* 11px */
+    padding: 0.188rem 0.375rem !important;
+  }
+}
+
+/* ================================================
+   SCROLL BEHAVIOR OPTIMIZATION
+   ================================================ */
+
+@media (max-width: 768px) {
+  /* Smooth scrolling container */
+  .issue-modal [data-radix-scroll-area-viewport] {
+    scroll-snap-type: none; /* Disable snap for smooth scroll */
+    scroll-behavior: smooth;
+    
+    /* Performance optimization */
+    transform: translateZ(0); /* Force GPU acceleration */
+    will-change: scroll-position;
+  }
+  
+  /* Prevent overscroll */
+  .issue-modal [data-radix-scroll-area-viewport] {
+    overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
+    overscroll-behavior-x: none;
+  }
+  
+  /* iOS momentum scrolling */
+  .issue-modal [data-radix-scroll-area-viewport] {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ================================================
+   PERFORMANCE OPTIMIZATIONS
+   ================================================ */
+
+@media (max-width: 768px) {
+  /* GPU acceleration for smooth rendering */
+  .issue-modal [data-slot="dialog-content"],
+  .issue-modal [data-slot="dialog-header"],
+  .issue-modal [data-slot="dialog-footer"] {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Contain layout calculations */
+  .issue-modal [data-slot="dialog-content"] {
+    contain: layout style paint;
+  }
+  
+  /* Reduce repaints */
+  .issue-modal button,
+  .issue-modal [data-slot="badge"],
+  .issue-modal a {
+    contain: layout style;
+  }
+}
+
+/* ================================================
+   ACCESSIBILITY - FOCUS MANAGEMENT
+   ================================================ */
+
+@media (max-width: 768px) {
+  /* Visible focus indicators */
+  .issue-modal button:focus-visible,
+  .issue-modal a:focus-visible,
+  .issue-modal input:focus-visible,
+  .issue-modal textarea:focus-visible {
+    outline: 2px solid hsl(var(--primary)) !important;
+    outline-offset: 2px !important;
+    z-index: 1 !important;
+  }
+  
+  /* Skip link for keyboard users */
+  .issue-modal .skip-to-content {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    z-index: 9999;
+    padding: 0.5rem 1rem;
+    background: hsl(var(--primary));
+    color: white;
+  }
+  
+  .issue-modal .skip-to-content:focus {
+    top: 0;
+  }
+}
+
+/* ================================================
+   PRINT STYLES (MOBILE)
+   ================================================ */
+
+@media print and (max-width: 768px) {
+  .issue-modal [data-slot="dialog-content"] {
+    position: static !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  /* Hide interactive elements */
+  .issue-modal button,
+  .issue-modal [data-slot="dialog-close"] {
+    display: none !important;
+  }
+}
+
+/* ================================================
+   REDUCED MOTION PREFERENCE
+   ================================================ */
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  .issue-modal * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ================================================
+   HIGH CONTRAST MODE
+   ================================================ */
+
+@media (max-width: 768px) and (prefers-contrast: high) {
+  .issue-modal [data-slot="badge"],
+  .issue-modal button {
+    border-width: 2px !important;
+  }
+  
+  .issue-modal [data-slot="dialog-header"],
+  .issue-modal [data-slot="dialog-footer"] {
+    border-width: 2px !important;
+  }
+}
+
+/* ================================================
+   DARK MODE ADJUSTMENTS
+   ================================================ */
+
+@media (max-width: 768px) {
+  .dark .issue-modal [data-slot="dialog-header"],
+  .dark .issue-modal [data-slot="dialog-footer"] {
+    background: rgba(10, 10, 10, 0.98) !important;
+    backdrop-filter: blur(12px) saturate(180%) !important;
+  }
+}
+
+/* ================================================
+   LOADING STATE STABILITY
+   ================================================ */
+
+@media (max-width: 768px) {
+  /* Prevent layout shift during loading */
+  .issue-modal [data-slot="skeleton"] {
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes skeleton-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  /* Fixed height for loading states */
+  .issue-modal .loading-placeholder {
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ================================================
+   VIEWPORT RESIZE HANDLING
+   ================================================ */
+
+@media (max-width: 768px) {
+  /* Smooth transition when viewport resizes */
+  .issue-modal [data-slot="dialog-content"] {
+    transition: height 0.2s ease-out, max-height 0.2s ease-out;
+  }
+  
+  /* Disable transition during active scroll */
+  .issue-modal [data-slot="dialog-content"].scrolling {
+    transition: none !important;
+  }
+}
+
+/* ================================================
+   ERROR STATE STABILITY
+   ================================================ */
+
+@media (max-width: 768px) {
+  /* Error messages don't cause layout shift */
+  .issue-modal .error-message {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 0.75rem;
+    background: hsl(var(--destructive));
+    color: white;
+  }
+}

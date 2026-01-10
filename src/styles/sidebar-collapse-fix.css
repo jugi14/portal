@@ -1,0 +1,120 @@
+/**
+ * Sidebar Collapse Fix - Enhanced Desktop Sidebar Transitions
+ * 
+ * Ensures smooth transitions when sidebar collapses/expands
+ * Note: Toggle button is now rendered outside sidebar container
+ */
+
+/* Ensure sidebar has proper width transitions */
+aside[data-sidebar-container] {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Collapsed sidebar - compact width */
+aside[data-sidebar-container][data-collapsed="true"] {
+  width: 4rem !important;
+  min-width: 4rem !important;
+}
+
+/* Expanded sidebar - full width */
+aside[data-sidebar-container][data-collapsed="false"] {
+  width: 20rem !important;
+  min-width: 20rem !important;
+}
+
+/* Smooth content transitions when collapsing */
+aside[data-sidebar-container] [data-sidebar-scroll] {
+  transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Hide section headers when collapsed */
+aside[data-sidebar-container][data-collapsed="true"]
+  [data-sidebar-section-header] {
+  display: none !important;
+}
+
+/* Center icons when collapsed */
+aside[data-sidebar-container][data-collapsed="true"]
+  button[data-sidebar-nav-item] {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Hide text labels when collapsed */
+aside[data-sidebar-container][data-collapsed="true"]
+  button[data-sidebar-nav-item]
+  span:not(.sr-only) {
+  display: none !important;
+}
+
+/* Hide badges when collapsed */
+aside[data-sidebar-container][data-collapsed="true"]
+  [data-sidebar-badge] {
+  display: none !important;
+}
+
+/* Smooth animation for all sidebar content */
+aside[data-sidebar-container] * {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease !important;
+}
+
+/* Prevent text wrapping when animating */
+aside[data-sidebar-container] span,
+aside[data-sidebar-container] p {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+}
+
+/* Footer positioning */
+aside[data-sidebar-container] [data-sidebar-footer] {
+  transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Collapsed footer - centered content */
+aside[data-sidebar-container][data-collapsed="true"]
+  [data-sidebar-footer] {
+  padding: 0.5rem !important;
+}
+
+aside[data-sidebar-container][data-collapsed="true"]
+  [data-sidebar-footer]
+  > div {
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+/* Hide user info text when collapsed */
+aside[data-sidebar-container][data-collapsed="true"]
+  [data-sidebar-footer]
+  .flex-1 {
+  display: none !important;
+}
+
+/* Logout button - icon only when collapsed */
+aside[data-sidebar-container][data-collapsed="true"]
+  [data-sidebar-logout]
+  span:not(.sr-only) {
+  display: none !important;
+}
+
+/* Ensure smooth icon-only navigation */
+aside[data-sidebar-container][data-collapsed="true"] svg {
+  margin: 0 auto !important;
+}
+
+/* Prevent layout shift during transition */
+aside[data-sidebar-container] {
+  will-change: width;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* GPU acceleration for smooth animations */
+aside[data-sidebar-container],
+aside[data-sidebar-container] * {
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

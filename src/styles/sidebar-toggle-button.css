@@ -1,0 +1,82 @@
+/**
+ * Sidebar Toggle Button - Fixed Floating Button
+ * 
+ * Button rendered outside sidebar container for proper z-index control
+ * and to prevent overlap issues with sidebar content
+ */
+
+/* Toggle button - Fixed position, floats above all content */
+button[aria-label*="sidebar"][class*="fixed"] {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth position transitions when sidebar state changes */
+button[aria-label*="sidebar"][class*="fixed"] {
+  transition: 
+    left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s ease !important;
+}
+
+/* Enhanced hover effect */
+button[aria-label*="sidebar"][class*="fixed"]:hover {
+  transform: scale(1.1);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    0 0 0 4px rgba(20, 146, 255, 0.1) !important;
+}
+
+/* Active state - slightly smaller for feedback */
+button[aria-label*="sidebar"][class*="fixed"]:active {
+  transform: scale(0.95);
+}
+
+/* Focus ring for accessibility */
+button[aria-label*="sidebar"][class*="fixed"]:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Dark mode enhancements */
+.dark button[aria-label*="sidebar"][class*="fixed"] {
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.dark button[aria-label*="sidebar"][class*="fixed"]:hover {
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 0 0 4px rgba(20, 146, 255, 0.2) !important;
+}
+
+/* Ensure button is above all sidebar content but below modals */
+button[aria-label*="sidebar"][class*="fixed"] {
+  z-index: 100 !important;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  button[aria-label*="sidebar"][class*="fixed"] {
+    transition: none !important;
+  }
+  
+  button[aria-label*="sidebar"][class*="fixed"]:hover {
+    transform: none !important;
+  }
+}
+
+/* Mobile - hide toggle button */
+@media (max-width: 767px) {
+  button[aria-label*="sidebar"][class*="fixed"] {
+    display: none !important;
+  }
+}
+
+/* Prevent button from being covered by page content */
+button[aria-label*="sidebar"][class*="fixed"] {
+  isolation: isolate;
+}

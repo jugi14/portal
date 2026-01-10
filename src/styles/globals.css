@@ -1,0 +1,3188 @@
+@custom-variant dark (&:is(.dark *));
+
+/* Import Inter font from Google Fonts with full italic support */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+
+/* Import Sidebar Clickable Fix - CRITICAL */
+@import "./sidebar-clickable-fix.css";
+
+/* Import Sidebar Layout Fix - CRITICAL */
+@import "./sidebar-layout-fix.css";
+
+/* Import Sidebar Collapse Fix - CRITICAL */
+@import "./sidebar-collapse-fix.css";
+
+/* Import Sidebar Toggle Button - CRITICAL */
+@import "./sidebar-toggle-button.css";
+
+/* Import Sidebar Final Polish - CRITICAL */
+@import "./sidebar-final-polish.css";
+
+/* Import Mobile Menu Enhanced - CRITICAL */
+@import "./mobile-menu-enhanced.css";
+
+/* Import Issue Modal Complete - MERGED & OPTIMIZED
+   Consolidates: mobile-issue-modal-unified.css + issue-modal-header-fix.css
+   Handles: Full-screen mobile container + header layout (all screens)
+   Eliminates: Duplicate rules, conflicts, 221 lines saved */
+@import "./issue-modal-complete.css";
+
+/* Import Mobile Viewport Stability - CRITICAL
+   Device-specific optimizations for viewport consistency
+   Handles: Keyboard, safe areas, orientation, layout shifts */
+@import "./mobile-viewport-stability.css";
+
+/* Import Layout Overflow Fix - CRITICAL */
+@import "./layout-overflow-fix.css";
+
+/* Import Page Layout Fix - CRITICAL */
+@import "./page-layout-fix.css";
+
+/* Import Modal Z-Index Fix */
+@import "./modal-z-index-fix.css";
+
+/* Import Dark Mode Enhancements */
+@import "./dark-mode-enhancements.css";
+
+/* Import Dark Mode Code Blocks */
+@import "./dark-mode-code-blocks.css";
+
+/* Import Login Page Enhancements */
+@import "./login-page-enhancements.css";
+
+/* Import Rich Text Editor Styles */
+@import "./rich-text-editor.css";
+
+/* Import Mobile Login Optimizations */
+@import "./mobile-login-optimizations.css";
+
+/* Import Mobile Logo Fix */
+@import "./mobile-logo-fix.css";
+
+/* Import Skeleton Responsive Enhancements */
+@import "./skeleton-responsive.css";
+
+/* Import Comment Toolbar Fix - CRITICAL */
+@import "./comment-toolbar-fix.css";
+
+/* Import Fixed Layout System - CRITICAL */
+@import "./fixed-layout.css";
+
+/* Import Content Width Fix - DISABLED (causes button truncation in tables) */
+/* @import "./content-width-fix.css"; */
+
+/* Import Mobile Kanban Fix - CRITICAL */
+@import "./mobile-kanban-fix.css";
+
+/*Notification Panel - Above Everything */
+[data-notification-panel] {
+  z-index: 10000 !important;
+  position: fixed !important;
+}
+
+/* Mobile: Full width on small screens */
+@media (max-width: 640px) {
+  [data-notification-panel] {
+    left: 1rem !important;
+    right: 1rem !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+}
+
+/* Critical: Force Select dropdown to appear above all modals */
+[data-radix-select-content] {
+  z-index: 9999 !important;
+  position: fixed !important;
+}
+
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
+
+/* Ensure Select portals render properly in dialogs */
+[role="dialog"] [data-radix-select-content] {
+  z-index: 9999 !important;
+}
+
+[role="dialog"] [data-radix-select-viewport] {
+  max-height: 300px !important;
+}
+
+:root {
+  --font-size: 16px; /* Increased from 14px for better readability (minimum 12px for all text) */
+
+  /* Typography System */
+  --font-family-primary: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 500;
+  --font-weight-bold: 600;
+
+  /* Teifi Brand Colors from Figma */
+  --background: #ffffff;
+  --foreground: #0c0c0c;
+  --card: #ffffff;
+  --card-foreground: #0c0c0c;
+  --popover: #ffffff;
+  --popover-foreground: #0c0c0c;
+  --primary: #1492ff;
+  --primary-foreground: #ffffff;
+  --secondary: #f8fafc;
+  --secondary-foreground: #374151;
+  --muted: #f8fafc;
+  --muted-foreground: #6b7280;
+  --accent: #00fcf3;
+  --accent-foreground: #000000;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: transparent;
+  --input-background: #ffffff;
+  --switch-background: #cbd5e1;
+
+  /* Teifi Typography System */
+  --font-family-primary:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 500;
+  --font-weight-bold: 600;
+  --font-weight-extrabold: 800;
+
+  /* Teifi Spacing System (based on Figma) */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-9: 37px;
+  --spacing-18: 72px;
+
+  /* Border Radius System */
+  --radius: 10px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+
+  /* Typography */
+  --font-weight-semibold: 500;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+
+  --ring: #1492ff;
+  --chart-1: #1492ff;
+  --chart-2: #00fcf3;
+  --chart-3: #10b981;
+  --chart-4: #f59e0b;
+  --chart-5: #ef4444;
+
+  /* Professional Header */
+  --header-background: #000000;
+  --header-foreground: #ffffff;
+  --header-muted: #c1c2b1;
+
+  /* Modern Sidebar - Black background with high contrast */
+  --sidebar-bg: #000000;
+  --sidebar-text: rgba(255, 255, 255, 1);
+  --sidebar-text-secondary: rgba(255, 255, 255, 0.8);
+  --sidebar-text-muted: rgba(255, 255, 255, 0.6);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+
+  /* Status Colors */
+  --success: #10b981;
+  --success-foreground: #ffffff;
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+  --info: #00d4ff;
+  --info-foreground: #ffffff;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #374151;
+  --sidebar-primary: #4f8cf6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f8fafc;
+  --sidebar-accent-foreground: #374151;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #4f8cf6;
+}
+
+.dark {
+  /* Typography System (same as light mode) */
+  --font-family-primary: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 500;
+  --font-weight-bold: 600;
+
+  /* Pure Black & White Base - Professional API Documentation Style */
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #0a0a0a;
+  --card-foreground: #ffffff;
+  --popover: #0a0a0a;
+  --popover-foreground: #ffffff;
+
+  /* Primary: Bright blue for accents */
+  --primary: #60a5fa;
+  --primary-foreground: #000000;
+
+  /* Secondary: Dark gray surfaces */
+  --secondary: #171717;
+  --secondary-foreground: #e5e5e5;
+
+  /* Muted: Subtle backgrounds */
+  --muted: #1a1a1a;
+  --muted-foreground: #9ca3af;
+
+  /* Accent: Cyan for highlights */
+  --accent: #00d4ff;
+  --accent-foreground: #000000;
+
+  /* Destructive: Red for errors */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders: Subtle white with low opacity */
+  --border: rgba(255, 255, 255, 0.1);
+  --input: #1a1a1a;
+  --input-background: #0a0a0a;
+  --switch-background: #27272a;
+  --ring: #60a5fa;
+
+  /* Typography */
+  --font-weight-semibold: 600;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+
+  /* Charts with vibrant colors for dark mode */
+  --chart-1: #60a5fa;
+  --chart-2: #00d4ff;
+  --chart-3: #22c55e;
+  --chart-4: #fbbf24;
+  --chart-5: #f87171;
+
+  /* Sidebar: Pure black with white text */
+  --sidebar: #000000;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #60a5fa;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #0a0a0a;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #60a5fa;
+
+  /* Modern sidebar variables */
+  --sidebar-bg: #000000;
+  --sidebar-text: rgba(255, 255, 255, 1);
+  --sidebar-text-secondary: rgba(255, 255, 255, 0.8);
+  --sidebar-text-muted: rgba(255, 255, 255, 0.5);
+
+  /* Status Colors with high contrast */
+  --success: #22c55e;
+  --success-foreground: #000000;
+  --warning: #fbbf24;
+  --warning-foreground: #000000;
+  --info: #00d4ff;
+  --info-foreground: #000000;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(
+    --sidebar-primary-foreground
+  );
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(
+    --sidebar-accent-foreground
+  );
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-header-background: var(--header-background);
+  --color-header-foreground: var(--header-foreground);
+  --color-header-muted: var(--header-muted);
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-text: var(--sidebar-text);
+  --color-sidebar-text-secondary: var(--sidebar-text-secondary);
+  --color-sidebar-text-muted: var(--sidebar-text-muted);
+  --color-sidebar-border: var(--sidebar-border);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-background text-foreground overflow-x-hidden;
+    max-width: 100vw;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /*Prevent container overflow */
+  #root {
+    @apply min-h-screen w-full overflow-x-hidden;
+    max-width: 100vw;
+  }
+
+  /* Ensure all main containers stay within viewport */
+  main {
+    @apply w-full overflow-x-hidden;
+    box-sizing: border-box;
+  }
+
+  /* Force all children to respect width - Exception for issue modal */
+  main > *:not(.issue-modal):not(.issue-modal *) {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  main > * > *:not(.issue-modal):not(.issue-modal *) {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/**
+ * Base typography - Compact & Professional
+ */
+@layer base {
+  :where(
+    :not(:has([class*=" text-"]), :not(:has([class^="text-"])))
+  ) {
+    h1 {
+      font-family: var(--font-family-primary);
+      font-size: 1.75rem;
+      font-weight: var(--font-weight-bold);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      font-family: var(--font-family-primary);
+      font-size: 1.375rem;
+      font-weight: var(--font-weight-semibold);
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-family: var(--font-family-primary);
+      font-size: 1.125rem;
+      font-weight: var(--font-weight-semibold);
+      line-height: 1.4;
+    }
+
+    h4 {
+      font-family: var(--font-family-primary);
+      font-size: 0.9375rem;
+      font-weight: var(--font-weight-semibold);
+      line-height: 1.5;
+    }
+
+    p {
+      font-family: var(--font-family-primary);
+      font-size: 0.875rem; /* 14px with 16px base - good for body text */
+      font-weight: var(--font-weight-normal);
+      line-height: 1.6;
+    }
+
+    label {
+      font-family: var(--font-family-primary);
+      font-size: 0.875rem; /* 14px - increased from 13px for better readability */
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    button {
+      font-family: var(--font-family-primary);
+      font-size: 0.875rem; /* 14px - clear and readable */
+      font-weight: var(--font-weight-medium);
+      line-height: 1.2;
+    }
+
+    input {
+      font-family: var(--font-family-primary);
+      font-size: 0.875rem; /* 14px - increased from 13px for better input readability */
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+
+    small {
+      font-family: var(--font-family-primary);
+      font-size: 0.75rem; /* 12px - MINIMUM readable size (was 11px) */
+      font-weight: var(--font-weight-normal);
+      line-height: 1.4;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+  font-family: var(--font-family-primary);
+}
+
+body {
+  font-family: var(--font-family-primary);
+}
+
+/* Utility classes */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Text overflow handling - prevent content from breaking card layout */
+.break-words {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
+}
+
+/* Scale animations for cards */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+.scale-102 {
+  transform: scale(1.02);
+}
+
+/*Optimized drag and drop animations for smooth performance */
+.dragging {
+  opacity: 0.8;
+  transform: scale(1.03) rotate(1deg);
+  transition:
+    transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.15s ease;
+  z-index: 1000;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  border: 2px dashed var(--color-primary);
+  will-change: transform, opacity;
+}
+
+.dark .dragging {
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+}
+
+.drop-zone-active {
+  border-color: #10b981 !important;
+  background-color: rgba(16, 185, 129, 0.08) !important;
+  transform: scale(1.01);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 0 0 2px rgba(16, 185, 129, 0.2),
+    0 8px 20px rgba(16, 185, 129, 0.1);
+  animation: pulse-drop-zone 2s ease-in-out infinite;
+  will-change: transform, border-color, background-color;
+}
+
+.drop-zone-invalid {
+  border-color: #ef4444 !important;
+  background-color: rgba(239, 68, 68, 0.03) !important;
+  animation: shake 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+@keyframes pulse-drop-zone {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 2px rgba(16, 185, 129, 0.2),
+      0 10px 25px rgba(16, 185, 129, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px rgba(16, 185, 129, 0.3),
+      0 15px 35px rgba(16, 185, 129, 0.15);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+/* Kanban column hover effects */
+.kanban-column:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/*Super Compact Team Issues Kanban card animations */
+.issues-kanban-card-compact {
+  transition:
+    transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.15s ease;
+  cursor: grab;
+  will-change: transform;
+  min-height: auto !important;
+  border-radius: 8px;
+  background: white;
+  border: 1px solid var(--color-border);
+}
+
+.issues-kanban-card-compact:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.issues-kanban-card-compact:active {
+  cursor: grabbing;
+}
+
+.issues-kanban-card-compact.dragging {
+  opacity: 0.8;
+  transform: scale(1.01) rotate(0.5deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border: 2px dashed var(--color-primary);
+  z-index: 1000;
+  will-change: transform, opacity;
+}
+
+/* Super compact card styling optimizations */
+.issues-kanban-card-compact .card-header {
+  padding: 10px 10px 6px 10px !important;
+}
+
+.issues-kanban-card-compact .card-content {
+  padding: 0 10px 10px 10px !important;
+}
+
+/* Compact badge styling - minimum 12px for readability */
+.issues-kanban-card-compact .badge {
+  font-size: 12px; /* Increased from 10px for better readability */
+  font-weight: 500;
+  padding: 2px 6px; /* Increased padding for better proportion */
+  height: 20px; /* Increased from 16px to accommodate larger text */
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+}
+
+/* Compact button styling - minimum 12px for readability */
+.issues-kanban-card-compact .btn-sm {
+  height: 28px; /* Increased from 24px for better touch target */
+  padding: 0 8px; /* Increased padding */
+  font-size: 12px; /* Increased from 10px for better readability */
+  border-radius: 4px;
+}
+
+/* Compact avatar styling - proportionally increased */
+.issues-kanban-card-compact .avatar {
+  width: 20px; /* Increased from 16px for better visibility */
+  height: 20px;
+}
+
+.issues-kanban-card-compact .avatar .avatar-fallback {
+  font-size: 10px; /* Increased from 8px - still compact but readable */
+}
+
+/* Remove previous card styling */
+.issues-kanban-card {
+  display: none;
+}
+
+/*Smooth column transitions */
+.issues-kanban-column {
+  transition:
+    transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.issues-kanban-column:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Drag preview styling */
+.issue-drag-preview {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 2px solid var(--color-primary);
+  max-width: 280px;
+  opacity: 0.9;
+}
+
+.issues-kanban-column {
+  min-height: calc(100vh - 200px);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.issues-kanban-column:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Optimized full-height kanban */
+.full-height-kanban {
+  height: calc(100vh - 160px);
+  min-height: 600px;
+}
+
+/* Ultra compact kanban columns */
+.kanban-column-compact {
+  min-width: 260px !important;
+  max-width: 300px;
+  background: rgba(248, 250, 252, 0.3);
+  border: 1px solid var(--color-border);
+}
+
+.dark .kanban-column-compact {
+  background: rgba(26, 26, 26, 0.5);
+  border-color: var(--color-border);
+}
+
+/*Dynamic Kanban Column Width */
+[style*="--kanban-column-width"] .kanban-column-compact,
+[style*="--kanban-column-width"] .issues-kanban-column {
+  min-width: var(--kanban-column-width, 280px) !important;
+  max-width: var(--kanban-column-width, 280px) !important;
+  transition:
+    min-width 0.3s ease,
+    max-width 0.3s ease;
+}
+
+/* Smooth transitions for width changes */
+[style*="--kanban-column-width"] .issues-kanban-card-compact {
+  transition:
+    transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.15s ease,
+    width 0.3s ease;
+}
+
+/* Ultra compact spacing for kanban board */
+.kanban-board-compact .gap-6 {
+  gap: 0.75rem;
+}
+
+.kanban-board-compact .gap-4 {
+  gap: 0.5rem;
+}
+
+.kanban-board-compact .p-4 {
+  padding: 0.75rem;
+}
+
+.kanban-board-compact .mb-4 {
+  margin-bottom: 0.5rem;
+}
+
+/* Ultra compact card margins */
+.issues-kanban-card-compact + .issues-kanban-card-compact {
+  margin-top: 8px;
+}
+
+/* Action bar optimizations */
+.team-action-bar {
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .team-action-bar {
+  background: rgba(26, 26, 26, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Priority indicators */
+.priority-urgent {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.priority-high {
+  background: linear-gradient(135deg, #ea580c, #f97316);
+}
+
+.priority-medium {
+  background: linear-gradient(135deg, #ca8a04, #eab308);
+}
+
+.priority-low {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+/* Unified neutral column styling */
+.kanban-column-unified {
+  background: rgba(248, 250, 252, 0.3);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.dark .kanban-column-unified {
+  background: rgba(42, 42, 42, 0.3);
+}
+
+/*Enhanced smooth card animations */
+.issue-card-enter {
+  animation: slideInUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.issue-card-move {
+  animation: cardMove 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.issue-card-optimistic-update {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cardMove {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+  50% {
+    transform: translateX(10px) scale(1.02);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+/*GPU acceleration for smooth performance */
+.drag-optimized {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Responsive kanban board */
+@media (max-width: 1024px) {
+  .issues-kanban-container {
+    flex-direction: column;
+  }
+
+  .issues-kanban-column {
+    min-height: 400px;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Enhanced progress bars */
+.progress-smooth {
+  transition: width 0.5s ease;
+}
+
+/* Button hover enhancements for issue actions */
+.issue-action-button {
+  transition: all 0.2s ease;
+}
+
+.issue-action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Progress bar enhancements */
+.progress-bar-glow {
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+}
+
+/*Enhanced Modal System - Teifi Issue Detail Modal */
+[data-slot="dialog-content"] {
+  z-index: 100 !important;
+  max-width: 56rem !important; /* 4xl = 56rem - More compact */
+}
+
+[data-slot="dialog-overlay"] {
+  z-index: 99 !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark [data-slot="dialog-overlay"] {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Issue Detail Modal Enhancements */
+.issue-modal [data-slot="dialog-content"] {
+  display: flex !important;
+  flex-direction: column !important;
+  max-height: 92vh !important;
+  max-width: 56rem !important; /* 4xl - Compact width */
+  overflow: visible !important; /* Allow close button to be visible */
+  border-radius: 10px !important;
+  box-shadow:
+    0 20px 40px -10px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Responsive modal sizing */
+@media (max-width: 1536px) {
+  .issue-modal [data-slot="dialog-content"] {
+    max-width: 88vw !important;
+    max-height: 90vh !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .issue-modal [data-slot="dialog-content"] {
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    position: fixed !important;
+    transform: none !important;
+  }
+
+  /* Mobile-specific padding adjustments */
+  .issue-modal .px-4 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .issue-modal .py-3 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .issue-modal .p-4 {
+    padding: 0.75rem !important;
+  }
+
+  .issue-modal .p-3 {
+    padding: 0.5rem !important;
+  }
+
+  /* Mobile grid adjustments */
+  .issue-modal .grid-cols-1.md\\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Mobile spacing adjustments */
+  .issue-modal .gap-5 {
+    gap: 1rem !important;
+  }
+
+  .issue-modal .space-y-5 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  /* Mobile header adjustments */
+  .issue-modal [data-slot="dialog-header"] {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    backdrop-filter: blur(8px) !important;
+  }
+}
+
+/* Enhanced scrollbar styling for modal */
+.issue-modal [data-radix-scroll-area-viewport] {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.issue-modal
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar {
+  width: 8px;
+}
+
+.issue-modal
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.issue-modal
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.issue-modal
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.dark
+  .issue-modal
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark
+  .issue-modal
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Modal content spacing and typography optimizations */
+.issue-modal .markdown-content p {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.issue-modal .markdown-content h1,
+.issue-modal .markdown-content h2,
+.issue-modal .markdown-content h3,
+.issue-modal .markdown-content h4,
+.issue-modal .markdown-content h5,
+.issue-modal .markdown-content h6 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.issue-modal .markdown-content h1:first-child,
+.issue-modal .markdown-content h2:first-child,
+.issue-modal .markdown-content h3:first-child,
+.issue-modal .markdown-content h4:first-child,
+.issue-modal .markdown-content h5:first-child,
+.issue-modal .markdown-content h6:first-child {
+  margin-top: 0;
+}
+
+.issue-modal .markdown-content ul,
+.issue-modal .markdown-content ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.issue-modal .markdown-content li {
+  margin: 0.25rem 0;
+}
+
+.issue-modal .markdown-content pre {
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.issue-modal .markdown-content table {
+  margin: 1rem 0;
+}
+
+.issue-modal .markdown-content blockquote {
+  margin: 1rem 0;
+}
+
+/* Enhanced focus management for modal */
+.issue-modal [data-slot="dialog-content"]:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for modal elements */
+.issue-modal .card {
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.issue-modal .card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Badge enhancements for issue modal */
+.issue-modal .badge {
+  transition: all 0.2s ease;
+}
+
+.issue-modal .badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Avatar enhancements */
+.issue-modal .avatar {
+  transition: transform 0.2s ease;
+}
+
+.issue-modal .avatar:hover {
+  transform: scale(1.05);
+}
+
+/* Enhanced button styling in modal */
+.issue-modal .button {
+  transition: all 0.2s ease;
+}
+
+.issue-modal .button:hover {
+  transform: translateY(-1px);
+}
+
+/* Loading state enhancements */
+.issue-modal .skeleton {
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Print styling for issue modal */
+@media print {
+  .issue-modal [data-slot="dialog-overlay"] {
+    position: static !important;
+    background: transparent !important;
+  }
+
+  .issue-modal [data-slot="dialog-content"] {
+    position: static !important;
+    max-width: none !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
+/* Teifi Login Page Enhancements */
+@keyframes pulse-gradient {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.teifi-gradient-bg {
+  background: linear-gradient(
+    135deg,
+    #f8fafc 0%,
+    #ffffff 50%,
+    #f1f5f9 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 20s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.glassmorphism {
+  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 25px 50px -12px rgba(20, 146, 255, 0.1),
+    0 10px 25px -3px rgba(0, 0, 0, 0.1);
+}
+
+.teifi-button-gradient {
+  background: linear-gradient(135deg, #1492ff 0%, #1492ff 100%);
+  box-shadow:
+    0 10px 25px -3px rgba(20, 146, 255, 0.25),
+    0 4px 6px -2px rgba(20, 146, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.teifi-button-gradient:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(20, 146, 255, 0.9) 0%,
+    rgba(20, 146, 255, 0.9) 100%
+  );
+  box-shadow:
+    0 20px 40px -6px rgba(20, 146, 255, 0.35),
+    0 8px 16px -4px rgba(20, 146, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.teifi-input-glass {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(156, 163, 175, 0.3);
+  transition: all 0.3s ease;
+}
+
+.teifi-input-glass:focus {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: #1492ff;
+  box-shadow: 0 0 0 3px rgba(20, 146, 255, 0.1);
+}
+
+.teifi-tab-active {
+  background: linear-gradient(135deg, #1492ff 0%, #1492ff 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(20, 146, 255, 0.3);
+}
+
+/* Enhance font loading and display */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+}
+
+/*Admin Customer Management Enhancements */
+@keyframes stat-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.stat-card-animated {
+  animation: stat-card-enter 0.4s cubic-bezier(0.4, 0, 0.2, 1)
+    backwards;
+}
+
+.stat-card-animated:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stat-card-animated:nth-child(2) {
+  animation-delay: 50ms;
+}
+.stat-card-animated:nth-child(3) {
+  animation-delay: 100ms;
+}
+.stat-card-animated:nth-child(4) {
+  animation-delay: 150ms;
+}
+.stat-card-animated:nth-child(5) {
+  animation-delay: 200ms;
+}
+
+/* Enhanced card hover with subtle lift */
+.teifi-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.teifi-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(20, 146, 255, 0.1);
+}
+
+/* Glassmorphism effect for modern UI */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass-effect {
+  background: rgba(26, 26, 26, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/*Markdown Content Styling for Issue Descriptions */
+.markdown-content {
+  line-height: 1.6;
+  color: var(--color-muted-foreground);
+}
+
+.markdown-content > *:first-child {
+  margin-top: 0 !important;
+}
+
+.markdown-content > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Headers in markdown */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  font-family: var(--font-family-primary);
+  color: var(--color-foreground);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content h1:first-child,
+.markdown-content h2:first-child,
+.markdown-content h3:first-child,
+.markdown-content h4:first-child,
+.markdown-content h5:first-child,
+.markdown-content h6:first-child {
+  margin-top: 0;
+}
+
+/* Lists in markdown */
+.markdown-content ul,
+.markdown-content ol {
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.markdown-content li {
+  margin: 0.25rem 0;
+  line-height: 1.5;
+}
+
+.markdown-content li > p {
+  margin: 0.25rem 0;
+}
+
+/* Nested lists */
+.markdown-content ul ul,
+.markdown-content ol ol,
+.markdown-content ul ol,
+.markdown-content ol ul {
+  margin: 0.25rem 0;
+}
+
+/* Code blocks and inline code */
+.markdown-content code {
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 0.85em;
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.markdown-content pre {
+  overflow-x: auto;
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  margin: 1rem 0;
+}
+
+.markdown-content pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 0.8rem;
+}
+
+/* Tables */
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  font-size: 0.875rem;
+}
+
+.markdown-content th,
+.markdown-content td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+}
+
+.markdown-content th {
+  background-color: var(--color-muted);
+  font-weight: 600;
+  color: var(--color-foreground);
+}
+
+.markdown-content tr:nth-child(even) {
+  background-color: var(--color-muted) / 20;
+}
+
+/* Blockquotes */
+.markdown-content blockquote {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 4px solid var(--color-primary);
+  background-color: var(--color-muted) / 30;
+  border-radius: 0 4px 4px 0;
+}
+
+.markdown-content blockquote p {
+  margin: 0.5rem 0;
+  font-style: italic;
+  color: var(--color-muted-foreground);
+}
+
+/* Links */
+.markdown-content a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.markdown-content a:hover {
+  text-decoration-color: var(--color-primary);
+}
+
+/* Horizontal rules */
+.markdown-content hr {
+  border: none;
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 1.5rem 0;
+}
+
+/* Task lists (GitHub flavor) */
+.markdown-content .task-list-item {
+  list-style: none;
+  margin-left: -1.5rem;
+  padding-left: 1.5rem;
+}
+
+.markdown-content .task-list-item input[type="checkbox"] {
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+
+/* Emphasis */
+.markdown-content strong {
+  font-weight: 600;
+  color: var(--color-foreground);
+}
+
+.markdown-content em {
+  font-style: italic;
+}
+
+/* Compact spacing for issue modal */
+.issue-modal .markdown-content h1,
+.issue-modal .markdown-content h2,
+.issue-modal .markdown-content h3,
+.issue-modal .markdown-content h4,
+.issue-modal .markdown-content h5,
+.issue-modal .markdown-content h6 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.issue-modal .markdown-content p {
+  margin-bottom: 0.75rem;
+}
+
+.issue-modal .markdown-content ul,
+.issue-modal .markdown-content ol {
+  margin: 0.5rem 0;
+}
+
+/* Dark mode adjustments */
+.dark .markdown-content code {
+  background: var(--color-muted);
+  color: var(--color-foreground);
+}
+
+.dark .markdown-content pre {
+  background: var(--color-muted);
+}
+
+.dark .markdown-content th {
+  background-color: var(--color-muted);
+  color: var(--color-foreground);
+}
+
+.dark .markdown-content blockquote {
+  background-color: var(--color-muted) / 30;
+  border-left-color: var(--color-primary);
+}
+
+/*Enhanced Skeleton Styling - Teifi Design System */
+[data-slot="skeleton"] {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted) 0%,
+    rgba(148, 163, 184, 0.1) 50%,
+    var(--color-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+.dark [data-slot="skeleton"] {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted) 0%,
+    rgba(71, 85, 105, 0.2) 50%,
+    var(--color-muted) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Skeleton variants for different use cases */
+.skeleton-card {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted) 0%,
+    rgba(148, 163, 184, 0.12) 50%,
+    var(--color-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+  will-change: background-position;
+}
+
+.skeleton-text {
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0.15) 0%,
+    rgba(148, 163, 184, 0.08) 50%,
+    rgba(148, 163, 184, 0.15) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  height: 1rem;
+  border-radius: var(--radius-sm);
+  will-change: background-position;
+}
+
+.skeleton-avatar {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted) 0%,
+    rgba(148, 163, 184, 0.18) 50%,
+    var(--color-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  border-radius: 50%;
+  will-change: background-position;
+}
+
+/* Dark mode skeleton variants - Enhanced contrast */
+.dark .skeleton-card {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted) 0%,
+    rgba(100, 116, 139, 0.2) 50%,
+    var(--color-muted) 100%
+  );
+}
+
+.dark .skeleton-text {
+  background: linear-gradient(
+    90deg,
+    rgba(100, 116, 139, 0.25) 0%,
+    rgba(100, 116, 139, 0.15) 50%,
+    rgba(100, 116, 139, 0.25) 100%
+  );
+}
+
+.dark .skeleton-avatar {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted) 0%,
+    rgba(100, 116, 139, 0.3) 50%,
+    var(--color-muted) 100%
+  );
+}
+
+/* Sidebar skeleton specific styling */
+[data-sidebar="menu-skeleton"] [data-slot="skeleton"],
+[data-skeleton-type="sidebar"] [data-slot="skeleton"] {
+  background: linear-gradient(
+    90deg,
+    var(--color-sidebar-accent) 0%,
+    rgba(148, 163, 184, 0.12) 50%,
+    var(--color-sidebar-accent) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+  will-change: background-position;
+}
+
+.dark [data-sidebar="menu-skeleton"] [data-slot="skeleton"],
+.dark [data-skeleton-type="sidebar"] [data-slot="skeleton"] {
+  background: linear-gradient(
+    90deg,
+    var(--color-sidebar-accent) 0%,
+    rgba(100, 116, 139, 0.2) 50%,
+    var(--color-sidebar-accent) 100%
+  );
+}
+
+/* Card skeleton for kanban loading */
+.kanban-skeleton-card,
+[data-skeleton-type="kanban-card"],
+[data-skeleton-type="kanban-column"] {
+  background: linear-gradient(
+    90deg,
+    rgba(248, 250, 252, 0.9) 0%,
+    rgba(226, 232, 240, 0.5) 50%,
+    rgba(248, 250, 252, 0.9) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2.2s ease-in-out infinite;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  will-change: background-position;
+}
+
+.dark .kanban-skeleton-card,
+.dark [data-skeleton-type="kanban-card"],
+.dark [data-skeleton-type="kanban-column"] {
+  background: linear-gradient(
+    90deg,
+    rgba(26, 26, 26, 0.9) 0%,
+    rgba(51, 51, 51, 0.5) 50%,
+    rgba(26, 26, 26, 0.9) 100%
+  );
+}
+
+/*Issue Creation Template Styling - Markdown Editor with Preview */
+.issue-creation-template {
+  font-family: var(--font-family-primary);
+}
+
+.issue-creation-template [data-slot="dialog-content"] {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+/*Markdown Editor Textarea */
+.issue-creation-template textarea#markdown-editor {
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--color-foreground);
+  background: var(--color-background);
+  resize: none;
+}
+
+.issue-creation-template
+  textarea#markdown-editor::-webkit-scrollbar {
+  width: 8px;
+}
+
+.issue-creation-template
+  textarea#markdown-editor::-webkit-scrollbar-track {
+  background: var(--color-muted);
+  border-radius: 4px;
+}
+
+.issue-creation-template
+  textarea#markdown-editor::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.issue-creation-template
+  textarea#markdown-editor::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}
+
+/* ️ Markdown Preview Panel */
+.issue-creation-template .prose {
+  font-family: var(--font-family-primary);
+  color: var(--color-foreground);
+}
+
+.issue-creation-template .prose h1,
+.issue-creation-template .prose h2,
+.issue-creation-template .prose h3 {
+  color: var(--color-foreground);
+  font-family: var(--font-family-primary);
+}
+
+.issue-creation-template .prose h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
+.issue-creation-template .prose strong {
+  font-weight: 600;
+  color: var(--color-foreground);
+}
+
+.issue-creation-template .prose em {
+  font-style: italic;
+  color: var(--color-muted-foreground);
+}
+
+.issue-creation-template .prose ul,
+.issue-creation-template .prose ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.issue-creation-template .prose li {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.issue-creation-template .prose hr {
+  border: none;
+  border-top: 2px solid var(--color-border);
+  margin: 1.5rem 0;
+}
+
+.issue-creation-template .prose code {
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 0.85em;
+  background: var(--color-muted);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  color: var(--color-foreground);
+}
+
+.issue-creation-template .prose pre {
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.issue-creation-template .prose pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.issue-creation-template .prose p {
+  margin: 0.75rem 0;
+  line-height: 1.6;
+}
+
+/* Editor toolbar styling */
+.issue-creation-template .border-border.rounded-t-lg {
+  background: var(--color-muted) / 30;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.issue-creation-template .border-border.rounded-t-lg button {
+  transition: all 0.2s ease;
+}
+
+.issue-creation-template
+  .border-border.rounded-t-lg
+  button:hover {
+  background: var(--color-muted);
+  color: var(--color-primary);
+}
+
+/* File attachment cards */
+.issue-creation-template .file-attachment-card {
+  transition: all 0.2s ease;
+}
+
+.issue-creation-template .file-attachment-card:hover {
+  background: var(--color-muted) / 50;
+  border-color: var(--color-primary) / 30;
+}
+
+/* Property selects styling */
+.issue-creation-template [data-radix-select-trigger] {
+  transition: all 0.2s ease;
+}
+
+.issue-creation-template [data-radix-select-trigger]:hover {
+  background: var(--color-muted) / 50;
+  border-color: var(--color-primary) / 30;
+}
+
+/* Create more toggle styling */
+.issue-creation-template [data-state="checked"] {
+  background: var(--color-primary);
+}
+
+/* Submit button hover effect */
+.issue-creation-template button[class*="bg-primary"]:hover {
+  box-shadow: 0 4px 12px rgba(20, 146, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Footer with subtle gradient */
+.issue-creation-template .bg-muted\/20 {
+  background: linear-gradient(
+    180deg,
+    var(--color-muted) / 20 0%,
+    var(--color-muted) / 40 100%
+  );
+}
+
+/* Dark mode adjustments */
+.dark .issue-creation-template textarea#markdown-editor {
+  color: var(--color-foreground);
+  background: var(--color-background);
+}
+
+.dark .issue-creation-template .prose {
+  color: var(--color-foreground);
+}
+
+.dark .issue-creation-template .prose code {
+  background: var(--color-muted);
+  border-color: var(--color-border);
+}
+
+.dark .issue-creation-template .prose pre {
+  background: var(--color-muted);
+  border-color: var(--color-border);
+}
+
+/*Card Content Overflow Prevention - Ensure clean padding and no overflow */
+.issues-kanban-card-compact,
+[data-slot="card"] {
+  overflow: hidden; /* Prevent content from breaking out */
+  max-width: 100%; /*Force card to respect column width */
+}
+
+.issues-kanban-card-compact .card-header,
+.issues-kanban-card-compact .card-content,
+[data-slot="card-header"],
+[data-slot="card-content"] {
+  padding-right: 1rem !important; /* Force right padding */
+  padding-left: 1rem !important; /* Force left padding */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  max-width: 100%; /*Prevent content from overflowing */
+}
+
+/* Ensure all text content respects card boundaries */
+.issues-kanban-card-compact * {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/*Force all flex children to respect max-width */
+.issues-kanban-card-compact [class*="flex"] {
+  max-width: 100%;
+  min-width: 0; /* Allow flex items to shrink */
+}
+
+/*Ensure buttons don't cause overflow */
+.issues-kanban-card-compact button {
+  max-width: 100%;
+}
+
+/*Text elements must truncate or wrap */
+.issues-kanban-card-compact span,
+.issues-kanban-card-compact p,
+.issues-kanban-card-compact h1,
+.issues-kanban-card-compact h2,
+.issues-kanban-card-compact h3,
+.issues-kanban-card-compact h4 {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/*Parent-Child Issue Enhancements */
+
+/* Parent issue with sub-issues indicator */
+.issues-kanban-card-compact.has-sub-issues {
+  background: linear-gradient(
+    90deg,
+    rgba(20, 146, 255, 0.03) 0%,
+    transparent 15%
+  );
+}
+
+.dark .issues-kanban-card-compact.has-sub-issues {
+  background: linear-gradient(
+    90deg,
+    rgba(91, 155, 213, 0.05) 0%,
+    transparent 15%
+  );
+}
+
+/* Sub-task card with purple accent */
+.issues-kanban-card-compact:has([class*="parent"]) {
+  background: linear-gradient(
+    90deg,
+    rgba(168, 85, 247, 0.02) 0%,
+    transparent 12%
+  );
+}
+
+.dark .issues-kanban-card-compact:has([class*="parent"]) {
+  background: linear-gradient(
+    90deg,
+    rgba(168, 85, 247, 0.05) 0%,
+    transparent 12%
+  );
+}
+
+/* Sub-issue progress bar styling */
+.issues-kanban-card-compact .sub-issue-progress {
+  background: var(--color-muted);
+  border-radius: 9999px;
+  overflow: hidden;
+  height: 4px;
+}
+
+.issues-kanban-card-compact .sub-issue-progress-bar {
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 9999px;
+}
+
+/* Completed sub-issues progress */
+.issues-kanban-card-compact .sub-issue-progress-bar.completed {
+  background: linear-gradient(90deg, #10b981 0%, #22c55e 100%);
+}
+
+/* Sub-issue count badge pulse animation */
+@keyframes sub-issue-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(20, 146, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(20, 146, 255, 0);
+  }
+}
+
+.issues-kanban-card-compact .sub-issue-badge {
+  animation: sub-issue-pulse 3s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+.issues-kanban-card-compact .sub-issue-badge:hover {
+  transform: scale(1.05);
+  animation: none;
+  box-shadow: 0 2px 8px rgba(20, 146, 255, 0.3);
+}
+
+/* Enhanced parent issue hover state */
+.issues-kanban-card-compact.has-sub-issues:hover {
+  border-left-width: 4px;
+  box-shadow:
+    -2px 0 0 0 var(--color-primary),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark .issues-kanban-card-compact.has-sub-issues:hover {
+  box-shadow:
+    -2px 0 0 0 var(--color-primary),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Sub-issue tooltip enhancements */
+.sub-issue-tooltip-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0;
+  transition: all 0.2s ease;
+}
+
+.sub-issue-tooltip-item:hover {
+  transform: translateX(2px);
+}
+
+/* Sub-issue state indicators in detail modal */
+.sub-issue-detail-card {
+  transition: all 0.2s ease;
+  border-left: 2px solid transparent;
+}
+
+.sub-issue-detail-card:hover {
+  border-left-color: var(--color-primary);
+  background-color: var(--color-muted) / 50;
+  transform: translateX(2px);
+}
+
+.sub-issue-detail-card.completed {
+  border-left-color: #10b981;
+  background: linear-gradient(
+    90deg,
+    rgba(16, 185, 129, 0.05) 0%,
+    transparent 20%
+  );
+}
+
+.sub-issue-detail-card.in-progress {
+  border-left-color: #3b82f6;
+  background: linear-gradient(
+    90deg,
+    rgba(59, 130, 246, 0.05) 0%,
+    transparent 20%
+  );
+}
+
+/* Progress bar in issue detail modal */
+.issue-modal .sub-issue-progress-bar {
+  height: 0.5rem;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
+  border-radius: 9999px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(20, 146, 255, 0.3);
+}
+
+.issue-modal .sub-issue-progress-bar.high-completion {
+  background: linear-gradient(90deg, #10b981 0%, #22c55e 100%);
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.3);
+}
+
+/* Enhanced kanban card progress bar */
+.issues-kanban-card-compact .sub-issue-progress-bar.completed {
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.issues-kanban-card-compact
+  .sub-issue-progress-bar.high-completion {
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.3);
+}
+
+/* Smooth progress animation */
+@keyframes progress-fill {
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  to {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+.progress-animated {
+  animation: progress-fill 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ️ Sub-task parent info box */
+.issues-kanban-card-compact .bg-purple-50 {
+  transition: all 0.2s ease;
+}
+
+.dark .issues-kanban-card-compact .bg-purple-50 {
+  background: rgba(168, 85, 247, 0.1) !important;
+}
+
+.issues-kanban-card-compact .bg-purple-50:hover {
+  background: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.dark .issues-kanban-card-compact .bg-purple-50:hover {
+  background: rgba(168, 85, 247, 0.15) !important;
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+/*Issue Creation Template Styling with Tiptap Editor */
+.issue-creation-template {
+  font-family: var(--font-family-primary);
+}
+
+.issue-creation-template [data-slot="dialog-content"] {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+/*Tiptap Editor Styling - Professional Teifi Design */
+.issue-creation-template .ProseMirror {
+  min-height: 400px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 1rem;
+  font-family: var(--font-family-primary);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--color-foreground);
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.issue-creation-template .ProseMirror:focus {
+  outline: none;
+}
+
+/* Ensure elements are displayed properly */
+.issue-creation-template .ProseMirror * {
+  display: revert;
+}
+
+/* Tiptap placeholder */
+.issue-creation-template
+  .ProseMirror
+  p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--color-muted-foreground);
+  pointer-events: none;
+  height: 0;
+}
+
+/* Tiptap content styling */
+.issue-creation-template .ProseMirror h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.issue-creation-template .ProseMirror h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.issue-creation-template .ProseMirror h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.issue-creation-template .ProseMirror p {
+  margin: 0.75rem 0;
+  display: block;
+}
+
+.issue-creation-template .ProseMirror strong,
+.issue-creation-template .ProseMirror b {
+  font-weight: 600;
+  color: var(--color-foreground);
+  display: inline;
+}
+
+.issue-creation-template .ProseMirror em,
+.issue-creation-template .ProseMirror i {
+  font-style: italic;
+  font-weight: 500; /* Slightly bolder for better distinction */
+  letter-spacing: 0.015em; /* Slightly wider spacing for better distinction */
+  color: var(--color-muted-foreground);
+  display: inline;
+}
+
+.issue-creation-template .ProseMirror ul,
+.issue-creation-template .ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+  display: block;
+}
+
+.issue-creation-template .ProseMirror li {
+  margin: 0.25rem 0;
+  line-height: 1.6;
+  display: list-item;
+}
+
+.issue-creation-template .ProseMirror hr {
+  border: none;
+  border-top: 2px solid var(--color-border);
+  margin: 1.5rem 0;
+  display: block;
+}
+
+.issue-creation-template .ProseMirror code {
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 0.85em;
+  background: var(--color-muted);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+.issue-creation-template .ProseMirror pre {
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  display: block;
+}
+
+.issue-creation-template .ProseMirror pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Tiptap scrollbar */
+.issue-creation-template .ProseMirror::-webkit-scrollbar {
+  width: 8px;
+}
+
+.issue-creation-template .ProseMirror::-webkit-scrollbar-track {
+  background: var(--color-muted);
+  border-radius: 4px;
+}
+
+.issue-creation-template .ProseMirror::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.issue-creation-template
+  .ProseMirror::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}
+
+/* Editor toolbar styling */
+.issue-creation-template .tiptap-toolbar {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-muted) / 30;
+  border-radius: 8px 8px 0 0;
+}
+
+.issue-creation-template .tiptap-toolbar button {
+  transition: all 0.2s ease;
+}
+
+.issue-creation-template .tiptap-toolbar button:hover {
+  background: var(--color-muted);
+}
+
+.issue-creation-template .tiptap-toolbar button.is-active {
+  background: var(--color-primary) / 10;
+  color: var(--color-primary);
+}
+
+/* File attachment cards */
+.issue-creation-template .file-attachment-card {
+  transition: all 0.2s ease;
+}
+
+.issue-creation-template .file-attachment-card:hover {
+  background: var(--color-muted) / 50;
+  border-color: var(--color-primary) / 30;
+}
+
+/* Property selects styling */
+.issue-creation-template [data-radix-select-trigger] {
+  transition: all 0.2s ease;
+}
+
+.issue-creation-template [data-radix-select-trigger]:hover {
+  background: var(--color-muted) / 50;
+  border-color: var(--color-primary) / 30;
+}
+
+/* Create more toggle styling */
+.issue-creation-template [data-state="checked"] {
+  background: var(--color-primary);
+}
+
+/* Submit button hover effect */
+.issue-creation-template button[class*="bg-primary"]:hover {
+  box-shadow: 0 4px 12px rgba(20, 146, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Footer with subtle gradient */
+.issue-creation-template .bg-muted\/20 {
+  background: linear-gradient(
+    180deg,
+    var(--color-muted) / 20 0%,
+    var(--color-muted) / 40 100%
+  );
+}
+
+/* Dark mode adjustments for Tiptap */
+.dark .issue-creation-template .ProseMirror {
+  color: var(--color-foreground);
+}
+
+.dark .issue-creation-template .ProseMirror code {
+  background: var(--color-muted);
+  border-color: var(--color-border);
+}
+
+.dark .issue-creation-template .ProseMirror pre {
+  background: var(--color-muted);
+  border-color: var(--color-border);
+}
+
+/*Enhanced Professional Header - Teifi Client Portal */
+
+/* Header with clean black background and subtle shadow */
+header[class*="bg-[#000000]"] {
+  background: #000000;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+.dark header[class*="bg-[#000000]"] {
+  background: #000000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Header navigation buttons hover states */
+header nav button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.05em;
+  position: relative;
+}
+
+header nav button::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #1492ff, #00fcf3);
+  transform: translateX(-50%);
+  transition: width 0.3s ease;
+}
+
+header nav button:hover::after {
+  width: 80%;
+}
+
+/* Active navigation item */
+header nav button[class*="text-white"]::after {
+  width: 80%;
+}
+
+/* Header icons with smooth hover */
+header button[class*="rounded-full"] {
+  transition: all 0.2s ease;
+}
+
+header button[class*="rounded-full"]:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Header avatar with ring effect */
+header .avatar {
+  transition: all 0.3s ease;
+}
+
+header .avatar:hover {
+  box-shadow: 0 0 0 3px rgba(20, 146, 255, 0.3);
+}
+
+/* Notification badge pulse in header */
+header [data-notification-badge] {
+  animation: notification-pulse 2s ease-in-out infinite;
+}
+
+@keyframes notification-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+  }
+}
+
+/* Header responsive adjustments */
+@media (max-width: 1024px) {
+  header nav {
+    display: none;
+  }
+
+  header .flex.items-center.gap-2 {
+    gap: 0.5rem;
+  }
+}
+
+/*Professional Acceptance Issues Table - Teifi Design System */
+
+/* Table container with smooth shadows */
+.issue-modal table {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Table header with subtle gradient */
+.issue-modal thead tr {
+  background: linear-gradient(
+    180deg,
+    var(--color-muted) / 40 0%,
+    var(--color-muted) / 20 100%
+  );
+}
+
+/* Table row hover with smooth transitions */
+.issue-modal tbody tr {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.issue-modal tbody tr:hover {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted) / 50 0%,
+    var(--color-muted) / 30 100%
+  );
+  transform: scale(1.001);
+}
+
+/* Completed task row styling */
+.issue-modal tbody tr:has([style*="completed"]) {
+  opacity: 0.7;
+}
+
+.issue-modal tbody tr:has([style*="completed"]):hover {
+  opacity: 1;
+}
+
+/* Priority indicator animations */
+.issue-modal .priority-indicator {
+  animation: pulse-priority 2s ease-in-out infinite;
+}
+
+@keyframes pulse-priority {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Status badge enhancements */
+.issue-modal tbody Badge[variant="secondary"] {
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.issue-modal tbody tr:hover Badge[variant="secondary"] {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced progress bar for acceptance issues */
+.acceptance-progress-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.acceptance-progress-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Compact table cells for better density */
+.issue-modal table td {
+  white-space: nowrap;
+}
+
+.issue-modal table td:nth-child(2) {
+  white-space: normal;
+  min-width: 300px;
+}
+
+/* Avatar ring effects */
+.issue-modal .avatar {
+  transition: all 0.2s ease;
+}
+
+.issue-modal tbody tr:hover .avatar {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px var(--color-primary) / 20;
+}
+
+/* Action button subtle animations */
+.issue-modal tbody Button[variant="ghost"] {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.issue-modal tbody Button[variant="ghost"]:hover {
+  background: var(--color-primary) / 10;
+  color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+/* Table scrollbar styling */
+.issue-modal .overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  padding: 1rem;
+}
+
+.issue-modal .overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.issue-modal .overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.issue-modal .overflow-x-auto::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.issue-modal .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.dark .issue-modal .overflow-x-auto::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark
+  .issue-modal
+  .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/*Enhanced Mobile Responsive Table - Acceptance Issues */
+@media (max-width: 1024px) {
+  /* Tablet: Hide priority column to save space */
+  .issue-modal table td:nth-child(4),
+  .issue-modal table th:nth-child(4) {
+    display: none;
+  }
+
+  /* Adjust column widths */
+  .issue-modal table th:nth-child(1),
+  .issue-modal table td:nth-child(1) {
+    width: 90px;
+  }
+
+  .issue-modal table th:nth-child(5),
+  .issue-modal table td:nth-child(5) {
+    width: 140px;
+  }
+
+  .issue-modal table th:nth-child(6),
+  .issue-modal table td:nth-child(6) {
+    width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Mobile: Reduce font size and padding */
+  .issue-modal table {
+    font-size: 0.75rem;
+  }
+
+  .issue-modal table th,
+  .issue-modal table td {
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* Hide priority AND status columns on mobile */
+  .issue-modal table td:nth-child(3),
+  .issue-modal table th:nth-child(3),
+  .issue-modal table td:nth-child(4),
+  .issue-modal table th:nth-child(4) {
+    display: none;
+  }
+
+  /* Adjust remaining column widths */
+  .issue-modal table th:nth-child(1),
+  .issue-modal table td:nth-child(1) {
+    width: 70px;
+  }
+
+  .issue-modal table th:nth-child(5),
+  .issue-modal table td:nth-child(5) {
+    width: 100px;
+  }
+
+  .issue-modal table th:nth-child(6),
+  .issue-modal table td:nth-child(6) {
+    width: 80px;
+  }
+
+  /* Smaller avatars on mobile */
+  .issue-modal table .avatar {
+    width: 20px;
+    height: 20px;
+  }
+
+  .issue-modal table .avatar .avatar-fallback {
+    font-size: 10px;
+  }
+
+  /* Hide assignee name, show only avatar on mobile */
+  .issue-modal table td:nth-child(5) span:not(.sr-only) {
+    display: none;
+  }
+
+  /* Smaller buttons on mobile */
+  .issue-modal table button {
+    height: 28px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+
+  .issue-modal table button svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/*Table Layout Auto - Allow columns to size based on content */
+.issue-modal table {
+  table-layout: auto;
+  width: 100%;
+}
+
+.issue-modal table th,
+.issue-modal table td {
+  vertical-align: middle;
+  text-align: left;
+}
+
+.issue-modal table th:last-child,
+.issue-modal table td:last-child {
+  text-align: center;
+}
+
+/* Ensure buttons display fully in Actions column */
+.issue-modal table td button {
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+/* Mobile: Optimize table layout */
+@media (max-width: 768px) {
+  .issue-modal table {
+    display: table;
+    width: 100%;
+  }
+  
+  /* Allow horizontal scroll if needed */
+  .issue-modal .overflow-x-auto {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Actions column minimum width for button groups */
+  .issue-modal table td:last-child {
+    min-width: 180px;
+  }
+  
+  /* Allow button wrapper to wrap on very small screens */
+  .issue-modal table td:last-child > div {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+/* Empty state for acceptance issues */
+.acceptance-empty-state {
+  background: linear-gradient(
+    135deg,
+    var(--color-muted) / 20 0%,
+    var(--color-muted) / 10 100%
+  );
+  border: 2px dashed var(--color-border);
+  transition: all 0.3s ease;
+}
+
+.acceptance-empty-state:hover {
+  border-color: var(--color-primary) / 50;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) / 5 0%,
+    var(--color-primary) / 2 100%
+  );
+}
+
+/*Sub-Issue Navigation Animations - Smooth transitions */
+
+/* Breadcrumb entrance animation */
+@keyframes breadcrumb-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.issue-modal [data-slot="dialog-header"] > div:first-child {
+  animation: breadcrumb-slide-down 0.3s
+    cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Back button hover effect */
+.issue-modal button:has(> svg.rotate-180) {
+  transition: all 0.2s ease;
+}
+
+.issue-modal button:has(> svg.rotate-180):hover {
+  transform: translateX(-2px);
+  background: var(--color-primary) / 10;
+  color: var(--color-primary);
+}
+
+/* Sub-issue badge pulse */
+@keyframes sub-issue-badge-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(168, 85, 247, 0);
+  }
+}
+
+.issue-modal [class*="bg-purple-50"] {
+  animation: sub-issue-badge-pulse 2s ease-in-out infinite;
+}
+
+/* Smooth content transition when navigating */
+.issue-modal [data-radix-scroll-area-viewport] {
+  transition: opacity 0.2s ease;
+}
+
+/* CRITICAL: Prevent display:table on viewport children - breaks layout */
+.issue-modal [data-radix-scroll-area-viewport] > div {
+  display: block !important;
+}
+
+.issue-modal.navigating [data-radix-scroll-area-viewport] {
+  opacity: 0.5;
+}
+
+/* Table row click feedback */
+.issue-modal tbody tr {
+  position: relative;
+}
+
+.issue-modal tbody tr::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--color-primary);
+  transform: scaleY(0);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.issue-modal tbody tr:hover::before {
+  transform: scaleY(1);
+}
+
+/*Enhanced Content-First Table Layout */
+/* ID badge inline with title */
+.issue-modal tbody tr td:first-child .flex {
+  align-items: flex-start;
+}
+
+.issue-modal tbody tr:hover td:first-child Badge {
+  border-color: var(--color-primary);
+  background: var(--color-primary) / 5;
+}
+
+/* Smooth transitions for all table elements */
+.issue-modal tbody tr Badge {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.issue-modal tbody tr .line-clamp-2 {
+  max-width: 100%;
+  word-break: break-word;
+}
+
+/* External link icon appears on hover */
+.issue-modal tbody tr a[title="Open in Linear"] {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.issue-modal tbody tr:hover a[title="Open in Linear"] {
+  opacity: 1 !important;
+}
+
+/* Breadcrumb separator animation */
+.issue-modal [orientation="vertical"] {
+  transition: all 0.2s ease;
+}
+
+/* Enhanced ChevronRight in breadcrumb */
+.issue-modal svg.h-3.w-3 {
+  transition: transform 0.2s ease;
+}
+
+.issue-modal div:hover > svg.h-3.w-3 {
+  transform: translateX(2px);
+}
+
+/* Parent identifier in breadcrumb */
+.issue-modal .max-w-\\[200px\\] {
+  transition: all 0.2s ease;
+}
+
+.issue-modal .max-w-\\[200px\\]:hover {
+  color: var(--color-primary);
+  transform: translateX(-2px);
+  cursor: pointer;
+}
+
+/*Enhanced Modern Sidebar Design - Teifi Client Portal */
+
+/* Sidebar container with subtle shadow and smooth transitions */
+aside.bg-sidebar,
+[data-sidebar-container] {
+  background: var(--color-sidebar);
+  box-shadow:
+    2px 0 8px rgba(0, 0, 0, 0.02),
+    1px 0 2px rgba(0, 0, 0, 0.04);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark aside.bg-sidebar,
+.dark [data-sidebar-container] {
+  background: #000000;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    2px 0 20px rgba(0, 0, 0, 0.5),
+    1px 0 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Sidebar collapsed state */
+[data-sidebar-container][data-collapsed="true"] {
+  width: 4rem !important;
+}
+
+[data-sidebar-container][data-collapsed="false"] {
+  width: 20rem !important;
+}
+
+/* User profile section with gradient background */
+.sidebar-user-profile {
+  background: linear-gradient(
+    135deg,
+    rgba(20, 146, 255, 0.05) 0%,
+    rgba(0, 252, 243, 0.03) 100%
+  );
+  border-bottom: 1px solid var(--color-border);
+  transition: all 0.3s ease;
+}
+
+.dark .sidebar-user-profile {
+  background: #0a0a0a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced avatar with glow effect */
+.sidebar-user-profile .avatar {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-user-profile:hover .avatar {
+  transform: scale(1.05);
+  box-shadow: 0 0 16px rgba(20, 146, 255, 0.3);
+}
+
+/* Navigation section headers with better typography */
+[data-sidebar-section-header] {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+[data-sidebar-section-header]:hover {
+  color: var(--color-foreground);
+  transform: translateX(2px);
+}
+
+/* Enhanced navigation buttons with smooth transitions */
+[data-sidebar-nav-item] {
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+[data-sidebar-nav-item]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-primary);
+  transform: scaleY(0);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-sidebar-nav-item]:hover::before {
+  transform: scaleY(1);
+}
+
+/* Active navigation item with accent */
+[data-sidebar-nav-item].active {
+  background: linear-gradient(
+    90deg,
+    rgba(20, 146, 255, 0.1) 0%,
+    rgba(20, 146, 255, 0.05) 50%,
+    transparent 100%
+  );
+  border-left: 2px solid var(--color-primary);
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.dark [data-sidebar-nav-item].active {
+  background: linear-gradient(
+    90deg,
+    rgba(96, 165, 250, 0.15) 0%,
+    rgba(96, 165, 250, 0.08) 50%,
+    transparent 100%
+  );
+  border-left: 2px solid #60a5fa;
+  color: #ffffff;
+}
+
+/* Team items with enhanced hover states */
+[data-sidebar-team-item] {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--radius-md);
+}
+
+[data-sidebar-team-item]:hover {
+  background: var(--color-muted);
+  transform: translateX(2px);
+}
+
+/* Team expansion button with smooth rotation */
+[data-sidebar-team-toggle] {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-sidebar-team-toggle][data-state="open"] svg {
+  transform: rotate(0deg);
+}
+
+[data-sidebar-team-toggle][data-state="closed"] svg {
+  transform: rotate(-90deg);
+}
+
+/* Collapsible sections with smooth animations */
+[data-radix-collapsible-content] {
+  overflow: hidden;
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-radix-collapsible-content][data-state="open"] {
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-radix-collapsible-content][data-state="closed"] {
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+/* Bottom actions section */
+[data-sidebar-footer] {
+  border-top: 1px solid var(--color-border);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--color-muted) / 30 100%
+  );
+}
+
+/* Logout button with destructive hover */
+[data-sidebar-logout]:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-destructive);
+  transform: translateX(2px);
+}
+
+/* Role badges with gradient backgrounds */
+[data-role-badge] {
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-role-badge]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile sidebar with backdrop blur */
+[data-sidebar-mobile] {
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.dark [data-sidebar-mobile] {
+  background: rgba(26, 26, 26, 0.95);
+}
+
+/* Scrollbar styling for sidebar */
+[data-sidebar-scroll] {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+[data-sidebar-scroll]::-webkit-scrollbar {
+  width: 6px;
+}
+
+[data-sidebar-scroll]::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-sidebar-scroll]::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+[data-sidebar-scroll]::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.dark [data-sidebar-scroll]::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark [data-sidebar-scroll]::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Empty state styling */
+[data-sidebar-empty-state] {
+  transition: all 0.3s ease;
+}
+
+[data-sidebar-empty-state]:hover {
+  transform: scale(1.02);
+}
+
+/* Badge counters in sidebar */
+[data-sidebar-badge] {
+  transition: all 0.2s ease;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-sidebar-badge]:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(20, 146, 255, 0.2);
+}
+
+/* Loading skeleton in sidebar */
+[data-sidebar-skeleton] {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted) 0%,
+    rgba(148, 163, 184, 0.08) 50%,
+    var(--color-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: sidebar-skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes sidebar-skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Responsive sidebar adjustments */
+@media (max-width: 768px) {
+  [data-sidebar-mobile] {
+    width: 100vw !important;
+    max-width: 320px;
+  }
+}
+
+/* Focus states for accessibility */
+[data-sidebar-nav-item]:focus-visible,
+[data-sidebar-team-item]:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+/* Improved spacing for nested teams */
+[data-sidebar-team-child] {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+[data-sidebar-team-child]::before {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--color-border);
+  opacity: 0.5;
+}
+
+/* Section dividers */
+[data-sidebar-section] + [data-sidebar-section] {
+  margin-top: 1.5rem;
+}

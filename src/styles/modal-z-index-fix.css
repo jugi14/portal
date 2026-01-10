@@ -1,0 +1,138 @@
+/**
+ * Modal Z-Index System Fix
+ * 
+ * Problem: Select dropdowns inside Dialogs are being covered by the Dialog overlay
+ * Solution: Proper z-index layering system
+ * 
+ * Z-Index Layers:
+ * - Base content: 0
+ * - Sticky elements: 10-20
+ * - Dropdown menus: 40-49
+ * - Dialog overlay: 50
+ * - Dialog content: 51
+ * - Select/Dropdown in Dialog: 52
+ * - Nested Dialog overlay: 60
+ * - Nested Dialog content: 61
+ * - Toast notifications: 100
+ */
+
+/* Dialog System - Base Layer */
+[data-slot="dialog-overlay"] {
+  z-index: 1000 !important;
+  position: fixed !important;
+  inset: 0 !important;
+}
+
+[data-slot="dialog-content"] {
+  z-index: 1001 !important;
+  position: fixed !important;
+}
+
+/* Select/Dropdown inside Dialog - Must be above dialog content */
+[data-slot="dialog-content"] [data-slot="select-content"],
+[data-slot="dialog-content"] [data-radix-select-content],
+[data-slot="dialog-content"] [data-radix-dropdown-menu-content],
+[data-slot="dialog-content"] [data-radix-popover-content],
+[data-radix-select-content],
+[data-radix-popper-content-wrapper] {
+  z-index: 10000 !important;
+  position: fixed !important;
+}
+
+/* Ensure Select Trigger is visible */
+[data-slot="dialog-content"] [data-radix-select-trigger] {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Select Viewport styling */
+[data-radix-select-viewport] {
+  max-height: 320px !important;
+  overflow-y: auto !important;
+}
+
+/* Nested/Stacked Dialogs Support */
+[data-slot="dialog-overlay"][data-state="open"] ~ [data-slot="dialog-portal"] [data-slot="dialog-overlay"] {
+  z-index: 2000 !important;
+}
+
+[data-slot="dialog-overlay"][data-state="open"] ~ [data-slot="dialog-portal"] [data-slot="dialog-content"] {
+  z-index: 2001 !important;
+}
+
+/* Select in Nested Dialog */
+[data-slot="dialog-content"]:last-of-type [data-slot="select-content"] {
+  z-index: 10000 !important;
+}
+
+/* Command/Combobox Dropdown */
+[data-slot="command-content"],
+[data-radix-command-content] {
+  z-index: 52 !important;
+}
+
+/* Alert Dialog System (Higher than regular Dialog) */
+[data-slot="alert-dialog-overlay"] {
+  z-index: 3000 !important;
+  position: fixed !important;
+  inset: 0 !important;
+}
+
+[data-slot="alert-dialog-content"] {
+  z-index: 3001 !important;
+  position: fixed !important;
+  max-width: 30vh;
+}
+
+/* Popover/Tooltip in Dialogs */
+[data-radix-popper-content-wrapper] {
+  z-index: 52 !important;
+}
+
+/* Toast Notifications - Always on top */
+[data-sonner-toaster] {
+  z-index: 100 !important;
+}
+
+/* Dropdown Menu - General */
+[data-radix-dropdown-menu-content] {
+  z-index: 40;
+}
+
+/* Dropdown Menu inside Dialog */
+[data-slot="dialog-content"] [data-radix-dropdown-menu-content] {
+  z-index: 52 !important;
+}
+
+/* Context Menu */
+[data-radix-context-menu-content] {
+  z-index: 40;
+}
+
+/* Context Menu inside Dialog */
+[data-slot="dialog-content"] [data-radix-context-menu-content] {
+  z-index: 52 !important;
+}
+
+/* Ensure Portal content renders correctly */
+[data-radix-portal] {
+  position: relative;
+  z-index: auto;
+}
+
+/* Fix for Select Content specifically */
+.radix-themes [data-radix-select-content] {
+  z-index: 52 !important;
+}
+
+/* Hover Card / Tooltip */
+[data-radix-hover-card-content],
+[data-radix-tooltip-content] {
+  z-index: 45;
+}
+
+/* Hover Card / Tooltip inside Dialog */
+[data-slot="dialog-content"] [data-radix-hover-card-content],
+[data-slot="dialog-content"] [data-radix-tooltip-content] {
+  z-index: 52 !important;
+}

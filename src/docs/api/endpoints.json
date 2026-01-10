@@ -1,0 +1,1201 @@
+{
+  "version": "2.0.0",
+  "lastUpdated": "2025-10-10",
+  "baseUrl": "https://{PROJECT_ID}.supabase.co/functions/v1/make-server-7f0d90fb",
+  "authentication": {
+    "type": "Bearer",
+    "header": "Authorization",
+    "format": "Bearer {ACCESS_TOKEN}",
+    "description": "All endpoints (except /health and /status) require valid Supabase access token"
+  },
+  
+  "businessServices": {
+    "userManagement": {
+      "name": "User Management Service",
+      "description": "User CRUD operations, customer assignments, authentication",
+      "basePath": "/admin/users",
+      "endpoints": [
+        {
+          "id": "user-list",
+          "method": "GET",
+          "path": "/admin/users",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Get all users in the system",
+          "query": {
+            "role": "optional - filter by role",
+            "customerId": "optional - filter by customer"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "users": [
+                {
+                  "id": "uuid",
+                  "email": "user@example.com",
+                  "name": "John Doe",
+                  "role": "client_user",
+                  "customers": ["customer-id"],
+                  "created_at": "2025-01-01T00:00:00Z"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "user-create",
+          "method": "POST",
+          "path": "/admin/users",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Create new user",
+          "body": {
+            "email": "required - unique email",
+            "name": "required - full name",
+            "password": "required - min 8 characters",
+            "role": "required - superadmin|admin|client_manager|client_user|tester|viewer",
+            "customers": "optional - array of customer IDs"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "user": {
+                "id": "new-uuid",
+                "email": "user@example.com"
+              }
+            },
+            "message": "User created successfully"
+          }
+        },
+        {
+          "id": "user-update",
+          "method": "PUT",
+          "path": "/admin/users/:userId",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Update user details",
+          "params": {
+            "userId": "User UUID"
+          },
+          "body": {
+            "name": "optional",
+            "role": "optional",
+            "customers": "optional - array of customer IDs",
+            "is_active": "optional - boolean"
+          },
+          "response": {
+            "success": true,
+            "message": "User updated successfully"
+          }
+        },
+        {
+          "id": "user-delete",
+          "method": "DELETE",
+          "path": "/admin/users/:userId",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Delete user (soft delete)",
+          "params": {
+            "userId": "User UUID"
+          },
+          "response": {
+            "success": true,
+            "message": "User deleted successfully"
+          }
+        },
+        {
+          "id": "user-get-customers",
+          "method": "GET",
+          "path": "/admin/users/:userId/customers",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Get user's assigned customers",
+          "params": {
+            "userId": "User UUID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "customers": [
+                {
+                  "id": "customer-uuid",
+                  "name": "Acme Corp",
+                  "assigned_at": "2025-01-01T00:00:00Z"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "user-assign-customer",
+          "method": "POST",
+          "path": "/admin/users/:userId/customers/:customerId",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Assign user to customer",
+          "params": {
+            "userId": "User UUID",
+            "customerId": "Customer UUID"
+          },
+          "response": {
+            "success": true,
+            "message": "User assigned to customer successfully"
+          }
+        },
+        {
+          "id": "user-remove-customer",
+          "method": "DELETE",
+          "path": "/admin/users/:userId/customers/:customerId",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Remove user from customer",
+          "params": {
+            "userId": "User UUID",
+            "customerId": "Customer UUID"
+          },
+          "response": {
+            "success": true,
+            "message": "User removed from customer successfully"
+          }
+        }
+      ]
+    },
+    
+    "customerManagement": {
+      "name": "Customer Management Service",
+      "description": "Customer/organization CRUD, member management",
+      "basePath": "/admin/customers",
+      "endpoints": [
+        {
+          "id": "customer-list",
+          "method": "GET",
+          "path": "/admin/customers",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Get all customers",
+          "response": {
+            "success": true,
+            "data": {
+              "customers": [
+                {
+                  "id": "uuid",
+                  "name": "Acme Corp",
+                  "description": "Customer description",
+                  "is_active": true,
+                  "created_at": "2025-01-01T00:00:00Z",
+                  "user_count": 5,
+                  "team_count": 3
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "customer-create",
+          "method": "POST",
+          "path": "/admin/customers",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Create new customer",
+          "body": {
+            "name": "required - customer name",
+            "description": "optional - customer description",
+            "is_active": "optional - default true"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "customer": {
+                "id": "new-uuid",
+                "name": "New Customer"
+              }
+            },
+            "message": "Customer created successfully"
+          }
+        },
+        {
+          "id": "customer-update",
+          "method": "PUT",
+          "path": "/admin/customers/:customerId",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Update customer details",
+          "params": {
+            "customerId": "Customer UUID"
+          },
+          "body": {
+            "name": "optional",
+            "description": "optional",
+            "is_active": "optional"
+          },
+          "response": {
+            "success": true,
+            "message": "Customer updated successfully"
+          }
+        },
+        {
+          "id": "customer-delete",
+          "method": "DELETE",
+          "path": "/admin/customers/:customerId",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Delete customer",
+          "params": {
+            "customerId": "Customer UUID"
+          },
+          "response": {
+            "success": true,
+            "message": "Customer deleted successfully"
+          }
+        }
+      ]
+    },
+    
+    "teamManagement": {
+      "name": "Team Management Service",
+      "description": "Team hierarchy, access control, member management",
+      "basePath": "/teams",
+      "endpoints": [
+        {
+          "id": "team-my-teams",
+          "method": "GET",
+          "path": "/teams/my-teams",
+          "auth": true,
+          "description": "Get current user's assigned teams",
+          "response": {
+            "success": true,
+            "data": {
+              "teams": [
+                {
+                  "id": "team-uuid",
+                  "name": "Development Team",
+                  "linear_team_id": "linear-id",
+                  "customer_id": "customer-uuid"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "team-check-access",
+          "method": "GET",
+          "path": "/teams/:teamId/access",
+          "auth": true,
+          "description": "Check if user has access to specific team",
+          "params": {
+            "teamId": "Team UUID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "hasAccess": true,
+              "accessType": "direct",
+              "role": "client_user"
+            }
+          }
+        },
+        {
+          "id": "team-hierarchy",
+          "method": "GET",
+          "path": "/teams/hierarchy",
+          "auth": true,
+          "description": "Get team hierarchy for current user",
+          "response": {
+            "success": true,
+            "data": [
+              {
+                "id": "team-uuid",
+                "name": "Parent Team",
+                "linear_team_id": "linear-id",
+                "customer_id": "customer-uuid",
+                "parent_id": null,
+                "children": [
+                  {
+                    "id": "child-uuid",
+                    "name": "Child Team",
+                    "parent_id": "team-uuid"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "team-create",
+          "method": "POST",
+          "path": "/teams",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Create new team",
+          "body": {
+            "name": "required - team name",
+            "linear_team_id": "required - Linear team ID",
+            "customer_id": "required - customer UUID",
+            "parent_id": "optional - parent team UUID",
+            "description": "optional"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "team": {
+                "id": "new-uuid",
+                "name": "New Team"
+              }
+            },
+            "message": "Team created successfully"
+          }
+        },
+        {
+          "id": "team-update",
+          "method": "PUT",
+          "path": "/teams/:teamId",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Update team details",
+          "params": {
+            "teamId": "Team UUID"
+          },
+          "body": {
+            "name": "optional",
+            "description": "optional",
+            "parent_id": "optional"
+          },
+          "response": {
+            "success": true,
+            "message": "Team updated successfully"
+          }
+        },
+        {
+          "id": "team-delete",
+          "method": "DELETE",
+          "path": "/teams/:teamId",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Delete team",
+          "params": {
+            "teamId": "Team UUID"
+          },
+          "response": {
+            "success": true,
+            "message": "Team deleted successfully"
+          }
+        },
+        {
+          "id": "team-get-members",
+          "method": "GET",
+          "path": "/teams/:teamId/members",
+          "auth": true,
+          "description": "Get team members",
+          "params": {
+            "teamId": "Team UUID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "members": [
+                {
+                  "id": "user-uuid",
+                  "email": "user@example.com",
+                  "name": "John Doe",
+                  "role": "client_user",
+                  "assigned_at": "2025-01-01T00:00:00Z"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "team-add-member",
+          "method": "POST",
+          "path": "/teams/:teamId/members/:userId",
+          "auth": true,
+          "roles": ["admin", "client_manager"],
+          "description": "Add member to team",
+          "params": {
+            "teamId": "Team UUID",
+            "userId": "User UUID"
+          },
+          "response": {
+            "success": true,
+            "message": "Member added to team successfully"
+          }
+        },
+        {
+          "id": "team-remove-member",
+          "method": "DELETE",
+          "path": "/teams/:teamId/members/:userId",
+          "auth": true,
+          "roles": ["admin", "client_manager"],
+          "description": "Remove member from team",
+          "params": {
+            "teamId": "Team UUID",
+            "userId": "User UUID"
+          },
+          "response": {
+            "success": true,
+            "message": "Member removed from team successfully"
+          }
+        }
+      ]
+    },
+    
+    "linearIntegration": {
+      "name": "Linear Integration Service",
+      "description": "Linear.app API integration - teams, issues, workflow states",
+      "basePath": "/linear",
+      "endpoints": [
+        {
+          "id": "linear-test",
+          "method": "GET",
+          "path": "/linear/test",
+          "auth": true,
+          "description": "Test Linear API connection",
+          "response": {
+            "success": true,
+            "message": "Linear API connection successful",
+            "data": {
+              "user": {
+                "id": "linear-user-id",
+                "name": "User Name",
+                "email": "user@example.com"
+              }
+            }
+          }
+        },
+        {
+          "id": "linear-teams-list",
+          "method": "GET",
+          "path": "/linear/teams",
+          "auth": true,
+          "description": "Get all Linear teams",
+          "response": {
+            "success": true,
+            "data": [
+              {
+                "id": "linear-team-id",
+                "name": "Development Team",
+                "key": "DEV",
+                "description": "Team description"
+              }
+            ]
+          }
+        },
+        {
+          "id": "linear-teams-get",
+          "method": "GET",
+          "path": "/linear/teams/:teamId",
+          "auth": true,
+          "description": "Get Linear team by ID",
+          "params": {
+            "teamId": "Linear Team ID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "id": "linear-team-id",
+              "name": "Development Team",
+              "key": "DEV"
+            }
+          }
+        },
+        {
+          "id": "linear-team-config",
+          "method": "GET",
+          "path": "/linear/teams/:teamId/config",
+          "auth": true,
+          "description": "Get complete team configuration (states, labels, members, projects)",
+          "params": {
+            "teamId": "Linear Team ID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "id": "linear-team-id",
+              "name": "Development Team",
+              "states": [],
+              "labels": [],
+              "members": [],
+              "projects": []
+            }
+          }
+        },
+        {
+          "id": "linear-team-states",
+          "method": "GET",
+          "path": "/linear/teams/:teamId/states",
+          "auth": true,
+          "description": "Get workflow states for team",
+          "params": {
+            "teamId": "Linear Team ID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "states": [
+                {
+                  "id": "state-id",
+                  "name": "Todo",
+                  "type": "unstarted",
+                  "color": "#e2e2e2",
+                  "position": 1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "linear-team-labels",
+          "method": "GET",
+          "path": "/linear/teams/:teamId/labels",
+          "auth": true,
+          "description": "Get team labels",
+          "params": {
+            "teamId": "Linear Team ID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "labels": [
+                {
+                  "id": "label-id",
+                  "name": "Bug",
+                  "color": "#f44336"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "linear-team-members",
+          "method": "GET",
+          "path": "/linear/teams/:teamId/members",
+          "auth": true,
+          "description": "Get Linear team members",
+          "params": {
+            "teamId": "Linear Team ID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "members": [
+                {
+                  "id": "member-id",
+                  "name": "John Doe",
+                  "email": "john@example.com",
+                  "avatarUrl": "https://..."
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "linear-team-projects",
+          "method": "GET",
+          "path": "/linear/teams/:teamId/projects",
+          "auth": true,
+          "description": "Get team projects",
+          "params": {
+            "teamId": "Linear Team ID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "projects": [
+                {
+                  "id": "project-id",
+                  "name": "Q4 2024 Release",
+                  "state": "started",
+                  "progress": 0.65
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "linear-team-issues",
+          "method": "GET",
+          "path": "/linear/teams/:teamId/issues",
+          "auth": true,
+          "description": "Get all issues for Linear team",
+          "params": {
+            "teamId": "Linear Team ID"
+          },
+          "response": {
+            "success": true,
+            "data": [
+              {
+                "id": "issue-id",
+                "identifier": "DEV-123",
+                "title": "Issue title",
+                "description": "Issue description",
+                "state": {
+                  "name": "In Progress"
+                },
+                "priority": 2
+              }
+            ]
+          }
+        },
+        {
+          "id": "linear-team-issues-by-state",
+          "method": "GET",
+          "path": "/linear/teams/:teamId/issues/by-state",
+          "auth": true,
+          "description": "Get issues grouped by workflow state",
+          "params": {
+            "teamId": "Linear Team ID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "Todo": [
+                {
+                  "id": "issue-id",
+                  "identifier": "DEV-123",
+                  "title": "Issue title"
+                }
+              ],
+              "In Progress": [],
+              "Done": []
+            }
+          }
+        },
+        {
+          "id": "linear-issues-get",
+          "method": "GET",
+          "path": "/linear/issues/:issueId",
+          "auth": true,
+          "description": "Get single issue by ID",
+          "params": {
+            "issueId": "Linear Issue ID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "id": "issue-id",
+              "identifier": "DEV-123",
+              "title": "Issue title",
+              "description": "Full description",
+              "state": {},
+              "assignee": {},
+              "labels": []
+            }
+          }
+        },
+        {
+          "id": "linear-issues-update-state",
+          "method": "PUT",
+          "path": "/linear/issues/:issueId/state",
+          "auth": true,
+          "permissions": ["create_issues"],
+          "description": "Update issue workflow state",
+          "params": {
+            "issueId": "Linear Issue ID"
+          },
+          "body": {
+            "stateId": "new-state-id"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "id": "issue-id",
+              "state": {
+                "id": "new-state-id",
+                "name": "Done"
+              }
+            },
+            "message": "Issue state updated successfully"
+          }
+        },
+        {
+          "id": "linear-issues-create",
+          "method": "POST",
+          "path": "/linear/issues",
+          "auth": true,
+          "permissions": ["create_issues"],
+          "description": "Create new Linear issue",
+          "body": {
+            "teamId": "required - Linear team ID",
+            "title": "required - issue title",
+            "description": "optional - issue description",
+            "priority": "optional - 0-4 (0=none, 1=urgent, 2=high, 3=medium, 4=low)",
+            "assigneeId": "optional - Linear user ID",
+            "labelIds": "optional - array of label IDs",
+            "projectId": "optional - project ID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "id": "new-issue-id",
+              "identifier": "DEV-124",
+              "title": "New issue title",
+              "url": "https://linear.app/..."
+            },
+            "message": "Issue created successfully"
+          }
+        },
+        {
+          "id": "linear-cache-invalidate",
+          "method": "POST",
+          "path": "/linear/cache/invalidate",
+          "auth": true,
+          "description": "Clear Linear cache (optionally for specific team)",
+          "body": {
+            "teamId": "optional - specific team ID to invalidate"
+          },
+          "response": {
+            "success": true,
+            "message": "Cache invalidated successfully"
+          }
+        },
+        {
+          "id": "linear-cache-stats",
+          "method": "GET",
+          "path": "/linear/cache/stats",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Get cache statistics",
+          "response": {
+            "success": true,
+            "data": {
+              "cacheSize": 1500,
+              "hitRate": 0.85,
+              "entries": 42
+            }
+          }
+        }
+      ]
+    },
+    
+    "issueManagement": {
+      "name": "Issue Management Service",
+      "description": "Issue CRUD and caching (alternative to Linear routes)",
+      "basePath": "/issues",
+      "endpoints": [
+        {
+          "id": "issues-team-list",
+          "method": "GET",
+          "path": "/issues/team/:teamId",
+          "auth": true,
+          "description": "Get all issues for a team",
+          "params": {
+            "teamId": "Team UUID (not Linear team ID)"
+          },
+          "response": {
+            "success": true,
+            "data": [
+              {
+                "id": "issue-id",
+                "identifier": "DEV-123",
+                "title": "Issue title"
+              }
+            ]
+          }
+        },
+        {
+          "id": "issues-team-by-state",
+          "method": "GET",
+          "path": "/issues/team/:teamId/by-state",
+          "auth": true,
+          "description": "Get issues grouped by state for team",
+          "params": {
+            "teamId": "Team UUID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "Todo": [],
+              "In Progress": [],
+              "Done": []
+            }
+          }
+        },
+        {
+          "id": "issues-get",
+          "method": "GET",
+          "path": "/issues/:issueId",
+          "auth": true,
+          "description": "Get single issue details",
+          "params": {
+            "issueId": "Linear Issue ID"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "id": "issue-id",
+              "identifier": "DEV-123",
+              "title": "Issue title",
+              "description": "Full description"
+            }
+          }
+        },
+        {
+          "id": "issues-update-state",
+          "method": "PUT",
+          "path": "/issues/:issueId/state",
+          "auth": true,
+          "permissions": ["create_issues"],
+          "description": "Update issue state",
+          "params": {
+            "issueId": "Linear Issue ID"
+          },
+          "body": {
+            "stateId": "new-state-id"
+          },
+          "response": {
+            "success": true,
+            "message": "Issue state updated successfully"
+          }
+        },
+        {
+          "id": "issues-create",
+          "method": "POST",
+          "path": "/issues",
+          "auth": true,
+          "permissions": ["create_issues"],
+          "description": "Create new issue",
+          "body": {
+            "teamId": "required - Linear team ID",
+            "title": "required",
+            "description": "optional",
+            "priority": "optional"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "id": "new-issue-id",
+              "identifier": "DEV-124"
+            },
+            "message": "Issue created successfully"
+          }
+        },
+        {
+          "id": "issues-cache-invalidate",
+          "method": "POST",
+          "path": "/issues/cache/invalidate",
+          "auth": true,
+          "description": "Invalidate issue cache",
+          "body": {
+            "teamId": "optional - specific team"
+          },
+          "response": {
+            "success": true,
+            "message": "Cache invalidated"
+          }
+        },
+        {
+          "id": "issues-cache-stats",
+          "method": "GET",
+          "path": "/issues/cache/stats",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Get cache statistics",
+          "response": {
+            "success": true,
+            "data": {
+              "cacheSize": 800,
+              "hitRate": 0.78
+            }
+          }
+        }
+      ]
+    },
+    
+    "adminDashboard": {
+      "name": "Admin Dashboard Service",
+      "description": "Admin statistics, activity logs, system health",
+      "basePath": "/admin",
+      "endpoints": [
+        {
+          "id": "admin-stats",
+          "method": "GET",
+          "path": "/admin/stats",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Get admin dashboard statistics",
+          "response": {
+            "success": true,
+            "data": {
+              "stats": {
+                "users": 100,
+                "customers": 15,
+                "teams": 45,
+                "recentActivity": 10
+              }
+            },
+            "timestamp": "2025-10-10T12:00:00Z"
+          }
+        },
+        {
+          "id": "admin-activity",
+          "method": "GET",
+          "path": "/admin/activity",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Get admin activity logs",
+          "query": {
+            "limit": "optional - default 50",
+            "offset": "optional - default 0"
+          },
+          "response": {
+            "success": true,
+            "data": {
+              "logs": [
+                {
+                  "id": "log-uuid",
+                  "user_id": "user-uuid",
+                  "action": "user_created",
+                  "details": {},
+                  "created_at": "2025-10-10T12:00:00Z"
+                }
+              ],
+              "total": 150,
+              "limit": 50,
+              "offset": 0
+            }
+          }
+        },
+        {
+          "id": "admin-roles",
+          "method": "GET",
+          "path": "/admin/roles",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Get role definitions and hierarchy",
+          "response": {
+            "success": true,
+            "data": {
+              "roles": [
+                {
+                  "name": "superadmin",
+                  "level": 6,
+                  "description": "Full system access"
+                },
+                {
+                  "name": "admin",
+                  "level": 5,
+                  "description": "Manage users, customers, teams"
+                },
+                {
+                  "name": "client_manager",
+                  "level": 4,
+                  "description": "Manage team members"
+                },
+                {
+                  "name": "client_user",
+                  "level": 3,
+                  "description": "View and create issues"
+                },
+                {
+                  "name": "tester",
+                  "level": 2,
+                  "description": "View issues only"
+                },
+                {
+                  "name": "viewer",
+                  "level": 1,
+                  "description": "Read-only access"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    
+    "systemManagement": {
+      "name": "System Management Service",
+      "description": "Health checks, migrations, diagnostics",
+      "basePath": "/",
+      "endpoints": [
+        {
+          "id": "health",
+          "method": "GET",
+          "path": "/health",
+          "auth": false,
+          "description": "Health check - no authentication required",
+          "response": {
+            "status": "healthy",
+            "timestamp": "2025-10-10T12:00:00.000Z"
+          }
+        },
+        {
+          "id": "status",
+          "method": "GET",
+          "path": "/status",
+          "auth": false,
+          "description": "System status with version and endpoints",
+          "response": {
+            "success": true,
+            "data": {
+              "server": "online",
+              "version": "2.0.0",
+              "architecture": "clean-modular",
+              "services": {
+                "database": "connected",
+                "linear": "connected",
+                "supabase": "connected"
+              }
+            }
+          }
+        },
+        {
+          "id": "migrate-run",
+          "method": "POST",
+          "path": "/migrate/schema-v2",
+          "auth": true,
+          "roles": ["superadmin"],
+          "description": "Run schema migration to V2",
+          "body": {
+            "dryRun": "optional - boolean, default false"
+          },
+          "response": {
+            "success": true,
+            "message": "Migration completed successfully",
+            "data": {
+              "migrated": true,
+              "version": "2.0"
+            }
+          }
+        },
+        {
+          "id": "migrate-status",
+          "method": "GET",
+          "path": "/migrate/status",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "Check migration status",
+          "response": {
+            "success": true,
+            "data": {
+              "migrated": true,
+              "version": "2.0",
+              "lastMigration": "2025-10-10T12:00:00Z"
+            }
+          }
+        },
+        {
+          "id": "diagnostics",
+          "method": "GET",
+          "path": "/diagnostics",
+          "auth": true,
+          "roles": ["admin", "superadmin"],
+          "description": "System diagnostics and health metrics",
+          "response": {
+            "success": true,
+            "data": {
+              "database": {
+                "status": "connected",
+                "latency": "15ms"
+              },
+              "linear": {
+                "status": "connected",
+                "latency": "120ms"
+              },
+              "cache": {
+                "size": 2500,
+                "hitRate": 0.85
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  
+  "roleHierarchy": {
+    "superadmin": {
+      "level": 6,
+      "description": "Full system access",
+      "permissions": ["all"]
+    },
+    "admin": {
+      "level": 5,
+      "description": "Manage users, customers, teams",
+      "permissions": [
+        "manage_users",
+        "manage_customers",
+        "manage_teams",
+        "view_admin_panel",
+        "view_activity_logs"
+      ]
+    },
+    "client_manager": {
+      "level": 4,
+      "description": "Manage team members",
+      "permissions": [
+        "manage_team_members",
+        "view_issues",
+        "create_issues"
+      ]
+    },
+    "client_user": {
+      "level": 3,
+      "description": "View and create issues",
+      "permissions": [
+        "view_issues",
+        "create_issues",
+        "update_issues"
+      ]
+    },
+    "tester": {
+      "level": 2,
+      "description": "View issues only",
+      "permissions": [
+        "view_issues"
+      ]
+    },
+    "viewer": {
+      "level": 1,
+      "description": "Read-only access",
+      "permissions": [
+        "view_issues"
+      ]
+    }
+  },
+  
+  "errorCodes": {
+    "BAD_REQUEST": {
+      "status": 400,
+      "description": "Invalid request parameters or missing required fields"
+    },
+    "UNAUTHORIZED": {
+      "status": 401,
+      "description": "Missing or invalid authentication token"
+    },
+    "FORBIDDEN": {
+      "status": 403,
+      "description": "Insufficient permissions to access this resource"
+    },
+    "NOT_FOUND": {
+      "status": 404,
+      "description": "Resource not found"
+    },
+    "CONFLICT": {
+      "status": 409,
+      "description": "Resource conflict (e.g., duplicate email)"
+    },
+    "RATE_LIMIT_EXCEEDED": {
+      "status": 429,
+      "description": "Too many requests - rate limit exceeded"
+    },
+    "INTERNAL_ERROR": {
+      "status": 500,
+      "description": "Internal server error"
+    }
+  },
+  
+  "statistics": {
+    "totalEndpoints": 55,
+    "businessServices": 7,
+    "serviceBreakdown": {
+      "userManagement": 7,
+      "customerManagement": 4,
+      "teamManagement": 9,
+      "linearIntegration": 15,
+      "issueManagement": 7,
+      "adminDashboard": 3,
+      "systemManagement": 5
+    }
+  }
+}

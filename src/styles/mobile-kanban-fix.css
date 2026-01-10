@@ -1,0 +1,168 @@
+/**
+ * Mobile Kanban Fix - Prevent Vertical Text Display
+ * 
+ * Issue: Kanban column headers and buttons displaying vertical text on mobile
+ * Fix: Force horizontal text orientation and proper mobile layout
+ */
+
+/* Force horizontal text orientation globally */
+* {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  -webkit-writing-mode: horizontal-tb !important;
+}
+
+/* Mobile Kanban Layout (max-width: 768px) */
+@media (max-width: 768px) {
+  /* Kanban container - Enable horizontal scroll */
+  .kanban-board-container,
+  [class*="kanban"] {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-behavior: smooth !important;
+  }
+
+  /* Kanban columns container - Horizontal flex layout */
+  .kanban-board-container > div,
+  [class*="kanban"] > div {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+    min-height: calc(100vh - 200px) !important;
+  }
+
+  /* Individual kanban column - Maintain minimum width */
+  .kanban-column-unified,
+  [class*="kanban"] > div > div {
+    flex-shrink: 0 !important;
+    min-width: 280px !important;
+    max-width: 320px !important;
+    writing-mode: horizontal-tb !important;
+  }
+
+  /* Column headers - Force horizontal text */
+  .kanban-column-unified h3,
+  .kanban-column-unified p,
+  .kanban-column-unified button,
+  .kanban-column-unified span {
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    display: inline-block !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+  }
+
+  /* New Group Task button - Ensure horizontal layout */
+  .kanban-column-unified button {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.375rem !important;
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+  }
+
+  /* Button text - Force horizontal */
+  .kanban-column-unified button > * {
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+  }
+
+  /* Icons - Ensure proper sizing */
+  .kanban-column-unified svg {
+    flex-shrink: 0 !important;
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+
+  /* Task cards - Maintain readability */
+  .kanban-column-unified [class*="card"] {
+    width: 100% !important;
+    writing-mode: horizontal-tb !important;
+  }
+
+  /* Card content - Horizontal text */
+  .kanban-column-unified [class*="card"] * {
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+  }
+
+  /* Badges - Horizontal layout */
+  .kanban-column-unified [class*="badge"] {
+    display: inline-flex !important;
+    writing-mode: horizontal-tb !important;
+  }
+
+  /* Column header metadata */
+  .kanban-column-unified .text-xs,
+  .kanban-column-unified .text-sm {
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    display: block !important;
+  }
+}
+
+/* Extra small screens (< 375px) - Even more compact */
+@media (max-width: 374px) {
+  .kanban-column-unified {
+    min-width: 260px !important;
+    max-width: 280px !important;
+  }
+
+  .kanban-board-container > div,
+  [class*="kanban"] > div {
+    gap: 0.75rem !important;
+    padding: 0.75rem !important;
+  }
+}
+
+/* Tablet (768px - 1024px) - Optimal column width */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .kanban-column-unified {
+    min-width: 300px !important;
+    max-width: 340px !important;
+  }
+}
+
+/* Prevent text rotation in all contexts */
+[class*="kanban"] *,
+.kanban-column-unified *,
+.kanban-board-container * {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  -webkit-writing-mode: horizontal-tb !important;
+}
+
+/* Accessibility - Ensure screen readers work correctly */
+@media (max-width: 768px) {
+  .kanban-column-unified [aria-label],
+  .kanban-column-unified [role="button"] {
+    writing-mode: horizontal-tb !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+}
+
+/* Dark mode support */
+.dark .kanban-column-unified {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .kanban-column-unified {
+    border-width: 2px !important;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .kanban-board-container,
+  .kanban-column-unified {
+    scroll-behavior: auto !important;
+  }
+}
