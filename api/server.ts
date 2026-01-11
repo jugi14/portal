@@ -6,7 +6,7 @@
  */
 
 import { handle } from "hono/vercel";
-import app from "./server/index";
+import app from "../src/server/index";
 
 // Export for Vercel serverless function
 export default handle(app);

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build && npm run copy-server",
+  "buildCommand": "npm run build",
   "outputDirectory": "build",
   "rewrites": [
     {
@@ -14,7 +14,8 @@
   ],
   "functions": {
     "api/server.ts": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": "src/server/**"
     }
   }
 }
