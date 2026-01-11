@@ -1965,3 +1965,91 @@ export async function createIssue(params: {
     data: createdIssue
   };
 }
+
+/**
+ * Get team issues (alias for getTeamIssuesByState for backward compatibility)
+ */
+export async function getTeamIssues(teamId: string) {
+  return await getTeamIssuesByState(teamId);
+}
+
+/**
+ * Invalidate cache for a specific team
+ */
+export async function invalidateCache(teamId: string) {
+  try {
+    // Invalidate issue detail cache for all issues in this team
+    const allIssues = await getAllTeamIssues(teamId);
+    const cacheKeys = allIssues.map(issue => `linear:issue-detail:${issue.id}`);
+    
+    // Delete all cache keys
+    for (const key of cacheKeys) {
+      try {
+        await kv.del(key);
+      } catch (error) {
+        // Ignore individual cache deletion errors
+      }
+    }
+    
+    return {
+      success: true,
+      message: `Invalidated cache for ${cacheKeys.length} issues in team ${teamId}`,
+      invalidatedCount: cacheKeys.length
+    };
+  } catch (error) {
+    console.error(`[invalidateCache] Error invalidating cache for team ${teamId}:`, error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to invalidate cache'
+    };
+  }
+}
+
+/**
+ * Get cache statistics
+ */
+export async function getCacheStats() {
+  try {
+    // Get all cache keys with prefix
+    const cacheKeys = await kv.getByPrefix('linear:issue-detail:');
+    
+    let totalSize = 0;
+    let validCaches = 0;
+    let expiredCaches = 0;
+    
+    // Check each cache entry
+    for (const key of cacheKeys) {
+      try {
+        const cached = await kv.get(key);
+        if (cached) {
+          if (cached.expiresAt && cached.expiresAt > Date.now()) {
+            validCaches++;
+          } else {
+            expiredCaches++;
+          }
+          // Estimate size (rough calculation)
+          totalSize += JSON.stringify(cached).length;
+        }
+      } catch (error) {
+        // Ignore individual cache read errors
+      }
+    }
+    
+    return {
+      success: true,
+      data: {
+        totalCaches: cacheKeys.length,
+        validCaches,
+        expiredCaches,
+        estimatedSize: totalSize,
+        estimatedSizeKB: Math.round(totalSize / 1024)
+      }
+    };
+  } catch (error) {
+    console.error('[getCacheStats] Error getting cache stats:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to get cache stats'
+    };
+  }
+}
