@@ -14,6 +14,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { LINEAR_QUERIES, FRAGMENTS } from "../helpers/linearGraphQL";
+import * as kv from "../kv_store";
 
 // Linear GraphQL endpoint
 const LINEAR_API_URL = "https://api.linear.app/graphql";
@@ -75,60 +76,16 @@ export async function executeLinearQuery(
       ? queryNameMatch[1]
       : "UnknownQuery";
 
-    // Log detailed request information
-    console.log(
-      `[${requestId}] [Linear API] Executing ${queryName} at ${new Date().toISOString()}`,
-    );
-    console.log(
-      `[${requestId}] [Linear API] Variables:`,
-      JSON.stringify(variables, null, 2),
-    );
-    console.log(
-      `[${requestId}] [Linear API] Query:`,
-      query.trim(),
-    );
-
-    // Log variable types for debugging type mismatches
-    Object.entries(variables).forEach(([key, value]) => {
-      const type = typeof value;
-      const isUuid =
-        typeof value === "string" &&
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-          value,
-        );
-      console.log(
-        `[${requestId}] [Linear API] Variable ${key}: ${type}${isUuid ? " (UUID)" : ""} = ${value}`,
-      );
-    });
-
+    // PERFORMANCE: Reduced logging - only log essential info
     const requestPayload = {
       query,
       variables,
     };
 
-    // CRITICAL DEBUG: Log payload structure
-    console.log(
-      `[${requestId}] [Linear API] Request payload structure:`,
-      {
-        hasQuery: !!query,
-        hasVariables: !!variables,
-        variablesType: typeof variables,
-        variablesIsString: typeof variables === 'string',
-        variablesKeys: typeof variables === 'object' && variables !== null 
-          ? Object.keys(variables) 
-          : 'N/A',
-        payloadKeys: Object.keys(requestPayload),
-      }
-    );
-
-    console.log(
-      `[${requestId}] [Linear API] Sending request to ${LINEAR_API_URL}`,
-    );
-    console.log(
-      `[${requestId}] [Linear API] Request payload:`,
-      JSON.stringify(requestPayload, null, 2),
-    );
-
+    // PERFORMANCE: Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    
     const response = await fetch(LINEAR_API_URL, {
       method: "POST",
       headers: {
@@ -138,18 +95,18 @@ export async function executeLinearQuery(
         "public-file-urls-expire-in": "3600", // 1 hour signed URLs for attachments
       },
       body: JSON.stringify(requestPayload),
+      signal: controller.signal,
     });
+    
+    clearTimeout(timeoutId);
 
     const responseTime = Date.now() - startTime;
-    console.log(
-      `[${requestId}] [Linear API] Response received for ${queryName}:`,
-      {
-        status: response.status,
-        statusText: response.statusText,
-        responseTime: `${responseTime}ms`,
-        contentType: response.headers.get("content-type"),
-      },
-    );
+    // Only log slow requests (> 1s) or errors
+    if (responseTime > 1000 || !response.ok) {
+      console.log(
+        `[${requestId}] [Linear API] ${queryName} - ${responseTime}ms (${response.status})`,
+      );
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -170,17 +127,6 @@ export async function executeLinearQuery(
     }
 
     const result = await response.json();
-
-    console.log(
-      `[${requestId}] [Linear API] Response parsed for ${queryName}:`,
-      {
-        hasData: !!result.data,
-        hasErrors: !!result.errors,
-        dataKeys: result.data ? Object.keys(result.data) : [],
-        errorCount: result.errors ? result.errors.length : 0,
-        responseTime: `${responseTime}ms`,
-      },
-    );
 
     if (result.errors && result.errors.length > 0) {
       console.error(
@@ -282,15 +228,12 @@ export async function executeLinearQuery(
       );
     }
 
-    console.log(
-      `[${requestId}] [Linear API] Successfully executed ${queryName}:`,
-      {
-        responseTime: `${responseTime}ms`,
-        dataStructure: result.data
-          ? getDataStructure(result.data)
-          : "No data",
-      },
-    );
+    // Only log slow requests
+    if (responseTime > 1000) {
+      console.log(
+        `[${requestId}] [Linear API] ${queryName} completed in ${responseTime}ms`,
+      );
+    }
 
     return result.data;
   } catch (error) {
@@ -766,50 +709,67 @@ export async function getCustomerDeliverables(
 }
 
 export async function getIssueDetail(issueId: string) {
+  // PERFORMANCE: Check cache first (2 minutes TTL for issue details)
+  const cacheKey = `linear:issue-detail:${issueId}`;
+  const cacheTTL = 120; // 2 minutes - balance between freshness and performance
+  const startTime = Date.now();
+  
+  try {
+    const cached = await kv.get(cacheKey);
+    if (cached) {
+      // Check if cached data has the expected structure
+      if (cached.data && cached.expiresAt) {
+        if (cached.expiresAt > Date.now()) {
+          const cacheTime = Date.now() - startTime;
+          console.log(`[getIssueDetail] Cache HIT for ${issueId} (${cacheTime}ms)`);
+          return cached.data;
+        } else {
+          console.log(`[getIssueDetail] Cache EXPIRED for ${issueId}`);
+        }
+      } else if (cached.expiresAt) {
+        // Legacy format: direct data with expiresAt
+        if (cached.expiresAt > Date.now()) {
+          const cacheTime = Date.now() - startTime;
+          console.log(`[getIssueDetail] Cache HIT (legacy) for ${issueId} (${cacheTime}ms)`);
+          return cached;
+        }
+      }
+    }
+  } catch (error) {
+    // Cache miss or error - continue to fetch from API
+    console.log(`[getIssueDetail] Cache MISS for ${issueId}:`, error instanceof Error ? error.message : 'Unknown error');
+  }
+  
+  console.log(`[getIssueDetail] Fetching from Linear API for ${issueId}...`);
+  const apiStartTime = Date.now();
+  
   // OPTIMIZED: Use shared query from linearGraphQL.tsx (DRY principle)
   // Includes full details: comments, attachments, children
-  
   const data = await executeLinearQuery(LINEAR_QUERIES.GET_ISSUE_DETAIL, { issueId });
   
-  console.log(`[getIssueDetail] Raw data for ${issueId}:`, {
-    hasIssue: !!data.issue,
-    hasChildren: !!(data.issue?.children),
-    childrenNodesCount: data.issue?.children?.nodes?.length || 0,
-    commentsCount: data.issue?.comments?.nodes?.length || 0
-  });
-  
-  //DEBUG: Log all comments with detailed info to debug filtering
-  if (data.issue?.comments?.nodes) {
-    console.log(`[getIssueDetail] Comments fetched from Linear (${data.issue.comments.nodes.length} total):`);
-    data.issue.comments.nodes.forEach((comment: any, index: number) => {
-      const body = comment.body || '';
-      const normalizedBody = body
-        .replace(/\\/g, '')              //REMOVE ALL BACKSLASHES (handles \[external\])
-        .trim()
-        .replace(/^[\s\n\r\t]+/, '')
-        .replace(/^\uFEFF/, '')
-        .toLowerCase();  //CASE-INSENSITIVE
-      
-      console.log(`  [${index}] Comment ${comment.id}:`);
-      console.log(`      Raw body length: ${body.length}`);
-      console.log(`      Raw body first 100 chars: "${body.substring(0, 100)}"`);
-      console.log(`      Raw body char codes (first 20): [${body.substring(0, 20).split('').map((c: string) => c.charCodeAt(0)).join(', ')}]`);
-      console.log(`      Normalized body (lowercase): "${normalizedBody.substring(0, 100)}"`);
-      console.log(`      Starts with [external] (case-insensitive): ${normalizedBody.startsWith('[external]')}`);
-      console.log(`      Contains [external] (any case): ${body.toLowerCase().includes('[external]')}`);
-      console.log(`      User: ${comment.user?.name}`);
-      console.log(`      Created: ${comment.createdAt}`);
-    });
-  }
+  const apiTime = Date.now() - apiStartTime;
+  console.log(`[getIssueDetail] Linear API response for ${issueId}: ${apiTime}ms`);
   
   // Transform children.nodes to subIssues for consistency with grouped API
   if (data.issue && data.issue.children) {
     data.issue.subIssues = data.issue.children.nodes || [];
     delete data.issue.children;
-    console.log(`[getIssueDetail] Transformed to subIssues, count: ${data.issue.subIssues.length}`);
-  } else {
-    console.log(`[getIssueDetail] No children found for issue ${issueId}`);
   }
+  
+  // Cache the result
+  try {
+    await kv.set(cacheKey, {
+      data: data.issue,
+      expiresAt: Date.now() + (cacheTTL * 1000),
+    });
+    console.log(`[getIssueDetail] Cached ${issueId} for ${cacheTTL}s`);
+  } catch (error) {
+    // Cache write failed - continue anyway
+    console.warn(`[getIssueDetail] Failed to cache ${issueId}:`, error instanceof Error ? error.message : 'Unknown error');
+  }
+  
+  const totalTime = Date.now() - startTime;
+  console.log(`[getIssueDetail] Total time for ${issueId}: ${totalTime}ms (API: ${apiTime}ms)`);
   
   return data.issue;
 }
@@ -958,6 +918,14 @@ export async function updateIssueState(
     issueId,
     stateId,
   });
+  
+  // PERFORMANCE: Invalidate cache when issue is updated
+  try {
+    await kv.del(`linear:issue-detail:${issueId}`);
+  } catch (error) {
+    // Cache invalidation failed - continue anyway
+  }
+  
   return data.issueUpdate;
 }
 
@@ -985,6 +953,14 @@ export async function addComment(
     issueId,
     body,
   });
+  
+  // PERFORMANCE: Invalidate cache when comment is added
+  try {
+    await kv.del(`linear:issue-detail:${issueId}`);
+  } catch (error) {
+    // Cache invalidation failed - continue anyway
+  }
+  
   return data.commentCreate;
 }
 

@@ -303,6 +303,7 @@ export const LINEAR_QUERIES = {
   /**
    * Get full issue detail (for modal)
    * INCLUDES: Comments, attachments, children
+   * PERFORMANCE: Reduced comments to 50 (most issues have < 50 comments)
    */
   GET_ISSUE_DETAIL: `
     query GetIssueDetail($issueId: String!) {
@@ -343,9 +344,13 @@ export const LINEAR_QUERIES = {
             ${FRAGMENTS.LABEL_FULL}
           }
         }
-        comments(first: 100) {
+        comments(first: 50, orderBy: createdAt) {
           nodes {
             ${FRAGMENTS.COMMENT_WITH_USER}
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
           }
         }
         attachments {
@@ -353,7 +358,7 @@ export const LINEAR_QUERIES = {
             ${FRAGMENTS.ATTACHMENT_FIELDS}
           }
         }
-        children(first: 100) {
+        children(first: 50) {
           nodes {
             id
             identifier

@@ -45,17 +45,9 @@ export function useSubIssueActions({
         return;
       }
       
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb/linear/teams/${teamId}/state-by-name?name=Release Ready`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await apiClient.get(`/linear/teams/${teamId}/state-by-name?name=Release Ready`);
       
-      const result = await response.json();
+      const result = response;
       
       if (!result.success || !result.data?.stateId) {
         console.error('[Approve] Failed to get Release Ready state:', result.error);
@@ -214,17 +206,9 @@ export function useSubIssueActions({
       // Step 2: Add "UAT Request Changes" label (if exists)
       try {
         // Get team config to find label
-        const teamConfigResponse = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb/linear/teams/${teamId}/config`,
-          {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const teamConfigResponse = await apiClient.get(`/linear/teams/${teamId}/config`);
         
-        const teamConfig = await teamConfigResponse.json();
+        const teamConfig = teamConfigResponse;
         const labels = teamConfig?.data?.labels || [];
         
         // Find "UAT Request Changes" label (case-insensitive)

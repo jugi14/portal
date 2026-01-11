@@ -40,27 +40,17 @@ export function useIssueActions({
       return null;
     }
 
-    const response = await fetch(
-      `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb/linear/teams/${teamId}/state-by-name?name=${encodeURIComponent(stateName)}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await apiClient.get(`/linear/teams/${teamId}/state-by-name?name=${encodeURIComponent(stateName)}`);
 
-    const result = await response.json();
-
-    if (!result.success || !result.data?.stateId) {
-      console.error('[IssueActions] Failed to get state:', result.error);
-      toast.error(result.error || `${stateName} state not found`);
+    if (!response.success || !response.data?.stateId) {
+      console.error('[IssueActions] Failed to get state:', response.error);
+      toast.error(response.error || `${stateName} state not found`);
       return null;
     }
 
     return {
-      stateId: result.data.stateId,
-      stateName: result.data.stateName || stateName
+      stateId: response.data.stateId,
+      stateName: response.data.stateName || stateName
     };
   }, [getTeamId]);
 

@@ -48,12 +48,9 @@ linearRoutes.get("/linear/test", async (c) => {
       {
         success: false,
         error: "Failed to test Linear connection",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Unknown error",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -73,7 +70,7 @@ linearRoutes.get("/linear/hierarchy", async (c) => {
     // Try to get from KV store first
     const { data: kvData, error: kvError } = await createClient(
       process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
       .from("kv_store_7f0d90fb")
       .select("value")
@@ -90,10 +87,10 @@ linearRoutes.get("/linear/hierarchy", async (c) => {
           : kvData.value;
       // Validate data structure
       if (!hierarchyData.teams || !Array.isArray(hierarchyData.teams)) {
-        console.error('[Linear] Invalid KV cache data structure:', {
+        console.error("[Linear] Invalid KV cache data structure:", {
           hasTeams: !!hierarchyData.teams,
           isArray: Array.isArray(hierarchyData.teams),
-          keys: Object.keys(hierarchyData)
+          keys: Object.keys(hierarchyData),
         });
         // Fall through to fetch from API
       } else {
@@ -114,7 +111,7 @@ linearRoutes.get("/linear/hierarchy", async (c) => {
           success: false,
           error: result.message || "Failed to fetch teams",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -133,12 +130,9 @@ linearRoutes.get("/linear/hierarchy", async (c) => {
       {
         success: false,
         error: "Failed to fetch team hierarchy",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Unknown error",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -158,7 +152,7 @@ linearRoutes.get("/linear/teams", async (c) => {
           success: false,
           error: result.message || "Failed to fetch teams",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -175,7 +169,7 @@ linearRoutes.get("/linear/teams", async (c) => {
         error: "Failed to fetch Linear teams",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -199,21 +193,20 @@ linearRoutes.post("/linear/clear-cache", async (c) => {
           success: false,
           error: "Unauthorized. Only admins can clear cache.",
         },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
-
     const supabase = createClient(
       process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
     // Clear all Linear-related cache entries
     const keysToDelete = [
-      'linear:organization',
-      'linear_teams:all',
-      'team_ownership_map:all',
+      "linear:organization",
+      "linear_teams:all",
+      "team_ownership_map:all",
     ];
 
     let deletedCount = 0;
@@ -221,23 +214,23 @@ linearRoutes.post("/linear/clear-cache", async (c) => {
     // Delete specific keys
     for (const key of keysToDelete) {
       const { error } = await supabase
-        .from('kv_store_7f0d90fb')
+        .from("kv_store_7f0d90fb")
         .delete()
-        .eq('key', key);
-      
+        .eq("key", key);
+
       if (!error) {
         deletedCount++;
       }
     }
 
     // Delete all keys with Linear-related prefixes
-    const prefixes = ['cache:linear-teams', 'linear:', 'team:'];
+    const prefixes = ["cache:linear-teams", "linear:", "team:"];
     for (const prefix of prefixes) {
       const { error } = await supabase
-        .from('kv_store_7f0d90fb')
+        .from("kv_store_7f0d90fb")
         .delete()
-        .like('key', `${prefix}%`);
-      
+        .like("key", `${prefix}%`);
+
       if (!error) {
       }
     }
@@ -245,22 +238,21 @@ linearRoutes.post("/linear/clear-cache", async (c) => {
     // Invalidate team cache
     await teamMethodsV2.invalidateCache();
 
-
     return c.json({
       success: true,
-      message: 'All Linear cache data cleared successfully',
+      message: "All Linear cache data cleared successfully",
       deletedKeys: deletedCount,
       clearedPrefixes: prefixes,
     });
   } catch (error) {
-    console.error('[Linear Cache Clear] Error:', error);
+    console.error("[Linear Cache Clear] Error:", error);
     return c.json(
       {
         success: false,
-        error: 'Failed to clear cache',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to clear cache",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -276,35 +268,31 @@ linearRoutes.post("/linear/sync-hierarchy", async (c) => {
     const role = c.get("role"); //Get role from auth context (set by authMiddleware)
     const isSuperAdmin = c.get("isSuperAdmin");
 
-
     //CRITICAL: Invalidate ALL caches before sync
     await teamMethodsV2.invalidateCache();
-    
+
     // CRITICAL: Also invalidate organization cache and linear teams cache
     const supabase = createClient(
       process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
-    
+
     // Delete all Linear-related caches
     await supabase
-      .from('kv_store_7f0d90fb')
+      .from("kv_store_7f0d90fb")
       .delete()
-      .or('key.eq.linear:organization,key.eq.team_ownership_map:all,key.like.cache:linear-teams%');
-    
+      .or(
+        "key.eq.linear:organization,key.eq.team_ownership_map:all,key.like.cache:linear-teams%"
+      );
 
     //FIXED: Check role from context instead of user.user_metadata
-    if (
-      !["superadmin", "admin"].includes(role) &&
-      !isSuperAdmin
-    ) {
+    if (!["superadmin", "admin"].includes(role) && !isSuperAdmin) {
       return c.json(
         {
           success: false,
-          error:
-            "Unauthorized. Only admins can sync team hierarchy.",
+          error: "Unauthorized. Only admins can sync team hierarchy.",
         },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -314,13 +302,12 @@ linearRoutes.post("/linear/sync-hierarchy", async (c) => {
       return c.json(
         {
           success: false,
-          error:
-            result.message || "Failed to sync team hierarchy",
+          error: result.message || "Failed to sync team hierarchy",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
-    
+
     // CRITICAL: Log sync results for debugging
     return c.json({
       success: true,
@@ -333,12 +320,9 @@ linearRoutes.post("/linear/sync-hierarchy", async (c) => {
       {
         success: false,
         error: "Failed to sync team hierarchy",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Unknown error",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -362,7 +346,7 @@ linearRoutes.get("/linear/teams/:teamId", async (c) => {
           error: "Team not found",
           teamId,
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -374,11 +358,8 @@ linearRoutes.get("/linear/teams/:teamId", async (c) => {
     console.error("[Linear] Get team error:", error);
 
     //Check if team not found in Linear workspace
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
-    if (
-      errorMessage.includes("not found in Linear workspace")
-    ) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("not found in Linear workspace")) {
       return c.json(
         {
           success: false,
@@ -387,7 +368,7 @@ linearRoutes.get("/linear/teams/:teamId", async (c) => {
             "This team may have been deleted from Linear or you don't have access to it.",
           teamId, //Now teamId is in scope!
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -397,7 +378,7 @@ linearRoutes.get("/linear/teams/:teamId", async (c) => {
         error: "Failed to fetch Linear team",
         message: errorMessage,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -412,8 +393,7 @@ linearRoutes.get("/linear/teams/:teamId/config", async (c) => {
 
   try {
     const user = c.get("user");
-    const result =
-      await linearTeamIssuesService.getTeamConfig(teamId);
+    const result = await linearTeamIssuesService.getTeamConfig(teamId);
 
     if (!result) {
       return c.json(
@@ -421,7 +401,7 @@ linearRoutes.get("/linear/teams/:teamId/config", async (c) => {
           success: false,
           error: "Team config not found",
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -433,11 +413,8 @@ linearRoutes.get("/linear/teams/:teamId/config", async (c) => {
     console.error("[Linear] Get team config error:", error);
 
     //Check if team not found in Linear workspace
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
-    if (
-      errorMessage.includes("not found in Linear workspace")
-    ) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("not found in Linear workspace")) {
       return c.json(
         {
           success: false,
@@ -446,7 +423,7 @@ linearRoutes.get("/linear/teams/:teamId/config", async (c) => {
             "This team may have been deleted from Linear or you don't have access to it.",
           teamId, //Now teamId is in scope!
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -456,7 +433,7 @@ linearRoutes.get("/linear/teams/:teamId/config", async (c) => {
         error: "Failed to fetch team config",
         message: errorMessage,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -466,63 +443,58 @@ linearRoutes.get("/linear/teams/:teamId/config", async (c) => {
  * LIGHTWEIGHT: Get workflow state ID by name (perfect for approve button!)
  * Query param: ?name=Client Review
  */
-linearRoutes.get(
-  "/linear/teams/:teamId/state-by-name",
-  async (c) => {
-    const teamId = c.req.param("teamId");
-    const stateName = c.req.query("name");
+linearRoutes.get("/linear/teams/:teamId/state-by-name", async (c) => {
+  const teamId = c.req.param("teamId");
+  const stateName = c.req.query("name");
 
-    try {
-      const user = c.get("user");
+  try {
+    const user = c.get("user");
 
-      if (!stateName) {
-        return c.json(
-          {
-            success: false,
-            error: "Missing required query parameter: name",
-          },
-          { status: 400 },
-        );
-      }
-      const stateId =
-        await linearTeamIssuesService.getStateIdByName(
-          teamId,
-          stateName,
-        );
-
-      if (!stateId) {
-        return c.json(
-          {
-            success: false,
-            error: `State "${stateName}" not found in team`,
-          },
-          { status: 404 },
-        );
-      }
-
-      return c.json({
-        success: true,
-        data: {
-          stateId,
-          stateName,
-        },
-      });
-    } catch (error) {
-      console.error("[Linear] Get state by name error:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-
+    if (!stateName) {
       return c.json(
         {
           success: false,
-          error: "Failed to fetch state by name",
-          message: errorMessage,
+          error: "Missing required query parameter: name",
         },
-        { status: 500 },
+        { status: 400 }
       );
     }
-  },
-);
+    const stateId = await linearTeamIssuesService.getStateIdByName(
+      teamId,
+      stateName
+    );
+
+    if (!stateId) {
+      return c.json(
+        {
+          success: false,
+          error: `State "${stateName}" not found in team`,
+        },
+        { status: 404 }
+      );
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        stateId,
+        stateName,
+      },
+    });
+  } catch (error) {
+    console.error("[Linear] Get state by name error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    return c.json(
+      {
+        success: false,
+        error: "Failed to fetch state by name",
+        message: errorMessage,
+      },
+      { status: 500 }
+    );
+  }
+});
 
 // ==================================================
 // LINEAR TEAM ISSUES
@@ -539,72 +511,60 @@ linearRoutes.get(
  *   timestamp: string
  * }
  */
-linearRoutes.get(
-  "/linear/teams/:teamId/issues-by-state",
-  async (c) => {
-    //CRITICAL: Declare teamId outside try block for catch scope access
-    const teamId = c.req.param("teamId");
+linearRoutes.get("/linear/teams/:teamId/issues-by-state", async (c) => {
+  //CRITICAL: Declare teamId outside try block for catch scope access
+  const teamId = c.req.param("teamId");
 
-    try {
-      const user = c.get("user");
-      const result =
-        await linearTeamIssuesService.getTeamIssuesByState(
-          teamId,
-        );
+  try {
+    const user = c.get("user");
+    const result = await linearTeamIssuesService.getTeamIssuesByState(teamId);
 
-      if (!result) {
-        return c.json(
-          {
-            success: false,
-            error: "Failed to fetch team issues by state",
-          },
-          { status: 500 },
-        );
-      }
-
-      return c.json({
-        success: true,
-        data: result,
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      console.error(
-        "[Linear] Get team issues by state error:",
-        error,
-      );
-
-      //Check if team not found in Linear workspace
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      if (
-        errorMessage.includes("not found in Linear workspace")
-      ) {
-        return c.json(
-          {
-            success: false,
-            error: "Team not found in Linear workspace",
-            message:
-              "This team may have been deleted from Linear or you don't have access to it.",
-            teamId, //Now teamId is in scope!
-          },
-          { status: 404 },
-        );
-      }
-
+    if (!result) {
       return c.json(
         {
           success: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to fetch team issues by state",
-          message: errorMessage,
+          error: "Failed to fetch team issues by state",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
-  },
-);
+
+    return c.json({
+      success: true,
+      data: result,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("[Linear] Get team issues by state error:", error);
+
+    //Check if team not found in Linear workspace
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("not found in Linear workspace")) {
+      return c.json(
+        {
+          success: false,
+          error: "Team not found in Linear workspace",
+          message:
+            "This team may have been deleted from Linear or you don't have access to it.",
+          teamId, //Now teamId is in scope!
+        },
+        { status: 404 }
+      );
+    }
+
+    return c.json(
+      {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch team issues by state",
+        message: errorMessage,
+      },
+      { status: 500 }
+    );
+  }
+});
 
 /**
  * GET /linear/teams/:teamId/issues
@@ -617,7 +577,6 @@ linearRoutes.get("/linear/teams/:teamId/issues", async (c) => {
   try {
     const user = c.get("user");
 
-
     // Check team access (optional - depends on your access control)
     // const accessCheck = await teamMethodsV2.checkUserTeamAccess(user.id, teamId);
     // if (!accessCheck.success) {
@@ -627,8 +586,7 @@ linearRoutes.get("/linear/teams/:teamId/issues", async (c) => {
     //   );
     // }
 
-    const result =
-      await linearTeamIssuesService.getTeamIssues(teamId);
+    const result = await linearTeamIssuesService.getTeamIssues(teamId);
 
     if (!result) {
       return c.json(
@@ -636,7 +594,7 @@ linearRoutes.get("/linear/teams/:teamId/issues", async (c) => {
           success: false,
           error: "Failed to fetch team issues",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -648,11 +606,8 @@ linearRoutes.get("/linear/teams/:teamId/issues", async (c) => {
     console.error("[Linear] Get team issues error:", error);
 
     //Check if team not found in Linear workspace
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
-    if (
-      errorMessage.includes("not found in Linear workspace")
-    ) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("not found in Linear workspace")) {
       return c.json(
         {
           success: false,
@@ -661,7 +616,7 @@ linearRoutes.get("/linear/teams/:teamId/issues", async (c) => {
             "This team may have been deleted from Linear or you don't have access to it.",
           teamId, //Now teamId is in scope!
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -671,7 +626,7 @@ linearRoutes.get("/linear/teams/:teamId/issues", async (c) => {
         error: "Failed to fetch team issues",
         message: errorMessage,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -680,46 +635,37 @@ linearRoutes.get("/linear/teams/:teamId/issues", async (c) => {
  * GET /linear/teams/:teamId/issues/by-state
  * Get issues grouped by state (NEW - optimized for kanban)
  */
-linearRoutes.get(
-  "/linear/teams/:teamId/issues/by-state",
-  async (c) => {
-    try {
-      const user = c.get("user");
-      const teamId = c.req.param("teamId");
-      const result =
-        await linearTeamIssuesService.getTeamIssuesByState(
-          teamId,
-        );
+linearRoutes.get("/linear/teams/:teamId/issues/by-state", async (c) => {
+  try {
+    const user = c.get("user");
+    const teamId = c.req.param("teamId");
+    const result = await linearTeamIssuesService.getTeamIssuesByState(teamId);
 
-      if (!result) {
-        return c.json(
-          {
-            success: false,
-            error: "Failed to fetch issues by state",
-          },
-          { status: 500 },
-        );
-      }
-
-      return c.json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      console.error(
-        "[Linear] Get issues by state error:",
-        error,
-      );
+    if (!result) {
       return c.json(
         {
           success: false,
           error: "Failed to fetch issues by state",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
-  },
-);
+
+    return c.json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    console.error("[Linear] Get issues by state error:", error);
+    return c.json(
+      {
+        success: false,
+        error: "Failed to fetch issues by state",
+      },
+      { status: 500 }
+    );
+  }
+});
 
 /**
  * POST /linear/graphql
@@ -741,16 +687,15 @@ linearRoutes.post("/linear/graphql", async (c) => {
           success: false,
           error: "GraphQL query is required",
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     // Execute query via linearTeamIssuesService
-    const result =
-      await linearTeamIssuesService.executeLinearQuery(
-        query,
-        variables || {},
-      );
+    const result = await linearTeamIssuesService.executeLinearQuery(
+      query,
+      variables || {}
+    );
 
     return c.json({
       success: true,
@@ -766,7 +711,7 @@ linearRoutes.post("/linear/graphql", async (c) => {
             ? error.message
             : "Failed to execute GraphQL query",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -780,9 +725,7 @@ linearRoutes.get("/linear/issues/:issueId", async (c) => {
     const user = c.get("user");
     const issueId = c.req.param("issueId");
 
-
-    const result =
-      await linearTeamIssuesService.getIssueDetail(issueId);
+    const result = await linearTeamIssuesService.getIssueDetail(issueId);
 
     if (!result) {
       return c.json(
@@ -790,7 +733,7 @@ linearRoutes.get("/linear/issues/:issueId", async (c) => {
           success: false,
           error: "Issue not found",
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -805,7 +748,7 @@ linearRoutes.get("/linear/issues/:issueId", async (c) => {
         success: false,
         error: "Failed to fetch issue",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -815,63 +758,58 @@ linearRoutes.get("/linear/issues/:issueId", async (c) => {
  * Create sub-issue for a parent issue
  *NEW: Properly handles teamId extraction from parent
  */
-linearRoutes.post(
-  "/linear/issues/:parentIssueId/sub-issues",
-  async (c) => {
-    try {
-      const user = c.get("user");
-      const parentIssueId = c.req.param("parentIssueId");
-      const body = await c.req.json();
-      const { title, description } = body;
-      // Validate input
-      if (!title || !title.trim()) {
-        return c.json(
-          {
-            success: false,
-            error: "Title is required",
-          },
-          { status: 400 },
-        );
-      }
+linearRoutes.post("/linear/issues/:parentIssueId/sub-issues", async (c) => {
+  try {
+    const user = c.get("user");
+    const parentIssueId = c.req.param("parentIssueId");
+    const body = await c.req.json();
+    const { title, description } = body;
+    // Validate input
+    if (!title || !title.trim()) {
+      return c.json(
+        {
+          success: false,
+          error: "Title is required",
+        },
+        { status: 400 }
+      );
+    }
 
-      // Call linearTeamIssuesService which properly handles teamId extraction
-      const result =
-        await linearTeamIssuesService.createSubIssue(
-          parentIssueId,
-          title.trim(),
-          description?.trim(),
-        );
+    // Call linearTeamIssuesService which properly handles teamId extraction
+    const result = await linearTeamIssuesService.createSubIssue(
+      parentIssueId,
+      title.trim(),
+      description?.trim()
+    );
 
-      if (!result) {
-        return c.json(
-          {
-            success: false,
-            error: "Failed to create sub-issue",
-          },
-          { status: 500 },
-        );
-      }
-      return c.json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      console.error("[Linear] Create sub-issue error:", error);
-
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-
+    if (!result) {
       return c.json(
         {
           success: false,
           error: "Failed to create sub-issue",
-          message: errorMessage,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
-  },
-);
+    return c.json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    console.error("[Linear] Create sub-issue error:", error);
+
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    return c.json(
+      {
+        success: false,
+        error: "Failed to create sub-issue",
+        message: errorMessage,
+      },
+      { status: 500 }
+    );
+  }
+});
 
 /**
  * PUT /linear/issues/:issueId/state
@@ -886,15 +824,14 @@ linearRoutes.put("/linear/issues/:issueId/state", async (c) => {
     if (!stateId) {
       return c.json(
         { success: false, error: "stateId is required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    const result =
-      await linearTeamIssuesService.updateIssueState(
-        issueId,
-        stateId,
-      );
+    const result = await linearTeamIssuesService.updateIssueState(
+      issueId,
+      stateId
+    );
 
     if (!result) {
       return c.json(
@@ -902,7 +839,7 @@ linearRoutes.put("/linear/issues/:issueId/state", async (c) => {
           success: false,
           error: "Failed to update issue state",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -918,7 +855,7 @@ linearRoutes.put("/linear/issues/:issueId/state", async (c) => {
         success: false,
         error: "Failed to update issue state",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -951,19 +888,19 @@ linearRoutes.post("/linear/issues/create", async (c) => {
           success: false,
           error: "teamId and title are required",
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     // Check team access
     const accessCheck = await teamMethodsV2.checkUserTeamAccess(
       user.id,
-      teamId,
+      teamId
     );
     if (!accessCheck.success) {
       return c.json(
         { success: false, error: "Access denied to this team" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -985,7 +922,7 @@ linearRoutes.post("/linear/issues/create", async (c) => {
           success: false,
           error: "Failed to create issue",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
     return c.json({
@@ -995,8 +932,7 @@ linearRoutes.post("/linear/issues/create", async (c) => {
   } catch (error) {
     console.error("[Linear] Create issue error:", error);
 
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
 
     return c.json(
       {
@@ -1004,7 +940,7 @@ linearRoutes.post("/linear/issues/create", async (c) => {
         error: "Failed to create issue",
         message: errorMessage,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -1022,8 +958,7 @@ linearRoutes.post("/linear/cache/invalidate", async (c) => {
     const user = c.get("user");
     const body = await c.req.json();
     const { teamId } = body;
-    const result =
-      await linearTeamIssuesService.invalidateCache(teamId);
+    const result = await linearTeamIssuesService.invalidateCache(teamId);
 
     return c.json({
       success: true,
@@ -1036,7 +971,7 @@ linearRoutes.post("/linear/cache/invalidate", async (c) => {
         success: false,
         error: "Failed to invalidate cache",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -1054,13 +989,11 @@ linearRoutes.get("/linear/cache/stats", async (c) => {
     if (role !== "admin" && role !== "superadmin") {
       return c.json(
         { success: false, error: "Admin access required" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
-
-    const result =
-      await linearTeamIssuesService.getCacheStats();
+    const result = await linearTeamIssuesService.getCacheStats();
 
     return c.json({
       success: true,
@@ -1073,7 +1006,7 @@ linearRoutes.get("/linear/cache/stats", async (c) => {
         success: false,
         error: "Failed to fetch cache stats",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -1091,9 +1024,7 @@ linearRoutes.get("/linear/teams/:teamId/states", async (c) => {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
 
-
-    const config =
-      await linearTeamIssuesService.getTeamConfig(teamId);
+    const config = await linearTeamIssuesService.getTeamConfig(teamId);
 
     if (!config) {
       return c.json(
@@ -1101,7 +1032,7 @@ linearRoutes.get("/linear/teams/:teamId/states", async (c) => {
           success: false,
           error: "Team config not found",
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -1123,7 +1054,7 @@ linearRoutes.get("/linear/teams/:teamId/states", async (c) => {
         success: false,
         error: "Failed to fetch team states",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -1136,8 +1067,7 @@ linearRoutes.get("/linear/teams/:teamId/labels", async (c) => {
   try {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
-    const config =
-      await linearTeamIssuesService.getTeamConfig(teamId);
+    const config = await linearTeamIssuesService.getTeamConfig(teamId);
 
     if (!config) {
       return c.json(
@@ -1145,7 +1075,7 @@ linearRoutes.get("/linear/teams/:teamId/labels", async (c) => {
           success: false,
           error: "Team config not found",
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -1167,7 +1097,7 @@ linearRoutes.get("/linear/teams/:teamId/labels", async (c) => {
         success: false,
         error: "Failed to fetch team labels",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -1181,9 +1111,7 @@ linearRoutes.get("/linear/teams/:teamId/members", async (c) => {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
 
-
-    const config =
-      await linearTeamIssuesService.getTeamConfig(teamId);
+    const config = await linearTeamIssuesService.getTeamConfig(teamId);
 
     if (!config) {
       return c.json(
@@ -1191,7 +1119,7 @@ linearRoutes.get("/linear/teams/:teamId/members", async (c) => {
           success: false,
           error: "Team config not found",
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -1213,7 +1141,7 @@ linearRoutes.get("/linear/teams/:teamId/members", async (c) => {
         success: false,
         error: "Failed to fetch team members",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -1222,48 +1150,44 @@ linearRoutes.get("/linear/teams/:teamId/members", async (c) => {
  * GET /linear/teams/:teamId/projects
  * Get Linear team projects
  */
-linearRoutes.get(
-  "/linear/teams/:teamId/projects",
-  async (c) => {
-    try {
-      const user = c.get("user");
-      const teamId = c.req.param("teamId");
-      const config =
-        await linearTeamIssuesService.getTeamConfig(teamId);
+linearRoutes.get("/linear/teams/:teamId/projects", async (c) => {
+  try {
+    const user = c.get("user");
+    const teamId = c.req.param("teamId");
+    const config = await linearTeamIssuesService.getTeamConfig(teamId);
 
-      if (!config) {
-        return c.json(
-          {
-            success: false,
-            error: "Team config not found",
-          },
-          { status: 404 },
-        );
-      }
-
-      return c.json({
-        success: true,
-        data: {
-          projects: config.projects || [],
-          team: {
-            id: config.id,
-            name: config.name,
-            key: config.key,
-          },
-        },
-      });
-    } catch (error) {
-      console.error("[Linear] Get projects error:", error);
+    if (!config) {
       return c.json(
         {
           success: false,
-          error: "Failed to fetch team projects",
+          error: "Team config not found",
         },
-        { status: 500 },
+        { status: 404 }
       );
     }
-  },
-);
+
+    return c.json({
+      success: true,
+      data: {
+        projects: config.projects || [],
+        team: {
+          id: config.id,
+          name: config.name,
+          key: config.key,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("[Linear] Get projects error:", error);
+    return c.json(
+      {
+        success: false,
+        error: "Failed to fetch team projects",
+      },
+      { status: 500 }
+    );
+  }
+});
 
 // ==================================================
 // FILE UPLOAD TO LINEAR
@@ -1273,76 +1197,68 @@ linearRoutes.get(
  * POST /linear/issues/:issueId/upload
  * Upload files to Linear issue
  */
-linearRoutes.post(
-  "/linear/issues/:issueId/upload",
-  async (c) => {
-    try {
-      const issueId = c.req.param("issueId");
-      // Debug headers
-      const contentType = c.req.header('Content-Type');
+linearRoutes.post("/linear/issues/:issueId/upload", async (c) => {
+  try {
+    const issueId = c.req.param("issueId");
+    // Debug headers
+    const contentType = c.req.header("Content-Type");
 
-      // Get multipart form data
-      const formData = await c.req.formData();
-      const files = formData.getAll("files") as File[];
+    // Get multipart form data
+    const formData = await c.req.formData();
+    const files = formData.getAll("files") as File[];
 
-      if (!files || files.length === 0) {
-        console.error('[Linear Routes] No files in formData');
-        return c.json(
-          { success: false, error: "No files provided" },
-          { status: 400 },
-        );
-      }
-
-
-      // Validate files are actual File objects
-      const validFiles = files.filter(f => f instanceof File);
-      if (validFiles.length === 0) {
-        console.error('[Linear Routes] No valid File objects found');
-        return c.json(
-          { success: false, error: "No valid files found" },
-          { status: 400 },
-        );
-      }
-
-      // Upload files using service
-      const attachments =
-        await linearTeamIssuesService.uploadFilesToIssue(
-          issueId,
-          validFiles,
-        );
-
-      if (!attachments || attachments.length === 0) {
-        console.error('[Linear Routes] No attachments returned from service');
-        return c.json(
-          { success: false, error: "Failed to upload any files" },
-          { status: 500 },
-        );
-      }
-
-
-      return c.json({
-        success: true,
-        data: {
-          attachments,
-          count: attachments.length,
-        },
-      });
-    } catch (error) {
-      console.error(
-        "[Linear Routes] File upload error:",
-        error,
-      );
-      console.error("[Linear Routes] Error stack:", error instanceof Error ? error.stack : 'No stack');
+    if (!files || files.length === 0) {
+      console.error("[Linear Routes] No files in formData");
       return c.json(
-        {
-          success: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to upload files",
-        },
-        { status: 500 },
+        { success: false, error: "No files provided" },
+        { status: 400 }
       );
     }
-  },
-);
+
+    // Validate files are actual File objects
+    const validFiles = files.filter((f) => f instanceof File);
+    if (validFiles.length === 0) {
+      console.error("[Linear Routes] No valid File objects found");
+      return c.json(
+        { success: false, error: "No valid files found" },
+        { status: 400 }
+      );
+    }
+
+    // Upload files using service
+    const attachments = await linearTeamIssuesService.uploadFilesToIssue(
+      issueId,
+      validFiles
+    );
+
+    if (!attachments || attachments.length === 0) {
+      console.error("[Linear Routes] No attachments returned from service");
+      return c.json(
+        { success: false, error: "Failed to upload any files" },
+        { status: 500 }
+      );
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        attachments,
+        count: attachments.length,
+      },
+    });
+  } catch (error) {
+    console.error("[Linear Routes] File upload error:", error);
+    console.error(
+      "[Linear Routes] Error stack:",
+      error instanceof Error ? error.stack : "No stack"
+    );
+    return c.json(
+      {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "Failed to upload files",
+      },
+      { status: 500 }
+    );
+  }
+});

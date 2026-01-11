@@ -429,27 +429,13 @@ class LinearCacheService {
     return this.get(
       key,
       async () => {
-        const url = `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb/linear/teams`;
-        const accessToken = secureTokenStorage.getToken();
+        const response = await apiClient.get('/linear/teams');
         
-        if (!accessToken) {
-          throw new Error('Authentication required. Please login to continue.');
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to fetch teams');
         }
         
-        const response = await fetchWithRateLimit(url, {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch teams: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to fetch teams');
-        }
-        
-        return result.data;
+        return response.data;
       },
       this.TTL.TEAMS,
       this.STALE_TIME.TEAMS
@@ -465,21 +451,13 @@ class LinearCacheService {
     return this.get(
       key,
       async () => {
-        const url = `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb/linear/teams/${teamId}`;
-        const response = await fetchWithRateLimit(url, {
-          headers: { 'Authorization': `Bearer ${publicAnonKey}` }
-        });
+        const response = await apiClient.get(`/linear/teams/${teamId}`);
         
-        if (!response.ok) {
-          throw new Error(`Failed to fetch team details: ${response.statusText}`);
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to fetch team details');
         }
         
-        const result = await response.json();
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to fetch team details');
-        }
-        
-        return result.data;
+        return response.data;
       },
       this.TTL.TEAM_DETAILS,
       this.STALE_TIME.TEAM_DETAILS
@@ -499,27 +477,13 @@ class LinearCacheService {
     return this.get(
       key,
       async () => {
-        const url = `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb/linear/teams/${teamId}/issues/by-state`;
-        const accessToken = secureTokenStorage.getToken();
+        const response = await apiClient.get(`/linear/teams/${teamId}/issues/by-state`);
         
-        if (!accessToken) {
-          throw new Error('Authentication required. Please login to continue.');
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to fetch issues');
         }
         
-        const response = await fetchWithRateLimit(url, {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch issues: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to fetch issues');
-        }
-        
-        return result.data;
+        return response.data;
       },
       this.TTL.ISSUES_BY_STATE,
       // CRITICAL: Set staleTime = TTL to disable stale-while-revalidate for issues
@@ -536,16 +500,7 @@ class LinearCacheService {
     return this.get(
       key,
       async () => {
-        // Use secure token storage (validates expiry automatically)
-        const accessToken = apiClient.getAccessToken();
-        if (!accessToken) {
-          throw new Error('No access token available - user may not be logged in or token expired');
-        }
-        
-        const url = `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb/linear/issues/${issueId}`;
-        const response = await fetchWithRateLimit(url, {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
+        const response = await apiClient.get(`/linear/issues/${issueId}`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch issue detail: ${response.statusText}`);

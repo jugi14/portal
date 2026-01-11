@@ -306,17 +306,14 @@ export async function checkAuthPermissions(
 
     // Normalize email for consistent checks
     const userEmail = (user.email || "").toLowerCase().trim();
-    console.log(`[Auth] Checking permissions for: ${userEmail}`);
 
-    // Schema V2.0: Get user object from KV store
-    let userObj = await kv.get(`user:${user.id}`);
-
-    // Determine user role (async calls)
-    const defaultRole = await getDefaultRole(userEmail);
-    const isSuperAdminByEmail = await isSuperAdminUser(userEmail);
-    const isTeifi = isTeifiUser(userEmail);
-    
-    console.log(`[Auth] User checks - Email: ${userEmail}, DefaultRole: ${defaultRole}, IsSuperAdmin: ${isSuperAdminByEmail}, IsTeifi: ${isTeifi}, CurrentStatus: ${userObj?.status || 'new user'}`);
+    // PERFORMANCE: Run all async calls in parallel
+    const [userObj, defaultRole, isSuperAdminByEmail] = await Promise.all([
+      kv.get(`user:${user.id}`),
+      getDefaultRole(userEmail),
+      isSuperAdminUser(userEmail),
+    ]);
+    const isTeifi = isTeifiUser(userEmail); // Synchronous
 
     // Schema V2.0: Auto-create user object if not exists
     if (!userObj) {
@@ -433,8 +430,21 @@ export async function checkAuthPermissions(
 
 /**
  * Auth middleware for Hono routes
+ * PERFORMANCE: Cache auth check within the same request to avoid duplicate calls
  */
 export async function authMiddleware(c: any, next: any) {
+  // PERFORMANCE: Check if auth already done in this request
+  const cachedAuth = c.get("_authCheck");
+  if (cachedAuth) {
+    // Reuse cached auth result
+    c.set("user", cachedAuth.user);
+    c.set("userPermissions", cachedAuth.userPermissions);
+    c.set("role", cachedAuth.role);
+    c.set("isSuperAdmin", cachedAuth.isSuperAdmin);
+    await next();
+    return;
+  }
+
   const authHeader = c.req.header("Authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -453,6 +463,9 @@ export async function authMiddleware(c: any, next: any) {
       { status: 401 },
     );
   }
+
+  // Cache auth result for this request
+  c.set("_authCheck", authCheck);
 
   // Attach user info to context
   c.set("user", authCheck.user);

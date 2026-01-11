@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -34,11 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Separator } from "./ui/separator";
 import { Card, CardContent } from "./ui/card";
 import { Progress } from "./ui/progress";
@@ -85,10 +76,7 @@ import {
 } from "../services/linearTeamIssuesService";
 import { IssueCreationTemplate } from "./IssueCreationTemplate";
 import { IssueDetailSkeleton } from "./ui/skeleton-library";
-import {
-  projectId,
-  publicAnonKey,
-} from "../utils/supabase/info";
+import { projectId, publicAnonKey } from "../utils/supabase/info";
 import { secureTokenStorage } from "../services/secureTokenStorage";
 import { toast } from "sonner";
 import { useHasRole } from "../contexts/PermissionContext";
@@ -134,86 +122,59 @@ const IssueDetailModalComponent = ({
   forceEnableComments = false, // Default false for backward compatibility
   showAcceptanceIssues = true, // Default true for backward compatibility
 }: IssueDetailModalProps) => {
-  const [issueDetails, setIssueDetails] =
-    useState<LinearIssue | null>(null);
+  const [issueDetails, setIssueDetails] = useState<LinearIssue | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Navigation state - Track parent/sub-issue navigation
-  const [navigationStack, setNavigationStack] = useState<
-    LinearIssue[]
-  >([]);
-  const [currentIssue, setCurrentIssue] =
-    useState<LinearIssue | null>(null);
+  const [navigationStack, setNavigationStack] = useState<LinearIssue[]>([]);
+  const [currentIssue, setCurrentIssue] = useState<LinearIssue | null>(null);
 
   // Scroll position preservation
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
-  const [savedScrollPosition, setSavedScrollPosition] =
-    useState(0);
+  const [savedScrollPosition, setSavedScrollPosition] = useState(0);
 
   // Sub-issue creation state
-  const [isCreatingSubIssue, setIsCreatingSubIssue] =
-    useState(false);
-  const [showSubIssueDialog, setShowSubIssueDialog] =
-    useState(false);
+  const [isCreatingSubIssue, setIsCreatingSubIssue] = useState(false);
+  const [showSubIssueDialog, setShowSubIssueDialog] = useState(false);
   const [newSubIssueTitle, setNewSubIssueTitle] = useState("");
-  const [newSubIssueDescription, setNewSubIssueDescription] =
-    useState("");
-  const [selectedFiles, setSelectedFiles] = useState<File[]>(
-    [],
-  );
+  const [newSubIssueDescription, setNewSubIssueDescription] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadingFiles, setUploadingFiles] = useState(false);
 
   // Request Changes state
   const [requestChangesSubIssue, setRequestChangesSubIssue] =
     useState<any>(null);
-  const [isRequestingChanges, setIsRequestingChanges] =
+  const [isRequestingChanges, setIsRequestingChanges] = useState(false);
+  const [requestChangesFiles, setRequestChangesFiles] = useState<File[]>([]);
+  const [isUploadingRequestChangesImage, setIsUploadingRequestChangesImage] =
     useState(false);
-  const [requestChangesFiles, setRequestChangesFiles] =
-    useState<File[]>([]);
-  const [
-    isUploadingRequestChangesImage,
-    setIsUploadingRequestChangesImage,
-  ] = useState(false);
-  const [
-    requestChangesHasContent,
-    setRequestChangesHasContent,
-  ] = useState(false);
+  const [requestChangesHasContent, setRequestChangesHasContent] =
+    useState(false);
 
   // Approve state
   const [isApproving, setIsApproving] = useState(false);
 
   // Partial Approve state
-  const [isPartialApproving, setIsPartialApproving] =
-    useState(false);
+  const [isPartialApproving, setIsPartialApproving] = useState(false);
 
   // Refresh state - Show subtle indicator when refreshing after mutations
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Team configuration for issue creation
   const [teamConfig, setTeamConfig] = useState<any>(null);
-  const [loadingTeamConfig, setLoadingTeamConfig] =
-    useState(false);
+  const [loadingTeamConfig, setLoadingTeamConfig] = useState(false);
 
   // Check user role for Linear link
-  const isAdminOrSuperAdmin = useHasRole([
-    "admin",
-    "superadmin",
-  ]);
+  const isAdminOrSuperAdmin = useHasRole(["admin", "superadmin"]);
 
   // Viewport stability hook
-  const {
-    lockScroll,
-    unlockScroll,
-    isKeyboardVisible,
-    deviceType,
-  } = useViewportStability();
+  const { lockScroll, unlockScroll, isKeyboardVisible, deviceType } =
+    useViewportStability();
 
   // Check if comments are enabled (admin setting or forced)
   const [commentsEnabled, setCommentsEnabled] = useState(() => {
     if (forceEnableComments) return true; // Tasks board always enables comments
-    return (
-      localStorage.getItem("teifi_enable_comments") === "true"
-    );
+    return localStorage.getItem("teifi_enable_comments") === "true";
   });
 
   // Comment actions with file upload support
@@ -265,9 +226,7 @@ const IssueDetailModalComponent = ({
       const text = editor.getText();
       const html = editor.getHTML();
       const hasImages = html.includes("<img");
-      setRequestChangesHasContent(
-        text.trim().length > 0 || hasImages,
-      );
+      setRequestChangesHasContent(text.trim().length > 0 || hasImages);
     },
     editorProps: {
       attributes: {
@@ -315,7 +274,7 @@ const IssueDetailModalComponent = ({
     if (uuidRegex.test(issueToLoad.team.id)) {
       console.warn(
         "[IssueDetailModal] Skipping team config load - team.id is UUID:",
-        issueToLoad.team.id,
+        issueToLoad.team.id
       );
       setTeamConfig(null);
       setLoadingTeamConfig(false);
@@ -326,20 +285,15 @@ const IssueDetailModalComponent = ({
       setLoadingTeamConfig(true);
       console.log(
         "[IssueDetailModal] Loading team config for:",
-        issueToLoad.team.id,
+        issueToLoad.team.id
       );
-      const config = await LinearQueries.getTeamConfig(
-        issueToLoad.team.id,
-      );
+      const config = await LinearQueries.getTeamConfig(issueToLoad.team.id);
       setTeamConfig(config);
     } catch (error) {
       // CRITICAL FIX: Gracefully handle team config errors
       // Team config is only needed for creating sub-issues, not for viewing
       // If Linear team ID is unavailable (e.g., UUID from database), fail silently
-      console.error(
-        "[IssueDetailModal] Failed to load team config:",
-        error,
-      );
+      console.error("[IssueDetailModal] Failed to load team config:", error);
       setTeamConfig(null);
       // Do NOT show error toast - this is non-critical for viewing issues
     } finally {
@@ -349,16 +303,15 @@ const IssueDetailModalComponent = ({
 
   // PERFORMANCE: Track in-flight API calls to prevent duplicates
   const loadingIssueIdRef = React.useRef<string | null>(null);
-  const loadIssuePromiseRef =
-    React.useRef<Promise<LinearIssue | null> | null>(null);
+  const loadIssuePromiseRef = React.useRef<Promise<LinearIssue | null> | null>(
+    null
+  );
 
   // Load detailed issue data - defined early so it can be used in other callbacks
   // CRITICAL FIX: Fetch fresh data from API to get sub-issues
   // Returns the loaded issue details for immediate use
   const loadIssueDetails = useCallback(
-    async (
-      issueToLoad: LinearIssue,
-    ): Promise<LinearIssue | null> => {
+    async (issueToLoad: LinearIssue): Promise<LinearIssue | null> => {
       if (!issueToLoad) {
         // ERROR: Invalid function call
         return null;
@@ -371,7 +324,7 @@ const IssueDetailModalComponent = ({
       ) {
         console.log(
           "[IssueDetailModal] Reusing in-flight request for:",
-          issueToLoad.identifier,
+          issueToLoad.identifier
         );
         return loadIssuePromiseRef.current;
       }
@@ -388,33 +341,17 @@ const IssueDetailModalComponent = ({
 
           console.log(
             "[IssueDetailModal] Fetching issue details for:",
-            issueToLoad.identifier,
+            issueToLoad.identifier
           );
 
           // FIXED: Fetch from API to get complete data including sub-issues
-          const response = await fetch(
-            `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb/issues/${issueToLoad.id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${secureTokenStorage.getToken()}`,
-                "Content-Type": "application/json",
-              },
-            },
-          );
+          const response = await apiClient.get(`/issues/${issueToLoad.id}`);
 
-          if (!response.ok) {
-            throw new Error(
-              `Failed to fetch issue: ${response.status}`,
-            );
+          if (!response.success || !response.data?.issue) {
+            throw new Error(response.error || "No issue data returned");
           }
 
-          const result = await response.json();
-
-          if (!result.success || !result.data?.issue) {
-            throw new Error("No issue data returned");
-          }
-
-          const details = result.data.issue;
+          const details = response.data.issue;
 
           // Concise logging (removed verbose sub-issues data)
           console.log(
@@ -438,12 +375,8 @@ const IssueDetailModalComponent = ({
           if (currentScrollPos > 0) {
             setTimeout(() => {
               if (scrollContainerRef.current) {
-                scrollContainerRef.current.scrollTop =
-                  currentScrollPos;
-                console.log(
-                  "[Scroll] Restored to position:",
-                  currentScrollPos,
-                );
+                scrollContainerRef.current.scrollTop = currentScrollPos;
+                console.log("[Scroll] Restored to position:", currentScrollPos);
               }
             }, 100); // Small delay to ensure DOM is ready
           }
@@ -452,7 +385,7 @@ const IssueDetailModalComponent = ({
         } catch (error) {
           console.error(
             "[IssueDetailModal] Failed to load issue details:",
-            error,
+            error
           );
           // Fallback to basic issue data
           setIssueDetails(issueToLoad);
@@ -468,7 +401,7 @@ const IssueDetailModalComponent = ({
       loadIssuePromiseRef.current = loadPromise;
       return loadPromise;
     },
-    [],
+    []
   ); // STABLE - No dependencies!
 
   // Initialize navigation when modal opens
@@ -481,7 +414,7 @@ const IssueDetailModalComponent = ({
     if (isOpen && issue?.id) {
       // Check if this is actually a NEW issue (prevent duplicate loads)
       const isNewIssue = lastIssueIdRef.current !== issue.id;
-      
+
       if (!isNewIssue && isInitializedRef.current) {
         // Same issue, already initialized - skip to prevent reload
         console.log(
@@ -503,8 +436,8 @@ const IssueDetailModalComponent = ({
 
       // CRITICAL FIX: Clear old data and show loading IMMEDIATELY
       // This prevents flash of old issue content when switching
-      setIssueDetails(null);    // Clear FIRST - before setting loading
-      setLoading(true);          // Then show skeleton
+      setIssueDetails(null); // Clear FIRST - before setting loading
+      setLoading(true); // Then show skeleton
 
       // Reset navigation stack and state
       setNavigationStack([]);
@@ -523,7 +456,7 @@ const IssueDetailModalComponent = ({
       if (isInitializedRef.current) {
         console.log("[IssueDetailModal] Closing - cleanup");
       }
-      
+
       isInitializedRef.current = false;
       lastIssueIdRef.current = null;
       loadingIssueIdRef.current = null;
@@ -541,15 +474,11 @@ const IssueDetailModalComponent = ({
   // Navigate to sub-issue
   const handleNavigateToSubIssue = useCallback(
     async (subIssue: any) => {
-      console.log(
-        "[Navigation] Navigating to sub-issue:",
-        subIssue.identifier,
-      );
+      console.log("[Navigation] Navigating to sub-issue:", subIssue.identifier);
 
       // CRITICAL FIX: Save FULL parent issue details (including subIssues array)
       // Use issueDetails if available (has full data), otherwise use issue
-      const parentToSave =
-        issueDetails || currentIssue || issue;
+      const parentToSave = issueDetails || currentIssue || issue;
 
       if (!parentToSave) {
         console.error("[Navigation] No parent issue to save");
@@ -559,8 +488,7 @@ const IssueDetailModalComponent = ({
       console.log("[Navigation] Saving parent to stack:", {
         identifier: parentToSave.identifier,
         hasSubIssues: !!(parentToSave as any).subIssues,
-        subIssuesCount:
-          (parentToSave as any).subIssues?.length || 0,
+        subIssuesCount: (parentToSave as any).subIssues?.length || 0,
       });
 
       // Add parent issue to navigation stack
@@ -580,48 +508,41 @@ const IssueDetailModalComponent = ({
           await loadIssueDetails(subIssue);
           console.log(
             "[Navigation] Sub-issue details loaded:",
-            subIssue.identifier,
+            subIssue.identifier
           );
         } else {
           throw new Error("Invalid sub-issue data");
         }
       } catch (error) {
-        console.error(
-          "[Navigation] Failed to load sub-issue:",
-          error,
-        );
+        console.error("[Navigation] Failed to load sub-issue:", error);
         toast.error("Failed to load sub-issue details");
         // Revert navigation on error
         setNavigationStack((prev) => prev.slice(0, -1));
-        setCurrentIssue(
-          navigationStack[navigationStack.length - 1] || issue,
-        );
+        setCurrentIssue(navigationStack[navigationStack.length - 1] || issue);
         setIssueDetails(parentToSave); // Restore parent data
         setLoading(false);
       }
     },
-    [issueDetails, navigationStack, issue, loadIssueDetails],
+    [issueDetails, navigationStack, issue, loadIssueDetails]
   );
 
   // Navigate back to parent
   const handleNavigateBack = useCallback(() => {
     console.log(
       "[Navigation] Navigating back, stack length:",
-      navigationStack.length,
+      navigationStack.length
     );
 
     if (navigationStack.length > 0) {
       // Pop from stack and restore parent
-      const parentIssue =
-        navigationStack[navigationStack.length - 1];
+      const parentIssue = navigationStack[navigationStack.length - 1];
 
       console.log("[Navigation] Restoring parent from stack:", {
         identifier: parentIssue.identifier,
         hasSubIssues: !!(parentIssue as any).subIssues,
-        subIssuesCount:
-          (parentIssue as any).subIssues?.length || 0,
+        subIssuesCount: (parentIssue as any).subIssues?.length || 0,
         subIssuesData: (parentIssue as any).subIssues?.map(
-          (s: any) => s.identifier,
+          (s: any) => s.identifier
         ),
       });
 
@@ -632,10 +553,7 @@ const IssueDetailModalComponent = ({
       setCurrentIssue(parentIssue);
       setIssueDetails(parentIssue); // This has subIssues array!
 
-      console.log(
-        "[Navigation] Returned to parent:",
-        parentIssue.identifier,
-      );
+      console.log("[Navigation] Returned to parent:", parentIssue.identifier);
     }
   }, [navigationStack]);
 
@@ -643,25 +561,20 @@ const IssueDetailModalComponent = ({
   const handleApproveSubIssue = useCallback(
     async (subIssue: any) => {
       const approveToastId = toast.loading(
-        `Approving ${subIssue.identifier}...`,
+        `Approving ${subIssue.identifier}...`
       );
 
       // Store original state for rollback if needed
       const originalIssueDetails = issueDetails;
 
       try {
-        console.log(
-          "[Approve] Approving sub-issue:",
-          subIssue.identifier,
-        );
+        console.log("[Approve] Approving sub-issue:", subIssue.identifier);
 
         // LIGHTWEIGHT: Get "Client Review" state ID directly (no full config needed!)
         // Get teamId from PARENT issue (sub-issues don't have team property)
         const teamId = (issueDetails || issue)?.team?.id;
         if (!teamId) {
-          console.error(
-            "[Approve] Team ID not found in parent issue",
-          );
+          console.error("[Approve] Team ID not found in parent issue");
           toast.error("Team information missing", {
             id: approveToastId,
           });
@@ -669,73 +582,60 @@ const IssueDetailModalComponent = ({
         }
 
         console.log(
-          `[Approve] Fetching "Client Review" state ID for team ${teamId}...`,
+          `[Approve] Fetching "Client Review" state ID for team ${teamId}...`
         );
 
         // Use secure token storage (validates expiry automatically)
         const accessToken = apiClient.getAccessToken();
         if (!accessToken) {
-          console.error(
-            "[Approve] No access token found or expired",
-          );
-          toast.error(
-            "Authentication required. Please sign in again.",
-            { id: approveToastId },
-          );
+          console.error("[Approve] No access token found or expired");
+          toast.error("Authentication required. Please sign in again.", {
+            id: approveToastId,
+          });
           return;
         }
 
-        const response = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb/linear/teams/${teamId}/state-by-name?name=Release Ready`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-          },
+        const response = await apiClient.get(
+          `/linear/teams/${teamId}/state-by-name?name=Release Ready`
         );
 
-        const result = await response.json();
-
-        if (!result.success || !result.data?.stateId) {
+        if (!response.success || !response.data?.stateId) {
           console.error(
             "[Approve] Failed to get Release Ready state:",
-            result.error,
+            response.error
           );
-          toast.error(
-            result.error || "Release Ready state not found",
-            { id: approveToastId },
-          );
+          toast.error(response.error || "Release Ready state not found", {
+            id: approveToastId,
+          });
           return;
         }
 
         const releaseReadyStateId = result.data.stateId;
-        const releaseReadyStateName =
-          result.data.stateName || "Release Ready";
+        const releaseReadyStateName = result.data.stateName || "Release Ready";
         console.log(
           "[Approve] Got Release Ready state ID:",
-          releaseReadyStateId,
+          releaseReadyStateId
         );
 
         // OPTIMISTIC UPDATE: Update UI immediately before API call
         if (issueDetails && (issueDetails as any).subIssues) {
-          const updatedSubIssues = (
-            issueDetails as any
-          ).subIssues.map((si: any) => {
-            if (si.id === subIssue.id) {
-              return {
-                ...si,
-                state: {
-                  ...si.state,
-                  id: releaseReadyStateId,
-                  name: releaseReadyStateName,
-                  type: "completed", // Release Ready is typically 'completed' type
-                },
-                _optimisticUpdate: true, // Mark for UI indication
-              };
+          const updatedSubIssues = (issueDetails as any).subIssues.map(
+            (si: any) => {
+              if (si.id === subIssue.id) {
+                return {
+                  ...si,
+                  state: {
+                    ...si.state,
+                    id: releaseReadyStateId,
+                    name: releaseReadyStateName,
+                    type: "completed", // Release Ready is typically 'completed' type
+                  },
+                  _optimisticUpdate: true, // Mark for UI indication
+                };
+              }
+              return si;
             }
-            return si;
-          });
+          );
 
           setIssueDetails({
             ...issueDetails,
@@ -748,28 +648,22 @@ const IssueDetailModalComponent = ({
         // Update issue state via API
         await LinearMutations.updateIssueState(
           subIssue.id,
-          releaseReadyStateId,
+          releaseReadyStateId
         );
 
         toast.success(
           `${subIssue.identifier} approved and moved to Release Ready`,
-          { id: approveToastId },
+          { id: approveToastId }
         );
 
         // CRITICAL: Wait for Linear API to propagate changes
-        await new Promise((resolve) =>
-          setTimeout(resolve, 500),
-        );
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         // Save current scroll position before refresh
         if (scrollContainerRef.current) {
-          const currentScroll =
-            scrollContainerRef.current.scrollTop;
+          const currentScroll = scrollContainerRef.current.scrollTop;
           setSavedScrollPosition(currentScroll);
-          console.log(
-            "[Approve] Saved scroll position:",
-            currentScroll,
-          );
+          console.log("[Approve] Saved scroll position:", currentScroll);
         }
 
         const issueToLoad = currentIssue || issue;
@@ -777,7 +671,7 @@ const IssueDetailModalComponent = ({
           try {
             console.log(
               "[Approve] Refreshing parent issue details:",
-              issueToLoad.identifier,
+              issueToLoad.identifier
             );
             setIsRefreshing(true); // Show subtle loading indicator
 
@@ -788,20 +682,19 @@ const IssueDetailModalComponent = ({
             }
 
             // Fetch fresh data (deduplication handled by loadIssueDetails)
-            const refreshedDetails =
-              await loadIssueDetails(issueToLoad);
+            const refreshedDetails = await loadIssueDetails(issueToLoad);
 
             // Update parent via callback with fresh data
             if (onIssueUpdate && refreshedDetails) {
               console.log(
-                "[Approve] Calling onIssueUpdate with refreshed parent data",
+                "[Approve] Calling onIssueUpdate with refreshed parent data"
               );
               onIssueUpdate(refreshedDetails);
             }
           } catch (refreshError) {
             console.error(
               "[Approve] Failed to refresh issue data:",
-              refreshError,
+              refreshError
             );
           } finally {
             setIsRefreshing(false);
@@ -812,17 +705,13 @@ const IssueDetailModalComponent = ({
         try {
           LinearQueries.invalidateIssues(teamId);
         } catch (err) {
-          console.warn(
-            "[Approve] Cache invalidation failed:",
-            err,
-          );
+          console.warn("[Approve] Cache invalidation failed:", err);
         }
       } catch (error) {
         console.error("[Approve] Failed:", error);
-        toast.error(
-          `Failed to approve ${subIssue.identifier}`,
-          { id: approveToastId },
-        );
+        toast.error(`Failed to approve ${subIssue.identifier}`, {
+          id: approveToastId,
+        });
 
         // Rollback optimistic update on error
         if (originalIssueDetails) {
@@ -830,13 +719,7 @@ const IssueDetailModalComponent = ({
         }
       }
     },
-    [
-      issueDetails,
-      currentIssue,
-      issue,
-      loadIssueDetails,
-      onIssueUpdate,
-    ],
+    [issueDetails, currentIssue, issue, loadIssueDetails, onIssueUpdate]
   );
 
   // Handle image paste for Request Changes editor
@@ -846,29 +729,22 @@ const IssueDetailModalComponent = ({
 
       setIsUploadingRequestChangesImage(true);
       try {
-        const targetIssue =
-          issueDetails || currentIssue || issue;
+        const targetIssue = issueDetails || currentIssue || issue;
         if (!targetIssue) {
           throw new Error("No issue selected");
         }
 
-        console.log(
-          "[Request Changes] Uploading pasted image:",
-          file.name,
-        );
+        console.log("[Request Changes] Uploading pasted image:", file.name);
 
         // Upload to Linear
         const result = await LinearMutations.uploadFilesToIssue(
           targetIssue.id,
-          [file],
+          [file]
         );
 
         if (result?.attachments?.[0]?.url) {
           const imageUrl = result.attachments[0].url;
-          console.log(
-            "[Request Changes] Image uploaded:",
-            imageUrl,
-          );
+          console.log("[Request Changes] Image uploaded:", imageUrl);
 
           // Insert image node (not markdown text) for preview
           requestChangesEditor
@@ -885,16 +761,13 @@ const IssueDetailModalComponent = ({
           throw new Error("No URL returned from upload");
         }
       } catch (error) {
-        console.error(
-          "[Request Changes] Image paste failed:",
-          error,
-        );
+        console.error("[Request Changes] Image paste failed:", error);
         toast.error("Failed to upload image");
       } finally {
         setIsUploadingRequestChangesImage(false);
       }
     },
-    [requestChangesEditor, issueDetails, currentIssue, issue],
+    [requestChangesEditor, issueDetails, currentIssue, issue]
   );
 
   // Handle file selection for Request Changes
@@ -912,24 +785,16 @@ const IssueDetailModalComponent = ({
         return true;
       });
 
-      setRequestChangesFiles((prev) => [
-        ...prev,
-        ...validFiles,
-      ]);
+      setRequestChangesFiles((prev) => [...prev, ...validFiles]);
       e.target.value = ""; // Reset input
     },
-    [],
+    []
   );
 
   // Handle remove file for Request Changes
-  const handleRemoveRequestChangesFile = useCallback(
-    (index: number) => {
-      setRequestChangesFiles((prev) =>
-        prev.filter((_, i) => i !== index),
-      );
-    },
-    [],
-  );
+  const handleRemoveRequestChangesFile = useCallback((index: number) => {
+    setRequestChangesFiles((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   // Request Changes for sub-issue - Add comment and move to Canceled state
   const handleRequestChanges = useCallback(async () => {
@@ -945,20 +810,14 @@ const IssueDetailModalComponent = ({
     // Check if editor has images (even without text)
     const hasImages = htmlContent.includes("<img");
 
-    if (
-      !textContent.trim() &&
-      requestChangesFiles.length === 0 &&
-      !hasImages
-    ) {
-      toast.error(
-        "Please provide a comment, paste images, or attach files",
-      );
+    if (!textContent.trim() && requestChangesFiles.length === 0 && !hasImages) {
+      toast.error("Please provide a comment, paste images, or attach files");
       return;
     }
 
     setIsRequestingChanges(true);
     const toastId = toast.loading(
-      `Requesting changes for ${requestChangesSubIssue.identifier}...`,
+      `Requesting changes for ${requestChangesSubIssue.identifier}...`
     );
 
     try {
@@ -972,45 +831,40 @@ const IssueDetailModalComponent = ({
 
       const accessToken = apiClient.getAccessToken();
       if (!accessToken) {
-        toast.error(
-          "Authentication required. Please sign in again.",
-          { id: toastId },
-        );
+        toast.error("Authentication required. Please sign in again.", {
+          id: toastId,
+        });
         setIsRequestingChanges(false);
         return;
       }
 
       // Convert HTML to Markdown
-      let commentMarkdown =
-        turndownService.turndown(htmlContent);
+      let commentMarkdown = turndownService.turndown(htmlContent);
 
       // Upload attached files first and append to comment
       if (requestChangesFiles.length > 0) {
         console.log(
           "[Request Changes] Uploading attached files:",
-          requestChangesFiles.length,
+          requestChangesFiles.length
         );
 
         try {
-          const uploadResult =
-            await LinearMutations.uploadFilesToIssue(
-              requestChangesSubIssue.id,
-              requestChangesFiles,
-            );
+          const uploadResult = await LinearMutations.uploadFilesToIssue(
+            requestChangesSubIssue.id,
+            requestChangesFiles
+          );
 
           // Append file links to comment markdown
           if (uploadResult?.attachments?.length > 0) {
             const fileLinks = uploadResult.attachments
               .map((att: any) => {
-                const fileName =
-                  att.title || att.filename || "Attachment";
+                const fileName = att.title || att.filename || "Attachment";
                 const fileUrl = att.url;
 
                 // Check if it's an image
-                const isImage =
-                  /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(
-                    fileName,
-                  );
+                const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(
+                  fileName
+                );
 
                 if (isImage) {
                   return `![${fileName}](${fileUrl})`;
@@ -1028,14 +882,11 @@ const IssueDetailModalComponent = ({
             }
 
             console.log(
-              "[Request Changes] Files uploaded and added to comment",
+              "[Request Changes] Files uploaded and added to comment"
             );
           }
         } catch (uploadError) {
-          console.error(
-            "[Request Changes] File upload failed:",
-            uploadError,
-          );
+          console.error("[Request Changes] File upload failed:", uploadError);
           toast.error("Failed to upload attachments", {
             id: toastId,
           });
@@ -1047,67 +898,56 @@ const IssueDetailModalComponent = ({
       // Step 1: Add comment with [external] prefix
       await LinearMutations.addCommentToIssue(
         requestChangesSubIssue.id,
-        `[external] ${commentMarkdown}`,
+        `[external] ${commentMarkdown}`
       );
 
       // Step 2: Add "UAT Request Changes" label (if exists)
       try {
-        const teamConfigResponse = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb/linear/teams/${teamId}/config`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-          },
+        const teamConfigResponse = await apiClient.get(
+          `/linear/teams/${teamId}/config`
         );
 
-        const teamConfig = await teamConfigResponse.json();
+        const teamConfig = teamConfigResponse;
         const labels = teamConfig?.data?.labels || [];
 
         // Find "UAT Request Changes" label (case-insensitive)
         let requestChangesLabel = labels.find(
-          (label: any) =>
-            label.name.toLowerCase() === "uat request changes",
+          (label: any) => label.name.toLowerCase() === "uat request changes"
         );
 
         // Create label if it doesn't exist
         if (!requestChangesLabel) {
           console.log(
-            '[Request Changes] Label not found, creating "UAT Request Changes" label',
+            '[Request Changes] Label not found, creating "UAT Request Changes" label'
           );
           const newLabel = await LinearMutations.createLabel({
             teamId: teamId,
             name: "UAT Request Changes",
             color: "#FF6B6B", // Orange-red color
-            description:
-              "Client requested changes during UAT review",
+            description: "Client requested changes during UAT review",
           });
           requestChangesLabel = newLabel;
           console.log(
             "[Request Changes] Label created successfully:",
-            newLabel,
+            newLabel
           );
         }
 
         if (requestChangesLabel) {
           await LinearMutations.addLabel(
             requestChangesSubIssue.id,
-            requestChangesLabel.id,
+            requestChangesLabel.id
           );
         }
       } catch (labelError) {
-        console.error(
-          "[Request Changes] Failed to add label:",
-          labelError,
-        );
+        console.error("[Request Changes] Failed to add label:", labelError);
         // Continue anyway - comment is more important
       }
 
       // Step 3: Success - NO state change
       toast.success(
         `Changes requested for ${requestChangesSubIssue.identifier}`,
-        { id: toastId },
+        { id: toastId }
       );
 
       // Close dialog and reset
@@ -1128,7 +968,7 @@ const IssueDetailModalComponent = ({
 
           const details = await LinearQueries.getIssueDetails(
             issueToLoad.id,
-            true,
+            true
           );
           if (details) {
             if (!(details as any).subIssues) {
@@ -1137,10 +977,7 @@ const IssueDetailModalComponent = ({
             setIssueDetails(details);
           }
         } catch (refreshError) {
-          console.error(
-            "[Request Changes] Refresh failed:",
-            refreshError,
-          );
+          console.error("[Request Changes] Refresh failed:", refreshError);
         }
       }
 
@@ -1152,7 +989,7 @@ const IssueDetailModalComponent = ({
             teamId,
             action: "request-changes",
           },
-        }),
+        })
       );
     } catch (error) {
       console.error("[Request Changes] Failed:", error);
@@ -1184,10 +1021,7 @@ const IssueDetailModalComponent = ({
         return;
       }
 
-      console.log(
-        "[Approve Main] Approving issue:",
-        targetIssue.identifier,
-      );
+      console.log("[Approve Main] Approving issue:", targetIssue.identifier);
 
       // LIGHTWEIGHT: Get "Release Ready" state ID directly
       const teamId = targetIssue.team?.id;
@@ -1201,63 +1035,50 @@ const IssueDetailModalComponent = ({
       }
 
       console.log(
-        `[Approve Main] Fetching "Release Ready" state ID for team ${teamId}...`,
+        `[Approve Main] Fetching "Release Ready" state ID for team ${teamId}...`
       );
 
       // Use secure token storage (validates expiry automatically)
       const accessToken = apiClient.getAccessToken();
       if (!accessToken) {
-        console.error(
-          "[Approve Main] No access token found or expired",
-        );
-        toast.error(
-          "Authentication required. Please sign in again.",
-          { id: approveToastId },
-        );
+        console.error("[Approve Main] No access token found or expired");
+        toast.error("Authentication required. Please sign in again.", {
+          id: approveToastId,
+        });
         setIsApproving(false);
         return;
       }
 
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb/linear/teams/${teamId}/state-by-name?name=Release Ready`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        },
+      const response = await apiClient.get(
+        `/linear/teams/${teamId}/state-by-name?name=Release Ready`
       );
 
-      const result = await response.json();
+      const result = response;
 
       if (!result.success || !result.data?.stateId) {
         console.error(
           "[Approve Main] Failed to get Release Ready state:",
-          result.error,
+          result.error
         );
-        toast.error(
-          result.error || "Release Ready state not found",
-          { id: approveToastId },
-        );
+        toast.error(result.error || "Release Ready state not found", {
+          id: approveToastId,
+        });
         setIsApproving(false);
         return;
       }
 
       const releaseReadyStateId = result.data.stateId;
-      console.log(
-        "[Approve Main] Got state ID:",
-        releaseReadyStateId,
-      );
+      console.log("[Approve Main] Got state ID:", releaseReadyStateId);
 
       // Update issue state
       await LinearMutations.updateIssueState(
         targetIssue.id,
-        releaseReadyStateId,
+        releaseReadyStateId
       );
 
       toast.success(
         `${targetIssue.identifier} approved and moved to Release Ready`,
-        { id: approveToastId },
+        { id: approveToastId }
       );
 
       // CRITICAL: Wait for Linear API to propagate changes
@@ -1270,7 +1091,7 @@ const IssueDetailModalComponent = ({
         try {
           console.log(
             "[Approve Main] Refreshing issue details:",
-            issueToLoad.identifier,
+            issueToLoad.identifier
           );
 
           // Clear cache before refresh
@@ -1280,21 +1101,17 @@ const IssueDetailModalComponent = ({
           }
 
           // Use the same fetch mechanism as modal initialization
-          const refreshedDetails =
-            await loadIssueDetails(issueToLoad);
+          const refreshedDetails = await loadIssueDetails(issueToLoad);
 
           // Notify parent component immediately with fresh data
           if (onIssueUpdate && refreshedDetails) {
             console.log(
-              "[Approve Main] Calling onIssueUpdate with refreshed data",
+              "[Approve Main] Calling onIssueUpdate with refreshed data"
             );
             onIssueUpdate(refreshedDetails);
           }
         } catch (refreshError) {
-          console.error(
-            "[Approve Main] Refresh failed:",
-            refreshError,
-          );
+          console.error("[Approve Main] Refresh failed:", refreshError);
         }
       }
     } catch (error) {
@@ -1305,142 +1122,113 @@ const IssueDetailModalComponent = ({
     } finally {
       setIsApproving(false);
     }
-  }, [
-    issueDetails,
-    currentIssue,
-    issue,
-    onIssueUpdate,
-    loadIssueDetails,
-  ]);
+  }, [issueDetails, currentIssue, issue, onIssueUpdate, loadIssueDetails]);
 
   // Partial Approve main issue - mark as partial approved and move unfinished sub-tasks to next cycle
-  const handlePartialApproveMainIssue =
-    useCallback(async () => {
-      setIsPartialApproving(true);
-      const partialApproveToastId = toast.loading(
-        "Partially approving issue...",
+  const handlePartialApproveMainIssue = useCallback(async () => {
+    setIsPartialApproving(true);
+    const partialApproveToastId = toast.loading("Partially approving issue...");
+
+    try {
+      const targetIssue = issueDetails || issue;
+      if (!targetIssue) {
+        toast.error("No issue to partially approve", {
+          id: partialApproveToastId,
+        });
+        setIsPartialApproving(false);
+        return;
+      }
+
+      const teamId = targetIssue.team?.id;
+      if (!teamId) {
+        console.error("[Partial Approve] Team ID not found");
+        toast.error("Team information missing", {
+          id: partialApproveToastId,
+        });
+        setIsPartialApproving(false);
+        return;
+      }
+
+      const subIssues = (targetIssue as any).subIssues || [];
+
+      console.log(
+        "[Partial Approve] Partially approving issue:",
+        targetIssue.identifier
       );
 
-      try {
-        const targetIssue = issueDetails || issue;
-        if (!targetIssue) {
-          toast.error("No issue to partially approve", {
-            id: partialApproveToastId,
-          });
-          setIsPartialApproving(false);
-          return;
-        }
+      const result = await LinearMutations.partialApproveIssue({
+        issueId: targetIssue.id,
+        teamId: teamId,
+        subIssues: subIssues,
+      });
 
-        const teamId = targetIssue.team?.id;
-        if (!teamId) {
-          console.error("[Partial Approve] Team ID not found");
-          toast.error("Team information missing", {
-            id: partialApproveToastId,
-          });
-          setIsPartialApproving(false);
-          return;
-        }
+      if (result.success) {
+        toast.success(result.message, {
+          id: partialApproveToastId,
+        });
 
-        const subIssues = (targetIssue as any).subIssues || [];
+        // OPTIMIZED: Refresh only modal internal state, let parent listen to event
+        const issueToLoad = currentIssue || issue;
+        if (issueToLoad) {
+          try {
+            console.log(
+              "[Partial Approve] Refreshing modal internal state:",
+              issueToLoad.identifier
+            );
+            setIsRefreshing(true); // Show subtle loading indicator
 
-        console.log(
-          "[Partial Approve] Partially approving issue:",
-          targetIssue.identifier,
-        );
+            // PERFORMANCE: Load fresh details for modal display
+            const refreshedDetails = await loadIssueDetails(issueToLoad);
 
-        const result =
-          await LinearMutations.partialApproveIssue({
-            issueId: targetIssue.id,
-            teamId: teamId,
-            subIssues: subIssues,
-          });
+            // Trigger global event for parent components to refresh independently
+            console.log(
+              "[Partial Approve] Dispatching linear-issue-updated event"
+            );
+            window.dispatchEvent(
+              new CustomEvent("linear-issue-updated", {
+                detail: {
+                  issueId: targetIssue.id,
+                  teamId: teamId,
+                  action: "partial-approve",
+                },
+              })
+            );
 
-        if (result.success) {
-          toast.success(result.message, {
-            id: partialApproveToastId,
-          });
-
-          // OPTIMIZED: Refresh only modal internal state, let parent listen to event
-          const issueToLoad = currentIssue || issue;
-          if (issueToLoad) {
-            try {
+            // OPTIONAL: Call onIssueUpdate if provided (for legacy support)
+            // Parent can choose to listen to event instead
+            if (onIssueUpdate && refreshedDetails) {
               console.log(
-                "[Partial Approve] Refreshing modal internal state:",
-                issueToLoad.identifier,
+                "[Partial Approve] Calling onIssueUpdate with refreshed data"
               );
-              setIsRefreshing(true); // Show subtle loading indicator
-
-              // PERFORMANCE: Load fresh details for modal display
-              const refreshedDetails =
-                await loadIssueDetails(issueToLoad);
-
-              // Trigger global event for parent components to refresh independently
-              console.log(
-                "[Partial Approve] Dispatching linear-issue-updated event",
-              );
-              window.dispatchEvent(
-                new CustomEvent("linear-issue-updated", {
-                  detail: {
-                    issueId: targetIssue.id,
-                    teamId: teamId,
-                    action: "partial-approve",
-                  },
-                }),
-              );
-
-              // OPTIONAL: Call onIssueUpdate if provided (for legacy support)
-              // Parent can choose to listen to event instead
-              if (onIssueUpdate && refreshedDetails) {
-                console.log(
-                  "[Partial Approve] Calling onIssueUpdate with refreshed data",
-                );
-                onIssueUpdate(refreshedDetails);
-              }
-            } catch (refreshError) {
-              console.error(
-                "[Partial Approve] Refresh failed:",
-                refreshError,
-              );
-            } finally {
-              setIsRefreshing(false);
+              onIssueUpdate(refreshedDetails);
             }
+          } catch (refreshError) {
+            console.error("[Partial Approve] Refresh failed:", refreshError);
+          } finally {
+            setIsRefreshing(false);
           }
-        } else {
-          toast.error("Failed to partially approve issue", {
-            id: partialApproveToastId,
-          });
         }
-      } catch (error) {
-        console.error("[Partial Approve] Failed:", error);
+      } else {
         toast.error("Failed to partially approve issue", {
           id: partialApproveToastId,
         });
-      } finally {
-        setIsPartialApproving(false);
       }
-    }, [
-      issueDetails,
-      currentIssue,
-      issue,
-      onIssueUpdate,
-      loadIssueDetails,
-    ]);
+    } catch (error) {
+      console.error("[Partial Approve] Failed:", error);
+      toast.error("Failed to partially approve issue", {
+        id: partialApproveToastId,
+      });
+    } finally {
+      setIsPartialApproving(false);
+    }
+  }, [issueDetails, currentIssue, issue, onIssueUpdate, loadIssueDetails]);
 
   // Load detailed issue data when current issue changes
   useEffect(() => {
-    if (
-      isOpen &&
-      currentIssue &&
-      currentIssue.id !== issueDetails?.id
-    ) {
+    if (isOpen && currentIssue && currentIssue.id !== issueDetails?.id) {
       loadIssueDetails(currentIssue); // CRITICAL: Pass currentIssue explicitly
     }
-  }, [
-    isOpen,
-    currentIssue,
-    issueDetails?.id,
-    loadIssueDetails,
-  ]);
+  }, [isOpen, currentIssue, issueDetails?.id, loadIssueDetails]);
 
   // Enhanced keyboard navigation with back support
   const handleKeyDown = useCallback(
@@ -1459,10 +1247,7 @@ const IssueDetailModalComponent = ({
       }
 
       // Ctrl/Cmd + O to open in Linear
-      if (
-        event.key === "o" &&
-        (event.metaKey || event.ctrlKey)
-      ) {
+      if (event.key === "o" && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
         const currentIssueUrl = (currentIssue || issue)?.url;
         if (currentIssueUrl) {
@@ -1470,20 +1255,13 @@ const IssueDetailModalComponent = ({
         }
       }
     },
-    [
-      isOpen,
-      issue,
-      currentIssue,
-      navigationStack,
-      handleNavigateBack,
-    ],
+    [isOpen, issue, currentIssue, navigationStack, handleNavigateBack]
   );
 
   useEffect(() => {
     if (isOpen) {
       document.addEventListener("keydown", handleKeyDown);
-      return () =>
-        document.removeEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
     }
   }, [isOpen, handleKeyDown]);
 
@@ -1500,12 +1278,12 @@ const IssueDetailModalComponent = ({
 
     window.addEventListener(
       "teifi_comments_toggle",
-      handleCommentsToggle as EventListener,
+      handleCommentsToggle as EventListener
     );
     return () => {
       window.removeEventListener(
         "teifi_comments_toggle",
-        handleCommentsToggle as EventListener,
+        handleCommentsToggle as EventListener
       );
     };
   }, [forceEnableComments]);
@@ -1524,41 +1302,31 @@ const IssueDetailModalComponent = ({
       const result = await LinearMutations.createSubIssue(
         issueDetails.id,
         newSubIssueTitle,
-        newSubIssueDescription || undefined,
+        newSubIssueDescription || undefined
       );
 
       // Upload files if any selected
       if (selectedFiles.length > 0 && result?.id) {
         setUploadingFiles(true);
-        toast.info(
-          `Uploading ${selectedFiles.length} file(s)...`,
-        );
+        toast.info(`Uploading ${selectedFiles.length} file(s)...`);
 
         try {
-          const uploadResult =
-            await LinearMutations.uploadFilesToIssue(
-              result.id,
-              selectedFiles,
-            );
+          const uploadResult = await LinearMutations.uploadFilesToIssue(
+            result.id,
+            selectedFiles
+          );
 
           toast.success(
-            `Sub-issue created with ${selectedFiles.length} attachment(s)!`,
+            `Sub-issue created with ${selectedFiles.length} attachment(s)!`
           );
         } catch (uploadError) {
-          console.error(
-            "[IssueDetailModal] Upload failed:",
-            uploadError,
-          );
-          toast.warning(
-            "Sub-issue created but file upload failed",
-          );
+          console.error("[IssueDetailModal] Upload failed:", uploadError);
+          toast.warning("Sub-issue created but file upload failed");
         } finally {
           setUploadingFiles(false);
         }
       } else {
-        toast.success(
-          `Sub-issue ${result?.identifier} created successfully`,
-        );
+        toast.success(`Sub-issue ${result?.identifier} created successfully`);
       }
 
       // Reset form
@@ -1568,22 +1336,16 @@ const IssueDetailModalComponent = ({
       setShowSubIssueDialog(false);
 
       // CRITICAL: Clear cache before reloading
-      console.log(
-        "[IssueDetailModal] Invalidating issue detail cache",
-      );
+      console.log("[IssueDetailModal] Invalidating issue detail cache");
       // Invalidate cache
-      import("../services/linearCacheService").then(
-        ({ linearCache }) => {
-          linearCache.invalidate(
-            `linear:issue-detail:issueId:${issueDetails.id}`,
-          );
-        },
-      );
+      import("../services/linearCacheService").then(({ linearCache }) => {
+        linearCache.invalidate(
+          `linear:issue-detail:issueId:${issueDetails.id}`
+        );
+      });
 
       // Trigger board reload to fetch fresh data including new sub-issue
-      console.log(
-        "[IssueDetailModal] Dispatching sub-issue-created event",
-      );
+      console.log("[IssueDetailModal] Dispatching sub-issue-created event");
       window.dispatchEvent(
         new CustomEvent("linear-issue-updated", {
           detail: {
@@ -1591,27 +1353,20 @@ const IssueDetailModalComponent = ({
             teamId: issueDetails.team?.id,
             action: "sub-issue-created",
           },
-        }),
+        })
       );
 
       // Board will auto-refresh and update modal via event listener
-      toast.success(
-        "Board refreshing to show new sub-issue...",
-      );
+      toast.success("Board refreshing to show new sub-issue...");
     } catch (error) {
-      console.error(
-        "[IssueDetailModal] Failed to create sub-issue:",
-        error,
-      );
+      console.error("[IssueDetailModal] Failed to create sub-issue:", error);
       toast.error("Failed to create sub-issue");
     } finally {
       setIsCreatingSubIssue(false);
     }
   };
 
-  const handleFileSelect = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
 
     console.log("[IssueDetailModal] Files selected:", {
@@ -1628,11 +1383,9 @@ const IssueDetailModalComponent = ({
     const validFiles = files.filter((file) => {
       if (file.size > maxSize) {
         console.error(
-          `[IssueDetailModal] File too large: ${file.name} (${file.size} bytes)`,
+          `[IssueDetailModal] File too large: ${file.name} (${file.size} bytes)`
         );
-        toast.error(
-          `File "${file.name}" is too large (max 10MB)`,
-        );
+        toast.error(`File "${file.name}" is too large (max 10MB)`);
         return false;
       }
       return true;
@@ -1662,10 +1415,7 @@ const IssueDetailModalComponent = ({
     }
   };
 
-  const getPriorityLabel = (
-    priority?: number,
-    priorityLabel?: string,
-  ) => {
+  const getPriorityLabel = (priority?: number, priorityLabel?: string) => {
     if (priorityLabel) return priorityLabel;
 
     switch (priority) {
@@ -1685,17 +1435,13 @@ const IssueDetailModalComponent = ({
   const getStateIcon = (stateType: string) => {
     switch (stateType) {
       case "completed":
-        return (
-          <CheckCircle className="h-4 w-4 text-green-500" />
-        );
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "canceled":
         return <XCircle className="h-4 w-4 text-red-500" />;
       case "started":
         return <Clock className="h-4 w-4 text-blue-500" />;
       default:
-        return (
-          <AlertTriangle className="h-4 w-4 text-yellow-500" />
-        );
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
     }
   };
 
@@ -1728,7 +1474,7 @@ const IssueDetailModalComponent = ({
     if (loading) {
       return null;
     }
-    
+
     // Only show issueDetails if available (loaded from API)
     // Never fallback to issue prop during transitions
     return issueDetails;
@@ -1740,16 +1486,10 @@ const IssueDetailModalComponent = ({
   // This prevents showing stale data from previous issue
   if (!displayIssue) {
     return (
-      <Dialog 
-        key={`loading-${issue.id}`}
-        open={isOpen} 
-        onOpenChange={onClose}
-      >
+      <Dialog key={`loading-${issue.id}`} open={isOpen} onOpenChange={onClose}>
         <DialogContent className="issue-modal !max-w-4xl !w-[92vw] !h-[88vh] !p-0 !gap-0 !flex !flex-col">
           <DialogHeader className="flex-shrink-0 p-6 pb-4 border-b bg-background">
-            <DialogTitle className="text-xl">
-              Loading...
-            </DialogTitle>
+            <DialogTitle className="text-xl">Loading...</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full">
@@ -1765,11 +1505,7 @@ const IssueDetailModalComponent = ({
 
   return (
     <>
-      <Dialog 
-        key={issue.id}
-        open={isOpen} 
-        onOpenChange={onClose}
-      >
+      <Dialog key={issue.id} open={isOpen} onOpenChange={onClose}>
         <DialogContent className="issue-modal !max-w-4xl !w-[92vw] !h-[88vh] !p-0 !gap-0 !flex !flex-col">
           {/* Fixed Header with Breadcrumb Navigation */}
           <DialogHeader className="flex-shrink-0 p-6 pb-4 border-b bg-background relative">
@@ -1841,16 +1577,11 @@ const IssueDetailModalComponent = ({
                 <div className="flex-shrink-0">
                   {(() => {
                     // Sub-Issue Actions (when viewing sub-issue from parent)
-                    if (
-                      navigationStack.length > 0 &&
-                      showAcceptanceIssues
-                    ) {
+                    if (navigationStack.length > 0 && showAcceptanceIssues) {
                       const stateName =
-                        displayIssue.state?.name?.toLowerCase() ||
-                        "";
+                        displayIssue.state?.name?.toLowerCase() || "";
                       const stateType =
-                        displayIssue.state?.type?.toLowerCase() ||
-                        "";
+                        displayIssue.state?.type?.toLowerCase() || "";
 
                       // CRITICAL: State-aware button logic based on Linear workflow
 
@@ -1885,9 +1616,7 @@ const IssueDetailModalComponent = ({
                               className="h-9 px-4 hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-950 dark:hover:text-blue-400"
                               onClick={async (e) => {
                                 e.stopPropagation();
-                                toast.info(
-                                  "Reopen functionality coming soon",
-                                );
+                                toast.info("Reopen functionality coming soon");
                               }}
                             >
                               <AlertTriangle className="h-4 w-4 mr-2" />
@@ -1948,9 +1677,7 @@ const IssueDetailModalComponent = ({
                               size="sm"
                               className="h-9 px-4 hover:bg-orange-50 hover:text-orange-700 dark:hover:bg-orange-950 dark:hover:text-orange-400"
                               onClick={() => {
-                                setRequestChangesSubIssue(
-                                  displayIssue as any,
-                                );
+                                setRequestChangesSubIssue(displayIssue as any);
                               }}
                             >
                               <MessageSquare className="h-4 w-4 mr-2" />
@@ -1974,7 +1701,7 @@ const IssueDetailModalComponent = ({
                               className="h-9 px-4 bg-green-600 hover:bg-green-700 text-white shadow-sm"
                               onClick={async () => {
                                 await handleApproveSubIssue(
-                                  displayIssue as any,
+                                  displayIssue as any
                                 );
                               }}
                             >
@@ -1986,9 +1713,7 @@ const IssueDetailModalComponent = ({
                               size="sm"
                               className="h-9 px-4 hover:bg-orange-50 hover:text-orange-700 dark:hover:bg-orange-950 dark:hover:text-orange-400"
                               onClick={() => {
-                                setRequestChangesSubIssue(
-                                  displayIssue as any,
-                                );
+                                setRequestChangesSubIssue(displayIssue as any);
                               }}
                             >
                               <MessageSquare className="h-4 w-4 mr-2" />
@@ -2006,9 +1731,7 @@ const IssueDetailModalComponent = ({
                             size="sm"
                             className="h-9 px-4 bg-green-600 hover:bg-green-700 text-white shadow-sm"
                             onClick={async () => {
-                              await handleApproveSubIssue(
-                                displayIssue as any,
-                              );
+                              await handleApproveSubIssue(displayIssue as any);
                             }}
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />
@@ -2019,9 +1742,7 @@ const IssueDetailModalComponent = ({
                             size="sm"
                             className="h-9 px-4 hover:bg-orange-50 hover:text-orange-700 dark:hover:bg-orange-950 dark:hover:text-orange-400"
                             onClick={() => {
-                              setRequestChangesSubIssue(
-                                displayIssue as any,
-                              );
+                              setRequestChangesSubIssue(displayIssue as any);
                             }}
                           >
                             <MessageSquare className="h-4 w-4 mr-2" />
@@ -2035,26 +1756,20 @@ const IssueDetailModalComponent = ({
                     // CRITICAL: Approve = Move to "Release Ready" state
                     // Business Rule: ALL children must be in "Release Ready" to approve parent
                     if (
-                      displayIssue.state?.name !==
-                        "Release Ready" &&
+                      displayIssue.state?.name !== "Release Ready" &&
                       navigationStack.length === 0
                     ) {
-                      const subIssues =
-                        (displayIssue as any).subIssues || [];
+                      const subIssues = (displayIssue as any).subIssues || [];
                       const hasSubIssues = subIssues.length > 0;
 
                       // Check how many children are NOT ready for release
                       const notReadyInfo = hasSubIssues
-                        ? getChildrenNotReadyForRelease(
-                            displayIssue,
-                          )
+                        ? getChildrenNotReadyForRelease(displayIssue)
                         : { count: 0, identifiers: [] };
 
                       // Determine button state based on business rules
-                      let buttonState:
-                        | "enabled"
-                        | "disabled"
-                        | "hidden" = "hidden";
+                      let buttonState: "enabled" | "disabled" | "hidden" =
+                        "hidden";
                       let tooltipText = "";
 
                       if (!hasSubIssues) {
@@ -2064,12 +1779,13 @@ const IssueDetailModalComponent = ({
                       } else if (notReadyInfo.count === 0) {
                         // All children in "Release Ready": Enable Approve button
                         buttonState = "enabled";
-                        tooltipText =
-                          "All sub-tasks ready for release";
+                        tooltipText = "All sub-tasks ready for release";
                       } else {
                         // Some children NOT in "Release Ready": Disable button
                         buttonState = "disabled";
-                        tooltipText = `${notReadyInfo.count} sub-task${notReadyInfo.count > 1 ? "s" : ""} not ready for release yet`;
+                        tooltipText = `${notReadyInfo.count} sub-task${
+                          notReadyInfo.count > 1 ? "s" : ""
+                        } not ready for release yet`;
                       }
 
                       if (buttonState === "hidden") return null;
@@ -2091,13 +1807,8 @@ const IssueDetailModalComponent = ({
                                     variant="outline"
                                     size="sm"
                                     className="h-9 px-3 sm:px-4 border-orange-500 text-orange-600 hover:bg-orange-50 hover:text-orange-700 dark:border-orange-600 dark:text-orange-400 dark:hover:bg-orange-950 dark:hover:text-orange-300 font-medium transition-all"
-                                    onClick={
-                                      handlePartialApproveMainIssue
-                                    }
-                                    disabled={
-                                      isPartialApproving ||
-                                      isApproving
-                                    }
+                                    onClick={handlePartialApproveMainIssue}
+                                    disabled={isPartialApproving || isApproving}
                                   >
                                     {isPartialApproving ? (
                                       <>
@@ -2124,26 +1835,17 @@ const IssueDetailModalComponent = ({
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-sm p-4">
                                   <p className="text-sm font-medium mb-2">
-                                    Mark issue as partially
-                                    approved
+                                    Mark issue as partially approved
                                   </p>
                                   <p className="text-xs text-muted-foreground">
-                                    Keep {completedCount}{" "}
-                                    completed sub-task
-                                    {completedCount > 1
-                                      ? "s"
-                                      : ""}{" "}
-                                    and move{" "}
-                                    {notReadyInfo.count}{" "}
-                                    unfinished task
-                                    {notReadyInfo.count > 1
-                                      ? "s"
-                                      : ""}{" "}
-                                    to the next cycle
+                                    Keep {completedCount} completed sub-task
+                                    {completedCount > 1 ? "s" : ""} and move{" "}
+                                    {notReadyInfo.count} unfinished task
+                                    {notReadyInfo.count > 1 ? "s" : ""} to the
+                                    next cycle
                                   </p>
                                   <p className="text-xs text-muted-foreground mt-2 italic">
-                                    Maintains parent-child
-                                    relationships for
+                                    Maintains parent-child relationships for
                                     traceability
                                   </p>
                                 </TooltipContent>
@@ -2155,12 +1857,9 @@ const IssueDetailModalComponent = ({
                                   variant="default"
                                   size="sm"
                                   className="h-9 px-4 bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all"
-                                  onClick={
-                                    handleApproveMainIssue
-                                  }
+                                  onClick={handleApproveMainIssue}
                                   disabled={
-                                    buttonState ===
-                                      "disabled" ||
+                                    buttonState === "disabled" ||
                                     isApproving ||
                                     isPartialApproving
                                   }
@@ -2184,8 +1883,7 @@ const IssueDetailModalComponent = ({
                                 </p>
                                 {buttonState === "disabled" && (
                                   <p className="text-xs text-muted-foreground mt-2">
-                                    All sub-tasks must be in
-                                    Release Ready state
+                                    All sub-tasks must be in Release Ready state
                                   </p>
                                 )}
                               </TooltipContent>
@@ -2196,9 +1894,7 @@ const IssueDetailModalComponent = ({
                               <DropdownMenu>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger
-                                      asChild
-                                    >
+                                    <DropdownMenuTrigger asChild>
                                       <Button
                                         variant="ghost"
                                         size="sm"
@@ -2209,9 +1905,7 @@ const IssueDetailModalComponent = ({
                                     </DropdownMenuTrigger>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    <p className="text-sm">
-                                      More actions
-                                    </p>
+                                    <p className="text-sm">More actions</p>
                                   </TooltipContent>
                                 </Tooltip>
                                 <DropdownMenuContent
@@ -2220,17 +1914,12 @@ const IssueDetailModalComponent = ({
                                 >
                                   <DropdownMenuItem
                                     className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer"
-                                    onClick={() =>
-                                      initiateDelete(
-                                        displayIssue,
-                                      )
-                                    }
+                                    onClick={() => initiateDelete(displayIssue)}
                                     disabled={isDeleting}
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
                                     Delete{" "}
-                                    {(displayIssue as any)
-                                      .subIssues?.length > 0
+                                    {(displayIssue as any).subIssues?.length > 0
                                       ? "group task"
                                       : "issue"}
                                   </DropdownMenuItem>
@@ -2268,11 +1957,13 @@ const IssueDetailModalComponent = ({
             {/* Priority Badge */}
             {displayIssue.priority !== undefined && (
               <Badge
-                className={`text-xs whitespace-nowrap ${getPriorityColor(displayIssue.priority)} text-white`}
+                className={`text-xs whitespace-nowrap ${getPriorityColor(
+                  displayIssue.priority
+                )} text-white`}
               >
                 {getPriorityLabel(
                   displayIssue.priority,
-                  displayIssue.priorityLabel,
+                  displayIssue.priorityLabel
                 )}
               </Badge>
             )}
@@ -2304,10 +1995,7 @@ const IssueDetailModalComponent = ({
           {/* Scrollable Content - OPTIMIZED: Tighter spacing */}
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full">
-              <div
-                ref={scrollContainerRef}
-                className="px-4 py-4"
-              >
+              <div ref={scrollContainerRef} className="px-4 py-4">
                 {loading ? (
                   <IssueDetailSkeleton />
                 ) : (
@@ -2322,16 +2010,16 @@ const IssueDetailModalComponent = ({
                           ...displayIssue,
                           description: newDescription,
                         } as LinearIssue);
-                        
+
                         // Invalidate cache
                         import("../services/linearCacheService").then(
                           ({ linearCache }) => {
                             linearCache.invalidate(
-                              `linear:issue-detail:issueId:${displayIssue.id}`,
+                              `linear:issue-detail:issueId:${displayIssue.id}`
                             );
-                          },
+                          }
                         );
-                        
+
                         // Trigger refresh
                         if (onIssueUpdate) {
                           onIssueUpdate({
@@ -2379,7 +2067,7 @@ const IssueDetailModalComponent = ({
                                           </p>
                                           <p className="text-sm text-foreground truncate">
                                             {formatDate(
-                                              displayIssue.completedAt,
+                                              displayIssue.completedAt
                                             )}
                                           </p>
                                         </div>
@@ -2393,9 +2081,7 @@ const IssueDetailModalComponent = ({
                                             Due Date
                                           </p>
                                           <p className="text-sm text-foreground truncate">
-                                            {formatDate(
-                                              displayIssue.dueDate,
-                                            )}
+                                            {formatDate(displayIssue.dueDate)}
                                           </p>
                                         </div>
                                       </div>
@@ -2408,8 +2094,7 @@ const IssueDetailModalComponent = ({
                                             Time Estimate
                                           </p>
                                           <p className="text-sm text-foreground">
-                                            {displayIssue.estimate}{" "}
-                                            hours
+                                            {displayIssue.estimate} hours
                                           </p>
                                         </div>
                                       </div>
@@ -2441,8 +2126,7 @@ const IssueDetailModalComponent = ({
                                 <div className="p-3 bg-muted/20 rounded-md border border-border/50">
                                   <div className="flex items-center gap-2">
                                     <div className="text-xl">
-                                      {displayIssue.project.icon ||
-                                        "📋"}
+                                      {displayIssue.project.icon || "📋"}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-xs text-muted-foreground">
@@ -2458,8 +2142,7 @@ const IssueDetailModalComponent = ({
 
                               {/* Labels */}
                               {displayIssue.labels?.nodes &&
-                                displayIssue.labels.nodes.length >
-                                  0 && (
+                                displayIssue.labels.nodes.length > 0 && (
                                   <div className="p-3 bg-muted/20 rounded-lg border border-border/50">
                                     <div className="flex items-center gap-2 mb-3">
                                       <Tag className="h-4 w-4 text-muted-foreground" />
@@ -2475,15 +2158,14 @@ const IssueDetailModalComponent = ({
                                             variant="outline"
                                             className="text-xs px-2.5 py-1 font-medium shadow-sm"
                                             style={{
-                                              borderColor:
-                                                label.color,
+                                              borderColor: label.color,
                                               color: label.color,
                                               backgroundColor: `${label.color}15`,
                                             }}
                                           >
                                             {label.name}
                                           </Badge>
-                                        ),
+                                        )
                                       )}
                                     </div>
                                   </div>
@@ -2491,8 +2173,7 @@ const IssueDetailModalComponent = ({
 
                               {/* Attachments */}
                               {displayIssue.attachments?.nodes &&
-                                displayIssue.attachments.nodes
-                                  .length > 0 && (
+                                displayIssue.attachments.nodes.length > 0 && (
                                   <div className="p-3 bg-muted/20 rounded-lg border border-border/50">
                                     <div className="flex items-center gap-2 mb-3">
                                       <Paperclip className="h-4 w-4 text-muted-foreground" />
@@ -2515,7 +2196,7 @@ const IssueDetailModalComponent = ({
                                               {attachment.title}
                                             </span>
                                           </a>
-                                        ),
+                                        )
                                       )}
                                     </div>
                                   </div>
@@ -2531,23 +2212,18 @@ const IssueDetailModalComponent = ({
 
                     {showAcceptanceIssues &&
                       (displayIssue as any).subIssues &&
-                      (displayIssue as any).subIssues.length >
-                        0 &&
+                      (displayIssue as any).subIssues.length > 0 &&
                       (() => {
-                        const subIssues = (displayIssue as any)
-                          .subIssues;
+                        const subIssues = (displayIssue as any).subIssues;
                         const completedCount = subIssues.filter(
-                          (sub: any) =>
-                            sub.state?.type === "completed",
+                          (sub: any) => sub.state?.type === "completed"
                         ).length;
-                        const inProgressCount =
-                          subIssues.filter(
-                            (sub: any) =>
-                              sub.state?.type === "started",
-                          ).length;
+                        const inProgressCount = subIssues.filter(
+                          (sub: any) => sub.state?.type === "started"
+                        ).length;
                         const totalCount = subIssues.length;
                         const percentage = Math.round(
-                          (completedCount / totalCount) * 100,
+                          (completedCount / totalCount) * 100
                         );
 
                         return (
@@ -2564,10 +2240,8 @@ const IssueDetailModalComponent = ({
                                   </h4>
                                   <p className="text-xs text-muted-foreground mt-0.5">
                                     {totalCount}{" "}
-                                    {totalCount === 1
-                                      ? "task"
-                                      : "tasks"}{" "}
-                                    • {completedCount} completed
+                                    {totalCount === 1 ? "task" : "tasks"} •{" "}
+                                    {completedCount} completed
                                   </p>
                                 </div>
                               </div>
@@ -2585,8 +2259,7 @@ const IssueDetailModalComponent = ({
                                     className="text-xs px-2.5 py-1 border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-400"
                                   >
                                     <Clock className="h-3 w-3 mr-1.5" />
-                                    {inProgressCount} In
-                                    Progress
+                                    {inProgressCount} In Progress
                                   </Badge>
                                 )}
                               </div>
@@ -2612,12 +2285,10 @@ const IssueDetailModalComponent = ({
                               </div>
                               <div className="flex items-center justify-between mt-2">
                                 <span className="text-xs text-muted-foreground">
-                                  {completedCount} of{" "}
-                                  {totalCount} completed
+                                  {completedCount} of {totalCount} completed
                                 </span>
                                 <span className="text-xs text-muted-foreground">
-                                  {totalCount - completedCount}{" "}
-                                  remaining
+                                  {totalCount - completedCount} remaining
                                 </span>
                               </div>
                             </div>
@@ -2625,43 +2296,31 @@ const IssueDetailModalComponent = ({
                             {/* Warning: Unapproved Children - Parent Cannot Be Moved */}
                             {(() => {
                               const allApproved =
-                                areAllChildrenApproved(
-                                  displayIssue,
-                                );
+                                areAllChildrenApproved(displayIssue);
 
                               // CRITICAL: Use workflow approval status (not release-ready status)
                               // For workflow lock message, we check if children are in "Client Review"
                               const subIssues =
-                                (displayIssue as any)
-                                  .subIssues || [];
-                              const unapprovedForWorkflow =
-                                subIssues.filter(
-                                  (subIssue: any) => {
-                                    const stateName =
-                                      subIssue.state?.name;
-                                    const stateType =
-                                      subIssue.state?.type;
-                                    // Not approved for workflow = not in Client Review and not completed
-                                    return !(
-                                      stateName ===
-                                        "Client Review" ||
-                                      stateType === "completed"
-                                    );
-                                  },
-                                );
+                                (displayIssue as any).subIssues || [];
+                              const unapprovedForWorkflow = subIssues.filter(
+                                (subIssue: any) => {
+                                  const stateName = subIssue.state?.name;
+                                  const stateType = subIssue.state?.type;
+                                  // Not approved for workflow = not in Client Review and not completed
+                                  return !(
+                                    stateName === "Client Review" ||
+                                    stateType === "completed"
+                                  );
+                                }
+                              );
                               const unapproved = {
-                                count:
-                                  unapprovedForWorkflow.length,
-                                identifiers:
-                                  unapprovedForWorkflow.map(
-                                    (si: any) => si.identifier,
-                                  ),
+                                count: unapprovedForWorkflow.length,
+                                identifiers: unapprovedForWorkflow.map(
+                                  (si: any) => si.identifier
+                                ),
                               };
 
-                              if (
-                                !allApproved &&
-                                unapproved.count > 0
-                              ) {
+                              if (!allApproved && unapproved.count > 0) {
                                 return (
                                   <div className="mx-6 mb-5 p-3 bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-950/20 dark:to-orange-900/10 border border-orange-300 dark:border-orange-800 rounded-lg shadow-sm">
                                     <div className="flex items-start gap-2.5">
@@ -2672,13 +2331,8 @@ const IssueDetailModalComponent = ({
                                             Locked
                                           </h5>
                                           <span className="text-xs text-orange-700 dark:text-orange-300">
-                                            Awaiting{" "}
-                                            {unapproved.count}{" "}
-                                            approval
-                                            {unapproved.count >
-                                            1
-                                              ? "s"
-                                              : ""}
+                                            Awaiting {unapproved.count} approval
+                                            {unapproved.count > 1 ? "s" : ""}
                                           </span>
                                         </div>
                                         <div className="flex flex-wrap gap-1.5">
@@ -2688,8 +2342,7 @@ const IssueDetailModalComponent = ({
                                               const subIssue =
                                                 issue.children?.nodes.find(
                                                   (si: any) =>
-                                                    si.identifier ===
-                                                    id,
+                                                    si.identifier === id
                                                 );
                                               return (
                                                 <Badge
@@ -2697,18 +2350,14 @@ const IssueDetailModalComponent = ({
                                                   variant="outline"
                                                   className="text-xs font-mono border-orange-400 dark:border-orange-600 bg-white dark:bg-orange-950/50 text-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-900/70 transition-colors cursor-pointer"
                                                   onClick={() => {
-                                                    if (
-                                                      subIssue
-                                                    ) {
+                                                    if (subIssue) {
                                                       setSelectedIssue(
-                                                        subIssue,
+                                                        subIssue
                                                       );
-                                                      setParentIssueChain(
-                                                        [
-                                                          ...parentIssueChain,
-                                                          issue,
-                                                        ],
-                                                      );
+                                                      setParentIssueChain([
+                                                        ...parentIssueChain,
+                                                        issue,
+                                                      ]);
                                                     }
                                                   }}
                                                 >
@@ -2716,12 +2365,9 @@ const IssueDetailModalComponent = ({
                                                 </Badge>
                                               );
                                             })}
-                                          {unapproved.count >
-                                            5 && (
+                                          {unapproved.count > 5 && (
                                             <span className="text-xs text-orange-600 dark:text-orange-400 font-medium self-center">
-                                              +
-                                              {unapproved.count -
-                                                5}
+                                              +{unapproved.count - 5}
                                             </span>
                                           )}
                                         </div>
@@ -2738,10 +2384,7 @@ const IssueDetailModalComponent = ({
                               <table className="w-full table-fixed">
                                 <tbody className="divide-y divide-border">
                                   {subIssues.map(
-                                    (
-                                      subIssue: any,
-                                      index: number,
-                                    ) => (
+                                    (subIssue: any, index: number) => (
                                       <tr
                                         key={subIssue.id}
                                         className="group hover:bg-muted/30 transition-colors"
@@ -2749,11 +2392,9 @@ const IssueDetailModalComponent = ({
                                         {/* ID + Title Column */}
                                         <td
                                           className="px-4 py-3.5 cursor-pointer"
-                                          style={{ width: '40%' }}
+                                          style={{ width: "40%" }}
                                           onClick={() =>
-                                            handleNavigateToSubIssue(
-                                              subIssue,
-                                            )
+                                            handleNavigateToSubIssue(subIssue)
                                           }
                                         >
                                           <div className="flex items-center gap-2.5">
@@ -2762,9 +2403,7 @@ const IssueDetailModalComponent = ({
                                               variant="outline"
                                               className="text-xs font-mono font-semibold border-border/60 bg-muted/30 hover:border-primary/50 transition-colors flex-shrink-0"
                                             >
-                                              {
-                                                subIssue.identifier
-                                              }
+                                              {subIssue.identifier}
                                             </Badge>
 
                                             {/* Chevron Icon */}
@@ -2778,9 +2417,7 @@ const IssueDetailModalComponent = ({
                                             {/* Linear Link - Admin only */}
                                             {isAdminOrSuperAdmin && (
                                               <a
-                                                href={
-                                                  subIssue.url
-                                                }
+                                                href={subIssue.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 onClick={(e) =>
@@ -2796,7 +2433,10 @@ const IssueDetailModalComponent = ({
                                         </td>
 
                                         {/* Status Column */}
-                                        <td className="px-4 py-3.5" style={{ width: '20%' }}>
+                                        <td
+                                          className="px-4 py-3.5"
+                                          style={{ width: "20%" }}
+                                        >
                                           {subIssue.state ? (
                                             <Badge
                                               variant="secondary"
@@ -2807,9 +2447,7 @@ const IssueDetailModalComponent = ({
                                               }`}
                                               style={{
                                                 backgroundColor: `${subIssue.state.color}15`,
-                                                color:
-                                                  subIssue.state
-                                                    .color,
+                                                color: subIssue.state.color,
                                                 borderColor: `${subIssue.state.color}30`,
                                               }}
                                             >
@@ -2817,21 +2455,16 @@ const IssueDetailModalComponent = ({
                                                 <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />
                                               )}
                                               {!subIssue._optimisticUpdate &&
-                                                subIssue.state
-                                                  .type ===
+                                                subIssue.state.type ===
                                                   "completed" && (
                                                   <CheckCircle className="h-3 w-3 mr-1.5" />
                                                 )}
                                               {!subIssue._optimisticUpdate &&
-                                                subIssue.state
-                                                  .type ===
+                                                subIssue.state.type ===
                                                   "started" && (
                                                   <Clock className="h-3 w-3 mr-1.5" />
                                                 )}
-                                              {
-                                                subIssue.state
-                                                  .name
-                                              }
+                                              {subIssue.state.name}
                                             </Badge>
                                           ) : (
                                             <span className="text-xs text-muted-foreground">
@@ -2843,10 +2476,8 @@ const IssueDetailModalComponent = ({
                                         {/* Actions Column */}
                                         <td
                                           className="px-4 py-3.5"
-                                          style={{ width: '40%' }}
-                                          onClick={(e) =>
-                                            e.stopPropagation()
-                                          }
+                                          style={{ width: "40%" }}
+                                          onClick={(e) => e.stopPropagation()}
                                         >
                                           <div className="flex items-center justify-end gap-2">
                                             {(() => {
@@ -2861,11 +2492,8 @@ const IssueDetailModalComponent = ({
 
                                               // 1. Shipped/Completed - NO ACTIONS (read-only)
                                               if (
-                                                stateType ===
-                                                  "completed" ||
-                                                stateName.includes(
-                                                  "shipped",
-                                                )
+                                                stateType === "completed" ||
+                                                stateName.includes("shipped")
                                               ) {
                                                 return (
                                                   <Badge
@@ -2880,42 +2508,32 @@ const IssueDetailModalComponent = ({
 
                                               // 2. Canceled - Show REOPEN button
                                               if (
-                                                stateType ===
-                                                  "canceled" ||
-                                                stateName.includes(
-                                                  "canceled",
-                                                )
+                                                stateType === "canceled" ||
+                                                stateName.includes("canceled")
                                               ) {
                                                 return (
                                                   <Button
                                                     variant="ghost"
                                                     size="sm"
                                                     className="h-7 px-2.5 text-xs hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-950 dark:hover:text-blue-400 transition-all whitespace-nowrap"
-                                                    onClick={async (
-                                                      e,
-                                                    ) => {
+                                                    onClick={async (e) => {
                                                       e.stopPropagation();
                                                       // TODO: Implement reopen logic - move to "Client Review" state
                                                       toast.info(
-                                                        "Reopen functionality coming soon",
+                                                        "Reopen functionality coming soon"
                                                       );
                                                     }}
                                                   >
                                                     <AlertTriangle className="h-3.5 w-3.5 mr-1" />
-                                                    Reopen for
-                                                    Retest
+                                                    Reopen for Retest
                                                   </Button>
                                                 );
                                               }
 
                                               // 3. Blocked - Show Request Changes (disabled)
                                               if (
-                                                stateName.includes(
-                                                  "blocked",
-                                                ) ||
-                                                stateName.includes(
-                                                  "waiting",
-                                                )
+                                                stateName.includes("blocked") ||
+                                                stateName.includes("waiting")
                                               ) {
                                                 return (
                                                   <Button
@@ -2932,23 +2550,20 @@ const IssueDetailModalComponent = ({
 
                                               // 4. QA / In Progress / Internal states - NO BUTTONS (hidden from client)
                                               if (
+                                                stateName.includes("qa") ||
                                                 stateName.includes(
-                                                  "qa",
+                                                  "in progress"
                                                 ) ||
                                                 stateName.includes(
-                                                  "in progress",
+                                                  "code review"
                                                 ) ||
                                                 stateName.includes(
-                                                  "code review",
-                                                ) ||
-                                                stateName.includes(
-                                                  "development",
+                                                  "development"
                                                 )
                                               ) {
                                                 return (
                                                   <span className="text-xs text-muted-foreground italic">
-                                                    Internal
-                                                    testing
+                                                    Internal testing
                                                   </span>
                                                 );
                                               }
@@ -2956,10 +2571,10 @@ const IssueDetailModalComponent = ({
                                               // 5. Release Ready - ONLY Request Changes (allow regression testing)
                                               if (
                                                 stateName.includes(
-                                                  "release ready",
+                                                  "release ready"
                                                 ) ||
                                                 stateName.includes(
-                                                  "ready for release",
+                                                  "ready for release"
                                                 )
                                               ) {
                                                 return (
@@ -2967,12 +2582,10 @@ const IssueDetailModalComponent = ({
                                                     variant="ghost"
                                                     size="sm"
                                                     className="!h-7 !px-2 !py-0 text-xs hover:bg-orange-50 hover:text-orange-700 dark:hover:bg-orange-950 dark:hover:text-orange-400 transition-all whitespace-nowrap"
-                                                    onClick={(
-                                                      e,
-                                                    ) => {
+                                                    onClick={(e) => {
                                                       e.stopPropagation();
                                                       setRequestChangesSubIssue(
-                                                        subIssue,
+                                                        subIssue
                                                       );
                                                     }}
                                                   >
@@ -2985,13 +2598,10 @@ const IssueDetailModalComponent = ({
                                               // 6. Client Review / Triage - Show BOTH buttons (active UAT phase)
                                               if (
                                                 stateName.includes(
-                                                  "client review",
+                                                  "client review"
                                                 ) ||
-                                                stateName.includes(
-                                                  "triage",
-                                                ) ||
-                                                stateType ===
-                                                  "unstarted"
+                                                stateName.includes("triage") ||
+                                                stateType === "unstarted"
                                               ) {
                                                 return (
                                                   <>
@@ -2999,12 +2609,10 @@ const IssueDetailModalComponent = ({
                                                       variant="ghost"
                                                       size="sm"
                                                       className="!h-7 !px-2 !py-0 text-xs hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-950 dark:hover:text-green-400 transition-all whitespace-nowrap"
-                                                      onClick={async (
-                                                        e,
-                                                      ) => {
+                                                      onClick={async (e) => {
                                                         e.stopPropagation();
                                                         await handleApproveSubIssue(
-                                                          subIssue,
+                                                          subIssue
                                                         );
                                                       }}
                                                     >
@@ -3015,12 +2623,10 @@ const IssueDetailModalComponent = ({
                                                       variant="outline"
                                                       size="sm"
                                                       className="!h-7 !px-2 !py-0 text-xs border-border hover:bg-orange-50 hover:text-orange-700 hover:border-orange-300 dark:hover:bg-orange-950 dark:hover:text-orange-400 transition-all whitespace-nowrap"
-                                                      onClick={(
-                                                        e,
-                                                      ) => {
+                                                      onClick={(e) => {
                                                         e.stopPropagation();
                                                         setRequestChangesSubIssue(
-                                                          subIssue,
+                                                          subIssue
                                                         );
                                                       }}
                                                     >
@@ -3038,12 +2644,10 @@ const IssueDetailModalComponent = ({
                                                     variant="ghost"
                                                     size="sm"
                                                     className="!h-7 !px-2 !py-0 text-xs hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-950 dark:hover:text-green-400 transition-all whitespace-nowrap"
-                                                    onClick={async (
-                                                      e,
-                                                    ) => {
+                                                    onClick={async (e) => {
                                                       e.stopPropagation();
                                                       await handleApproveSubIssue(
-                                                        subIssue,
+                                                        subIssue
                                                       );
                                                     }}
                                                   >
@@ -3054,12 +2658,10 @@ const IssueDetailModalComponent = ({
                                                     variant="ghost"
                                                     size="sm"
                                                     className="!h-7 !px-2 !py-0 text-xs hover:bg-orange-50 hover:text-orange-700 dark:hover:bg-orange-950 dark:hover:text-orange-400 transition-all whitespace-nowrap"
-                                                    onClick={(
-                                                      e,
-                                                    ) => {
+                                                    onClick={(e) => {
                                                       e.stopPropagation();
                                                       setRequestChangesSubIssue(
-                                                        subIssue,
+                                                        subIssue
                                                       );
                                                     }}
                                                   >
@@ -3076,13 +2678,9 @@ const IssueDetailModalComponent = ({
                                                 variant="ghost"
                                                 size="sm"
                                                 className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100 ml-1"
-                                                onClick={(
-                                                  e,
-                                                ) => {
+                                                onClick={(e) => {
                                                   e.stopPropagation();
-                                                  initiateDelete(
-                                                    subIssue,
-                                                  );
+                                                  initiateDelete(subIssue);
                                                 }}
                                                 title={`Delete ${subIssue.identifier}`}
                                               >
@@ -3092,22 +2690,19 @@ const IssueDetailModalComponent = ({
                                           </div>
                                         </td>
                                       </tr>
-                                    ),
+                                    )
                                   )}
                                 </tbody>
                               </table>
                             </div>
 
                             {/* Add New Task Button - Only show in "Client Review" state */}
-                            {displayIssue.state?.name ===
-                              "Client Review" && (
+                            {displayIssue.state?.name === "Client Review" && (
                               <div className="mx-6 mt-4">
                                 <Button
                                   variant="outline"
                                   className="w-full border-dashed border-border/70 hover:border-primary hover:bg-primary/5 transition-all"
-                                  onClick={() =>
-                                    setShowSubIssueDialog(true)
-                                  }
+                                  onClick={() => setShowSubIssueDialog(true)}
                                 >
                                   <Plus className="h-4 w-4 mr-2" />
                                   Add new task
@@ -3121,10 +2716,8 @@ const IssueDetailModalComponent = ({
                     {/* 🆕 Add Sub-Issue Button (when no acceptance issues exist) - Only show if enabled AND in "Client Review" state */}
                     {showAcceptanceIssues &&
                       (!(displayIssue as any).subIssues ||
-                        (displayIssue as any).subIssues
-                          .length === 0) &&
-                      displayIssue.state?.name ===
-                        "Client Review" && (
+                        (displayIssue as any).subIssues.length === 0) &&
+                      displayIssue.state?.name === "Client Review" && (
                         <div className="border-t pt-6">
                           <div className="flex items-center gap-3 mb-4">
                             <GitBranch className="h-5 w-5 text-muted-foreground" />
@@ -3134,16 +2727,13 @@ const IssueDetailModalComponent = ({
                           </div>
                           <div className="p-8 bg-muted/20 rounded-lg border-2 border-dashed border-border text-center">
                             <p className="text-sm text-muted-foreground mb-4">
-                              No acceptance issues yet. Break
-                              down this issue into smaller
-                              tasks.
+                              No acceptance issues yet. Break down this issue
+                              into smaller tasks.
                             </p>
                             <Button
                               variant="outline"
                               className="border-dashed hover:border-primary hover:bg-primary/5 transition-colors"
-                              onClick={() =>
-                                setShowSubIssueDialog(true)
-                              }
+                              onClick={() => setShowSubIssueDialog(true)}
                             >
                               <Plus className="h-4 w-4 mr-2" />
                               Add new task
@@ -3156,11 +2746,10 @@ const IssueDetailModalComponent = ({
                     {commentsEnabled &&
                       (() => {
                         //Filter to only show [external] comments (client portal comments)
-                        const allComments =
-                          displayIssue.comments?.nodes || [];
+                        const allComments = displayIssue.comments?.nodes || [];
 
-                        const externalComments =
-                          allComments.filter((comment: any) => {
+                        const externalComments = allComments.filter(
+                          (comment: any) => {
                             const body = comment.body || "";
 
                             const normalizedBody = body
@@ -3171,106 +2760,105 @@ const IssueDetailModalComponent = ({
                               .toLowerCase(); //CASE-INSENSITIVE
 
                             const isExternal =
-                              normalizedBody.startsWith(
-                                "[external]",
-                              );
+                              normalizedBody.startsWith("[external]");
 
                             return isExternal;
-                          });
+                          }
+                        );
 
                         return (
                           <div className="border-t pt-6">
                             <div className="flex items-center gap-3 mb-6">
                               <MessageSquare className="h-5 w-5 text-muted-foreground" />
                               <h4 className="font-semibold text-base">
-                                Comments (
-                                {externalComments.length})
+                                Comments ({externalComments.length})
                               </h4>
                             </div>
 
                             {/* Existing Comments - Filtered to [external] only */}
                             {externalComments.length > 0 && (
                               <div className="space-y-4 mb-8">
-                                {externalComments.map(
-                                  (comment: any) => {
-                                    // Strip [external] prefix for display
-                                    const cleanBody =
-                                      LinearHelpers.stripExternalPrefix(
-                                        comment.body || "",
-                                      );
+                                {externalComments.map((comment: any) => {
+                                  // Strip [external] prefix for display
+                                  const cleanBody =
+                                    LinearHelpers.stripExternalPrefix(
+                                      comment.body || ""
+                                    );
 
-                                    // Extract Portal Metadata to get real user info
-                                    // CRITICAL: Single Linear API key means comment.user = API key owner
-                                    // Real portal user is in [Portal Metadata] footer
-                                    const portalMetadata =
-                                      LinearHelpers.extractPortalMetadata(
-                                        comment.body || "",
-                                      );
+                                  // Extract Portal Metadata to get real user info
+                                  // CRITICAL: Single Linear API key means comment.user = API key owner
+                                  // Real portal user is in [Portal Metadata] footer
+                                  const portalMetadata =
+                                    LinearHelpers.extractPortalMetadata(
+                                      comment.body || ""
+                                    );
 
-                                    console.log('[IssueDetailModal] Comment metadata:', {
+                                  console.log(
+                                    "[IssueDetailModal] Comment metadata:",
+                                    {
                                       hasMetadata: !!portalMetadata,
                                       linearUser: comment.user?.name,
                                       portalUser: portalMetadata?.userName,
-                                      commentId: comment.id
-                                    });
+                                      commentId: comment.id,
+                                    }
+                                  );
 
-                                    // Use Portal user if metadata exists, otherwise fallback to Linear API user
-                                    const displayName = portalMetadata
-                                      ? portalMetadata.userName
-                                      : comment.user?.name || "Unknown User";
-                                    
-                                    const displayTime = portalMetadata
-                                      ? portalMetadata.timestamp
-                                      : formatDate(comment.createdAt);
-                                    
-                                    const displayInitials = portalMetadata
-                                      ? portalMetadata.userInitials
-                                      : comment.user?.name?.substring(0, 2).toUpperCase() || "?";
-                                    
-                                    // CRITICAL: If Portal Metadata exists, DON'T use Linear avatar
-                                    // Portal users aren't Linear users, so only show initials
-                                    const displayAvatarUrl = portalMetadata 
-                                      ? undefined 
-                                      : comment.user?.avatarUrl;
+                                  // Use Portal user if metadata exists, otherwise fallback to Linear API user
+                                  const displayName = portalMetadata
+                                    ? portalMetadata.userName
+                                    : comment.user?.name || "Unknown User";
 
-                                    return (
-                                      <Card
-                                        key={comment.id}
-                                        className="shadow-sm border-border/50"
-                                      >
-                                        <CardContent className="!p-3">
-                                          <div className="flex items-start gap-2.5">
-                                            <Avatar className="h-7 w-7 flex-shrink-0">
-                                              <AvatarImage
-                                                src={displayAvatarUrl}
+                                  const displayTime = portalMetadata
+                                    ? portalMetadata.timestamp
+                                    : formatDate(comment.createdAt);
+
+                                  const displayInitials = portalMetadata
+                                    ? portalMetadata.userInitials
+                                    : comment.user?.name
+                                        ?.substring(0, 2)
+                                        .toUpperCase() || "?";
+
+                                  // CRITICAL: If Portal Metadata exists, DON'T use Linear avatar
+                                  // Portal users aren't Linear users, so only show initials
+                                  const displayAvatarUrl = portalMetadata
+                                    ? undefined
+                                    : comment.user?.avatarUrl;
+
+                                  return (
+                                    <Card
+                                      key={comment.id}
+                                      className="shadow-sm border-border/50"
+                                    >
+                                      <CardContent className="!p-3">
+                                        <div className="flex items-start gap-2.5">
+                                          <Avatar className="h-7 w-7 flex-shrink-0">
+                                            <AvatarImage
+                                              src={displayAvatarUrl}
+                                            />
+                                            <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                                              {displayInitials}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-1">
+                                              <span className="text-sm font-medium text-foreground">
+                                                {displayName}
+                                              </span>
+                                              <span className="text-xs text-muted-foreground">
+                                                {displayTime}
+                                              </span>
+                                            </div>
+                                            <div className="prose prose-sm max-w-none text-sm">
+                                              <MarkdownRenderer
+                                                content={cleanBody}
                                               />
-                                              <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                                                {displayInitials}
-                                              </AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex-1 min-w-0">
-                                              <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-sm font-medium text-foreground">
-                                                  {displayName}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground">
-                                                  {displayTime}
-                                                </span>
-                                              </div>
-                                              <div className="prose prose-sm max-w-none text-sm">
-                                                <MarkdownRenderer
-                                                  content={
-                                                    cleanBody
-                                                  }
-                                                />
-                                              </div>
                                             </div>
                                           </div>
-                                        </CardContent>
-                                      </Card>
-                                    );
-                                  },
-                                )}
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  );
+                                })}
                               </div>
                             )}
 
@@ -3298,7 +2886,11 @@ const IssueDetailModalComponent = ({
                                     isAddingComment ||
                                     isUploadingImage
                                   }
-                                  className={`h-8 w-8 p-0 ${commentEditor?.isActive("bold") ? "bg-primary/10 text-primary" : ""}`}
+                                  className={`h-8 w-8 p-0 ${
+                                    commentEditor?.isActive("bold")
+                                      ? "bg-primary/10 text-primary"
+                                      : ""
+                                  }`}
                                   title="Bold"
                                 >
                                   <Bold className="h-4 w-4" />
@@ -3319,7 +2911,11 @@ const IssueDetailModalComponent = ({
                                     isAddingComment ||
                                     isUploadingImage
                                   }
-                                  className={`h-8 w-8 p-0 ${commentEditor?.isActive("italic") ? "bg-primary/10 text-primary" : ""}`}
+                                  className={`h-8 w-8 p-0 ${
+                                    commentEditor?.isActive("italic")
+                                      ? "bg-primary/10 text-primary"
+                                      : ""
+                                  }`}
                                   title="Italic"
                                 >
                                   <Italic className="h-4 w-4" />
@@ -3343,7 +2939,13 @@ const IssueDetailModalComponent = ({
                                     isAddingComment ||
                                     isUploadingImage
                                   }
-                                  className={`h-8 w-8 p-0 ${commentEditor?.isActive("heading", { level: 2 }) ? "bg-primary/10 text-primary" : ""}`}
+                                  className={`h-8 w-8 p-0 ${
+                                    commentEditor?.isActive("heading", {
+                                      level: 2,
+                                    })
+                                      ? "bg-primary/10 text-primary"
+                                      : ""
+                                  }`}
                                   title="Heading"
                                 >
                                   <Heading2 className="h-4 w-4" />
@@ -3364,7 +2966,11 @@ const IssueDetailModalComponent = ({
                                     isAddingComment ||
                                     isUploadingImage
                                   }
-                                  className={`h-8 w-8 p-0 ${commentEditor?.isActive("bulletList") ? "bg-primary/10 text-primary" : ""}`}
+                                  className={`h-8 w-8 p-0 ${
+                                    commentEditor?.isActive("bulletList")
+                                      ? "bg-primary/10 text-primary"
+                                      : ""
+                                  }`}
                                   title="Bullet List"
                                 >
                                   <List className="h-4 w-4" />
@@ -3385,7 +2991,11 @@ const IssueDetailModalComponent = ({
                                     isAddingComment ||
                                     isUploadingImage
                                   }
-                                  className={`h-8 w-8 p-0 ${commentEditor?.isActive("orderedList") ? "bg-primary/10 text-primary" : ""}`}
+                                  className={`h-8 w-8 p-0 ${
+                                    commentEditor?.isActive("orderedList")
+                                      ? "bg-primary/10 text-primary"
+                                      : ""
+                                  }`}
                                   title="Numbered List"
                                 >
                                   <ListOrdered className="h-4 w-4" />
@@ -3406,7 +3016,11 @@ const IssueDetailModalComponent = ({
                                     isAddingComment ||
                                     isUploadingImage
                                   }
-                                  className={`h-8 w-8 p-0 ${commentEditor?.isActive("codeBlock") ? "bg-primary/10 text-primary" : ""}`}
+                                  className={`h-8 w-8 p-0 ${
+                                    commentEditor?.isActive("codeBlock")
+                                      ? "bg-primary/10 text-primary"
+                                      : ""
+                                  }`}
                                   title="Code Block"
                                 >
                                   <Code className="h-4 w-4" />
@@ -3418,31 +3032,25 @@ const IssueDetailModalComponent = ({
                                 {/* Submit Button */}
                                 <Button
                                   onClick={handleAddComment}
-                                  disabled={
-                                    isAddingComment ||
-                                    isUploadingImage
-                                  }
+                                  disabled={isAddingComment || isUploadingImage}
                                   size="sm"
                                   className="h-8"
                                 >
-                                  {(isAddingComment ||
-                                    isUploadingImage) && (
+                                  {(isAddingComment || isUploadingImage) && (
                                     <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
                                   )}
                                   {isAddingComment
                                     ? "Adding..."
                                     : isUploadingImage
-                                      ? "Uploading..."
-                                      : "Comment"}
+                                    ? "Uploading..."
+                                    : "Comment"}
                                 </Button>
                               </div>
 
                               {/*WYSIWYG Editor */}
                               <div className="border border-t-0 border-border rounded-b-lg bg-background overflow-hidden">
                                 {commentEditor ? (
-                                  <EditorContent
-                                    editor={commentEditor}
-                                  />
+                                  <EditorContent editor={commentEditor} />
                                 ) : (
                                   <div className="min-h-[120px] p-4 flex items-center justify-center text-muted-foreground">
                                     Loading editor...
@@ -3465,27 +3073,21 @@ const IssueDetailModalComponent = ({
                                 <div className="space-y-2.5 mt-3">
                                   <div className="flex items-center justify-between">
                                     <Label className="text-xs text-muted-foreground">
-                                      Attachments (
-                                      {attachedFiles.length})
+                                      Attachments ({attachedFiles.length})
                                     </Label>
-                                    {attachedFiles.length >
-                                      1 && (
+                                    {attachedFiles.length > 1 && (
                                       <button
                                         type="button"
                                         onClick={() => {
                                           for (
-                                            let i =
-                                              attachedFiles.length -
-                                              1;
+                                            let i = attachedFiles.length - 1;
                                             i >= 0;
                                             i--
                                           ) {
                                             handleRemoveFile(i);
                                           }
                                         }}
-                                        disabled={
-                                          isAddingComment
-                                        }
+                                        disabled={isAddingComment}
                                         className="text-xs text-muted-foreground hover:text-destructive transition-colors"
                                       >
                                         Clear all
@@ -3498,104 +3100,87 @@ const IssueDetailModalComponent = ({
                                     className={`grid gap-2 ${
                                       attachedFiles.length === 1
                                         ? "grid-cols-1"
-                                        : attachedFiles.length ===
-                                            2
-                                          ? "grid-cols-2"
-                                          : "grid-cols-2 md:grid-cols-3"
+                                        : attachedFiles.length === 2
+                                        ? "grid-cols-2"
+                                        : "grid-cols-2 md:grid-cols-3"
                                     }`}
                                   >
-                                    {attachedFiles.map(
-                                      (file, index) => {
-                                        const isImage =
-                                          file.type.startsWith(
-                                            "image/",
-                                          );
-                                        const isPdf =
-                                          file.type ===
-                                          "application/pdf";
-                                        const fileUrl =
-                                          URL.createObjectURL(
-                                            file,
-                                          );
+                                    {attachedFiles.map((file, index) => {
+                                      const isImage =
+                                        file.type.startsWith("image/");
+                                      const isPdf =
+                                        file.type === "application/pdf";
+                                      const fileUrl = URL.createObjectURL(file);
 
-                                        return (
-                                          <div
-                                            key={index}
-                                            className="group relative flex flex-col gap-2 p-2.5 bg-muted/30 hover:bg-muted/50 rounded-lg border border-border transition-colors"
-                                          >
-                                            {/* File preview or icon */}
-                                            <div className="relative aspect-video w-full bg-muted rounded overflow-hidden flex items-center justify-center">
-                                              {isImage ? (
-                                                <img
-                                                  src={fileUrl}
-                                                  alt={
-                                                    file.name
-                                                  }
-                                                  className="w-full h-full object-cover"
-                                                  onLoad={() =>
-                                                    URL.revokeObjectURL(
-                                                      fileUrl,
-                                                    )
-                                                  }
-                                                />
-                                              ) : (
-                                                <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                                                  {isPdf ? (
-                                                    <FileText className="h-8 w-8" />
-                                                  ) : (
-                                                    <File className="h-8 w-8" />
-                                                  )}
-                                                  <span className="text-xs px-2 py-0.5 bg-background rounded">
-                                                    {file.name
-                                                      .split(
-                                                        ".",
-                                                      )
-                                                      .pop()
-                                                      ?.toUpperCase()}
-                                                  </span>
-                                                </div>
-                                              )}
+                                      return (
+                                        <div
+                                          key={index}
+                                          className="group relative flex flex-col gap-2 p-2.5 bg-muted/30 hover:bg-muted/50 rounded-lg border border-border transition-colors"
+                                        >
+                                          {/* File preview or icon */}
+                                          <div className="relative aspect-video w-full bg-muted rounded overflow-hidden flex items-center justify-center">
+                                            {isImage ? (
+                                              <img
+                                                src={fileUrl}
+                                                alt={file.name}
+                                                className="w-full h-full object-cover"
+                                                onLoad={() =>
+                                                  URL.revokeObjectURL(fileUrl)
+                                                }
+                                              />
+                                            ) : (
+                                              <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                                {isPdf ? (
+                                                  <FileText className="h-8 w-8" />
+                                                ) : (
+                                                  <File className="h-8 w-8" />
+                                                )}
+                                                <span className="text-xs px-2 py-0.5 bg-background rounded">
+                                                  {file.name
+                                                    .split(".")
+                                                    .pop()
+                                                    ?.toUpperCase()}
+                                                </span>
+                                              </div>
+                                            )}
 
-                                              {/* Remove button overlay */}
-                                              <Button
-                                                type="button"
-                                                variant="destructive"
-                                                size="sm"
-                                                onClick={() =>
-                                                  handleRemoveFile(
-                                                    index,
-                                                  )
-                                                }
-                                                disabled={
-                                                  isAddingComment
-                                                }
-                                                className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                              >
-                                                <X className="h-3.5 w-3.5" />
-                                              </Button>
-                                            </div>
-
-                                            {/* File info */}
-                                            <div className="min-w-0">
-                                              <p
-                                                className="text-xs font-medium truncate"
-                                                title={
-                                                  file.name
-                                                }
-                                              >
-                                                {file.name}
-                                              </p>
-                                              <p className="text-xs text-muted-foreground">
-                                                {file.size <
-                                                1024 * 1024
-                                                  ? `${(file.size / 1024).toFixed(1)} KB`
-                                                  : `${(file.size / (1024 * 1024)).toFixed(2)} MB`}
-                                              </p>
-                                            </div>
+                                            {/* Remove button overlay */}
+                                            <Button
+                                              type="button"
+                                              variant="destructive"
+                                              size="sm"
+                                              onClick={() =>
+                                                handleRemoveFile(index)
+                                              }
+                                              disabled={isAddingComment}
+                                              className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                              <X className="h-3.5 w-3.5" />
+                                            </Button>
                                           </div>
-                                        );
-                                      },
-                                    )}
+
+                                          {/* File info */}
+                                          <div className="min-w-0">
+                                            <p
+                                              className="text-xs font-medium truncate"
+                                              title={file.name}
+                                            >
+                                              {file.name}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                              {file.size < 1024 * 1024
+                                                ? `${(file.size / 1024).toFixed(
+                                                    1
+                                                  )} KB`
+                                                : `${(
+                                                    file.size /
+                                                    (1024 * 1024)
+                                                  ).toFixed(2)} MB`}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
                                   </div>
                                 </div>
                               )}
@@ -3608,13 +3193,8 @@ const IssueDetailModalComponent = ({
                                   className="hidden"
                                   multiple
                                   accept="image/*,.pdf,.doc,.docx,.txt"
-                                  onChange={
-                                    handleCommentFileSelect
-                                  }
-                                  disabled={
-                                    isAddingComment ||
-                                    isUploadingImage
-                                  }
+                                  onChange={handleCommentFileSelect}
+                                  disabled={isAddingComment || isUploadingImage}
                                 />
                                 <Button
                                   type="button"
@@ -3623,14 +3203,11 @@ const IssueDetailModalComponent = ({
                                   onClick={() =>
                                     document
                                       .getElementById(
-                                        "comment-file-upload-input",
+                                        "comment-file-upload-input"
                                       )
                                       ?.click()
                                   }
-                                  disabled={
-                                    isAddingComment ||
-                                    isUploadingImage
-                                  }
+                                  disabled={isAddingComment || isUploadingImage}
                                   className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
                                 >
                                   <Paperclip className="h-4 w-4" />
@@ -3706,10 +3283,7 @@ const IssueDetailModalComponent = ({
           try {
             setIsCreatingSubIssue(true);
 
-            console.log(
-              "[IssueDetailModal] Creating sub-issue:",
-              issueData,
-            );
+            console.log("[IssueDetailModal] Creating sub-issue:", issueData);
 
             const result = await LinearMutations.createSubIssue(
               issueDetails.id,
@@ -3717,38 +3291,30 @@ const IssueDetailModalComponent = ({
               issueData.description,
               issueData.priority,
               issueData.stateId,
-              issueData.assigneeId,
+              issueData.assigneeId
             );
 
-            if (
-              issueData.files &&
-              issueData.files.length > 0 &&
-              result?.id
-            ) {
+            if (issueData.files && issueData.files.length > 0 && result?.id) {
               setUploadingFiles(true);
-              toast.info(
-                `Uploading ${issueData.files.length} file(s)...`,
-              );
+              toast.info(`Uploading ${issueData.files.length} file(s)...`);
 
               try {
                 await LinearMutations.uploadFilesToIssue(
                   result.id,
-                  issueData.files,
+                  issueData.files
                 );
                 toast.success(
-                  `Sub-issue created with ${issueData.files.length} attachment(s)!`,
+                  `Sub-issue created with ${issueData.files.length} attachment(s)!`
                 );
               } catch (uploadError) {
                 console.error("Upload failed:", uploadError);
-                toast.warning(
-                  "Sub-issue created but file upload failed",
-                );
+                toast.warning("Sub-issue created but file upload failed");
               } finally {
                 setUploadingFiles(false);
               }
             } else {
               toast.success(
-                `Sub-issue ${result?.identifier} created successfully`,
+                `Sub-issue ${result?.identifier} created successfully`
               );
             }
 
@@ -3758,18 +3324,16 @@ const IssueDetailModalComponent = ({
             setShowSubIssueDialog(false);
 
             // CRITICAL: Invalidate cache before reloading
-            import("../services/linearCacheService").then(
-              ({ linearCache }) => {
-                linearCache.invalidate(
-                  `linear:issue-detail:issueId:${issueDetails.id}`,
-                );
-              },
-            );
+            import("../services/linearCacheService").then(({ linearCache }) => {
+              linearCache.invalidate(
+                `linear:issue-detail:issueId:${issueDetails.id}`
+              );
+            });
 
             // CRITICAL FIX: Dispatch event to trigger board reload
             // This ensures sub-issue count updates on parent issue
             console.log(
-              "[IssueDetailModal] Dispatching sub-issue-created event",
+              "[IssueDetailModal] Dispatching sub-issue-created event"
             );
             window.dispatchEvent(
               new CustomEvent("linear-issue-updated", {
@@ -3778,7 +3342,7 @@ const IssueDetailModalComponent = ({
                   teamId: issueDetails.team?.id,
                   action: "sub-issue-created",
                 },
-              }),
+              })
             );
 
             // Reload modal with fresh data (board will also reload via event listener)
@@ -3788,7 +3352,7 @@ const IssueDetailModalComponent = ({
           } catch (error) {
             console.error(
               "[IssueDetailModal] Failed to create sub-issue:",
-              error,
+              error
             );
             toast.error("Failed to create sub-issue");
             throw error;
@@ -3818,12 +3382,11 @@ const IssueDetailModalComponent = ({
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Request Changes -{" "}
-              {requestChangesSubIssue?.identifier}
+              Request Changes - {requestChangesSubIssue?.identifier}
             </DialogTitle>
             <DialogDescription>
-              Add a comment describing what changes are needed
-              for this acceptance issue.
+              Add a comment describing what changes are needed for this
+              acceptance issue.
             </DialogDescription>
           </DialogHeader>
 
@@ -3838,18 +3401,18 @@ const IssueDetailModalComponent = ({
                   variant="ghost"
                   size="sm"
                   onClick={() =>
-                    requestChangesEditor
-                      ?.chain()
-                      .focus()
-                      .toggleBold()
-                      .run()
+                    requestChangesEditor?.chain().focus().toggleBold().run()
                   }
                   disabled={
                     !requestChangesEditor ||
                     isRequestingChanges ||
                     isUploadingRequestChangesImage
                   }
-                  className={`h-8 w-8 p-0 ${requestChangesEditor?.isActive("bold") ? "bg-primary/10 text-primary" : ""}`}
+                  className={`h-8 w-8 p-0 ${
+                    requestChangesEditor?.isActive("bold")
+                      ? "bg-primary/10 text-primary"
+                      : ""
+                  }`}
                   title="Bold"
                 >
                   <Bold className="h-4 w-4" />
@@ -3859,18 +3422,18 @@ const IssueDetailModalComponent = ({
                   variant="ghost"
                   size="sm"
                   onClick={() =>
-                    requestChangesEditor
-                      ?.chain()
-                      .focus()
-                      .toggleItalic()
-                      .run()
+                    requestChangesEditor?.chain().focus().toggleItalic().run()
                   }
                   disabled={
                     !requestChangesEditor ||
                     isRequestingChanges ||
                     isUploadingRequestChangesImage
                   }
-                  className={`h-8 w-8 p-0 ${requestChangesEditor?.isActive("italic") ? "bg-primary/10 text-primary" : ""}`}
+                  className={`h-8 w-8 p-0 ${
+                    requestChangesEditor?.isActive("italic")
+                      ? "bg-primary/10 text-primary"
+                      : ""
+                  }`}
                   title="Italic"
                 >
                   <Italic className="h-4 w-4" />
@@ -3892,7 +3455,11 @@ const IssueDetailModalComponent = ({
                     isRequestingChanges ||
                     isUploadingRequestChangesImage
                   }
-                  className={`h-8 w-8 p-0 ${requestChangesEditor?.isActive("heading", { level: 2 }) ? "bg-primary/10 text-primary" : ""}`}
+                  className={`h-8 w-8 p-0 ${
+                    requestChangesEditor?.isActive("heading", { level: 2 })
+                      ? "bg-primary/10 text-primary"
+                      : ""
+                  }`}
                   title="Heading"
                 >
                   <Heading2 className="h-4 w-4" />
@@ -3913,7 +3480,11 @@ const IssueDetailModalComponent = ({
                     isRequestingChanges ||
                     isUploadingRequestChangesImage
                   }
-                  className={`h-8 w-8 p-0 ${requestChangesEditor?.isActive("bulletList") ? "bg-primary/10 text-primary" : ""}`}
+                  className={`h-8 w-8 p-0 ${
+                    requestChangesEditor?.isActive("bulletList")
+                      ? "bg-primary/10 text-primary"
+                      : ""
+                  }`}
                   title="Bullet List"
                 >
                   <List className="h-4 w-4" />
@@ -3934,7 +3505,11 @@ const IssueDetailModalComponent = ({
                     isRequestingChanges ||
                     isUploadingRequestChangesImage
                   }
-                  className={`h-8 w-8 p-0 ${requestChangesEditor?.isActive("orderedList") ? "bg-primary/10 text-primary" : ""}`}
+                  className={`h-8 w-8 p-0 ${
+                    requestChangesEditor?.isActive("orderedList")
+                      ? "bg-primary/10 text-primary"
+                      : ""
+                  }`}
                   title="Numbered List"
                 >
                   <ListOrdered className="h-4 w-4" />
@@ -3955,7 +3530,11 @@ const IssueDetailModalComponent = ({
                     isRequestingChanges ||
                     isUploadingRequestChangesImage
                   }
-                  className={`h-8 w-8 p-0 ${requestChangesEditor?.isActive("codeBlock") ? "bg-primary/10 text-primary" : ""}`}
+                  className={`h-8 w-8 p-0 ${
+                    requestChangesEditor?.isActive("codeBlock")
+                      ? "bg-primary/10 text-primary"
+                      : ""
+                  }`}
                   title="Code Block"
                 >
                   <Code className="h-4 w-4" />
@@ -3965,9 +3544,7 @@ const IssueDetailModalComponent = ({
               {/* Editor */}
               <div className="border border-t-0 border-border rounded-b-lg bg-background overflow-hidden">
                 {requestChangesEditor ? (
-                  <EditorContent
-                    editor={requestChangesEditor}
-                  />
+                  <EditorContent editor={requestChangesEditor} />
                 ) : (
                   <div className="min-h-[120px] p-4 flex items-center justify-center text-muted-foreground">
                     Loading editor...
@@ -3993,8 +3570,7 @@ const IssueDetailModalComponent = ({
                   </Label>
                   <div className="space-y-2">
                     {requestChangesFiles.map((file, index) => {
-                      const isImage =
-                        file.type.startsWith("image/");
+                      const isImage = file.type.startsWith("image/");
 
                       return (
                         <div
@@ -4020,9 +3596,7 @@ const IssueDetailModalComponent = ({
                             variant="destructive"
                             size="sm"
                             onClick={() =>
-                              handleRemoveRequestChangesFile(
-                                index,
-                              )
+                              handleRemoveRequestChangesFile(index)
                             }
                             disabled={isRequestingChanges}
                             className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -4041,7 +3615,9 @@ const IssueDetailModalComponent = ({
                             <p className="text-xs text-muted-foreground">
                               {file.size < 1024 * 1024
                                 ? `${(file.size / 1024).toFixed(1)} KB`
-                                : `${(file.size / (1024 * 1024)).toFixed(2)} MB`}
+                                : `${(file.size / (1024 * 1024)).toFixed(
+                                    2
+                                  )} MB`}
                             </p>
                           </div>
                         </div>
@@ -4061,8 +3637,7 @@ const IssueDetailModalComponent = ({
                   accept="image/*,.pdf,.doc,.docx,.txt"
                   onChange={handleRequestChangesFileSelect}
                   disabled={
-                    isRequestingChanges ||
-                    isUploadingRequestChangesImage
+                    isRequestingChanges || isUploadingRequestChangesImage
                   }
                 />
                 <Button
@@ -4071,14 +3646,11 @@ const IssueDetailModalComponent = ({
                   size="sm"
                   onClick={() =>
                     document
-                      .getElementById(
-                        "request-changes-file-upload-input",
-                      )
+                      .getElementById("request-changes-file-upload-input")
                       ?.click()
                   }
                   disabled={
-                    isRequestingChanges ||
-                    isUploadingRequestChangesImage
+                    isRequestingChanges || isUploadingRequestChangesImage
                   }
                   className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
                 >
@@ -4088,9 +3660,7 @@ const IssueDetailModalComponent = ({
                       ? "Add more files"
                       : "Attach files"}
                   </span>
-                  <span className="ml-auto text-xs">
-                    Images, PDFs, Docs
-                  </span>
+                  <span className="ml-auto text-xs">Images, PDFs, Docs</span>
                 </Button>
               </div>
 
@@ -4102,9 +3672,7 @@ const IssueDetailModalComponent = ({
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-foreground">
-                    Quick image insert
-                  </p>
+                  <p className="text-xs text-foreground">Quick image insert</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     Paste images directly with{" "}
                     <kbd className="px-1 py-0.5 text-xs bg-muted rounded">
@@ -4126,8 +3694,8 @@ const IssueDetailModalComponent = ({
               requestChangesFiles.length === 0 &&
               !isUploadingRequestChangesImage && (
                 <p className="text-xs text-muted-foreground">
-                  Add a comment, paste images, or attach files
-                  to request changes
+                  Add a comment, paste images, or attach files to request
+                  changes
                 </p>
               )}
 
@@ -4139,9 +3707,7 @@ const IssueDetailModalComponent = ({
                   setRequestChangesFiles([]);
                   setRequestChangesHasContent(false);
                   if (requestChangesEditor) {
-                    requestChangesEditor.commands.setContent(
-                      "",
-                    );
+                    requestChangesEditor.commands.setContent("");
                   }
                 }}
                 disabled={isRequestingChanges}
@@ -4186,12 +3752,10 @@ export const IssueDetailModal = React.memo(
     return (
       prevProps.isOpen === nextProps.isOpen &&
       prevProps.issue?.id === nextProps.issue?.id &&
-      prevProps.forceEnableComments ===
-        nextProps.forceEnableComments &&
-      prevProps.showAcceptanceIssues ===
-        nextProps.showAcceptanceIssues
+      prevProps.forceEnableComments === nextProps.forceEnableComments &&
+      prevProps.showAcceptanceIssues === nextProps.showAcceptanceIssues
       // Note: We don't compare onClose, onIssueUpdate, onIssueClick callbacks
       // as they're typically stable or we want to allow updates
     );
-  },
+  }
 );

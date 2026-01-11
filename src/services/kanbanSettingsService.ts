@@ -11,10 +11,7 @@
  * - Backend KV: Persistent cross-device settings
  */
 
-import {
-  projectId,
-  publicAnonKey,
-} from "../utils/supabase/info";
+import { apiClient } from "./apiClient";
 import { createClient } from "../utils/supabase/client";
 import type {
   KanbanBoardSettings,
@@ -23,15 +20,10 @@ import type {
 } from "../types/kanban";
 
 class KanbanSettingsService {
-  private baseUrl: string;
   private supabase: ReturnType<typeof createClient>;
 
   constructor() {
-    this.baseUrl = `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb`;
-    this.supabase = createClient(
-      `https://${projectId}.supabase.co`,
-      publicAnonKey,
-    );
+    this.supabase = createClient();
   }
 
   /**
@@ -149,13 +141,7 @@ class KanbanSettingsService {
         `[${requestId}] Fetching from backend (ignoring localStorage)...`,
       );
 
-      const response = await fetch(
-        `${this.baseUrl}/user/teams/${teamId}/kanban-settings`,
-        {
-          method: "GET",
-          headers,
-        },
-      );
+      const response = await apiClient.get(`/user/teams/${teamId}/kanban-settings`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -238,22 +224,13 @@ class KanbanSettingsService {
       const headers = await this.getHeaders();
 
       // Sync to backend
-      const response = await fetch(
-        `${this.baseUrl}/user/teams/${teamId}/kanban-settings`,
-        {
-          method: "PUT",
-          headers,
-          body: JSON.stringify(settings),
-        },
-      );
+      const response = await apiClient.put(`/user/teams/${teamId}/kanban-settings`, settings);
 
-      if (!response.ok) {
-        throw new Error(
-          `HTTP ${response.status}: ${response.statusText}`,
-        );
+      if (!response.success) {
+        throw new Error(response.error || "Failed to update settings");
       }
 
-      const result = await response.json();
+      const result = response;
 
       if (!result.success) {
         throw new Error(
@@ -310,21 +287,13 @@ class KanbanSettingsService {
 
     try {
       // Delete from backend
-      const response = await fetch(
-        `${this.baseUrl}/user/teams/${teamId}/kanban-settings`,
-        {
-          method: "DELETE",
-          headers: this.headers,
-        },
-      );
+      const response = await apiClient.delete(`/user/teams/${teamId}/kanban-settings`);
 
-      if (!response.ok) {
-        throw new Error(
-          `HTTP ${response.status}: ${response.statusText}`,
-        );
+      if (!response.success) {
+        throw new Error(response.error || "Failed to delete settings");
       }
 
-      const result = await response.json();
+      const result = response;
 
       if (!result.success) {
         throw new Error(

@@ -3,7 +3,7 @@
  * Handles app startup, cleanup, and health check endpoints
  */
 
-import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { apiClient } from './apiClient';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -38,42 +38,26 @@ interface CleanupResponse {
 
 
 class InitializationService {
-  private baseUrl: string;
-  private defaultHeaders: HeadersInit;
-
-  constructor() {
-    this.baseUrl = `https://${projectId}.supabase.co/functions/v1/make-server-7f0d90fb`;
-    this.defaultHeaders = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${publicAnonKey}`
-    };
-  }
-
   private async makeRequest<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     try {
-      const url = `${this.baseUrl}${endpoint}`;
-      const response = await fetch(url, {
-        headers: this.defaultHeaders,
-        ...options,
-      });
-      const data = await response.json();
+      const response = await apiClient.get<T>(endpoint);
       
-      if (!response.ok) {
-        console.error(`[Init] API Error ${response.status}:`, data);
+      if (!response.success) {
+        console.error(`[Init] API Error:`, response.error);
         return {
           success: false,
-          error: data.error || `HTTP ${response.status}: ${response.statusText}`
+          error: response.error || 'Request failed'
         };
       }
       return {
-        success: data.success !== false,
-        data: data.data || data,
-        message: data.message,
-        timestamp: data.timestamp,
-        error: data.error
+        success: true,
+        data: response.data,
+        message: response.message,
+        timestamp: (response as any).timestamp,
+        error: response.error
       };
     } catch (error) {
       // Log network issues as info rather than error (offline mode is expected)
