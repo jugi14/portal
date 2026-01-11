@@ -355,7 +355,7 @@ export function TeamAssignmentDialog({
       console.log(
         `[TeamAssignment] Loading members for team ${teamId}`,
       );
-      const result = await adminService.getTeamMembers(
+      const result = await adminService.getCustomerTeamMembers(
         customerId,
         teamId,
       );
@@ -379,7 +379,7 @@ export function TeamAssignmentDialog({
   ) => {
     setLoadingTeamMembers(true);
     try {
-      const result = await adminService.addMemberToTeam(
+      const result = await adminService.addMemberToCustomerTeam(
         customerId,
         teamId,
         userId,
@@ -408,7 +408,7 @@ export function TeamAssignmentDialog({
 
     setLoadingTeamMembers(true);
     try {
-      const result = await adminService.removeMemberFromTeam(
+      const result = await adminService.removeMemberFromCustomerTeam(
         customerId,
         teamId,
         userId,

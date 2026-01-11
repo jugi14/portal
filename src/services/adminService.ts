@@ -317,7 +317,7 @@ export class AdminService {
   /**
    * Get members assigned to a specific team within a customer
    */
-  async getTeamMembers(customerId: string, teamId: string): Promise<{ success: boolean; data?: any; error?: string }> {
+  async getCustomerTeamMembers(customerId: string, teamId: string): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
       const response = await apiClient.get(`/admin/customers/${customerId}/teams/${teamId}/members`);
       return {
@@ -337,7 +337,7 @@ export class AdminService {
   /**
    * Add member to a specific team within a customer
    */
-  async addMemberToTeam(customerId: string, teamId: string, userId: string): Promise<{ success: boolean; error?: string }> {
+  async addMemberToCustomerTeam(customerId: string, teamId: string, userId: string): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await apiClient.post(`/admin/customers/${customerId}/teams/${teamId}/members`, {
         userId
@@ -358,7 +358,7 @@ export class AdminService {
   /**
    * Remove member from a specific team within a customer
    */
-  async removeMemberFromTeam(customerId: string, teamId: string, userId: string): Promise<{ success: boolean; error?: string }> {
+  async removeMemberFromCustomerTeam(customerId: string, teamId: string, userId: string): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await apiClient.delete(`/admin/customers/${customerId}/teams/${teamId}/members/${userId}`);
       return {
