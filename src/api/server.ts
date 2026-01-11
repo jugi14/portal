@@ -8,5 +8,7 @@
 import { handle } from "hono/vercel";
 import app from "../server/index";
 
+// Export handler for Vercel using handle() from hono/vercel
+// This properly converts Vercel's request format to Hono's expected format
 export default handle(app);
 

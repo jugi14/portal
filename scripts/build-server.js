@@ -34,7 +34,7 @@ async function buildServer() {
         'hono',
         'hono/cors',
         'hono/logger',
-        'hono/vercel',
+        // Note: hono/vercel should NOT be external - it needs to be bundled
         '@hono/node-server',
         'dotenv',
       ],
