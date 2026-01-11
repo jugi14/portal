@@ -17,7 +17,7 @@ Client portal application built with React, Node.js, Hono, and Supabase.
 
 ### Prerequisites
 
-- **Node.js** 20.x or higher
+- **Node.js** 24.x (required for Vercel deployment)
 - **npm** or **yarn**
 - **Supabase** account (for database)
 - **Linear.app** account (for issue tracking)

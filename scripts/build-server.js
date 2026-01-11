@@ -23,7 +23,7 @@ async function buildServer() {
       bundle: true,
       outfile: join(rootDir, 'api/server.js'),
       platform: 'node',
-      target: 'node20',
+      target: 'node24',
       format: 'esm',
       sourcemap: false,
       minify: true, // Minify to reduce bundle size
