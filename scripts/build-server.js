@@ -26,7 +26,7 @@ async function buildServer() {
       target: 'node20',
       format: 'esm',
       sourcemap: false,
-      minify: false,
+      minify: true, // Minify to reduce bundle size
       external: [
         // Keep these as external dependencies (Vercel provides them)
         '@supabase/supabase-js',
