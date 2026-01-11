@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "/api/server.js"
+      "destination": "/api/_entry"
     },
     {
       "source": "/(.*)",
@@ -13,8 +13,9 @@
     }
   ],
   "functions": {
-    "api/server.js": {
-      "maxDuration": 30
+    "api/_entry.ts": {
+      "maxDuration": 30,
+      "includeFiles": "src/server/**"
     }
   }
 }
