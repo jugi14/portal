@@ -33,7 +33,7 @@ class APIClient {
 
   constructor() {
     // Auto-detect API URL based on environment
-    const isDevelopment = import.meta.env.DEV;
+
     const customApiUrl = import.meta.env.VITE_API_BASE_URL;
 
     if (customApiUrl) {
@@ -42,21 +42,6 @@ class APIClient {
       this.baseURL = customApiUrl.endsWith("/api")
         ? customApiUrl
         : `${customApiUrl}/api`;
-    } else if (isDevelopment) {
-      // Development: use local backend with /api prefix
-      // Auto-detect port from VITE_API_BASE_URL or use default 3001
-      // If VITE_API_BASE_URL is set but doesn't include port, extract from it
-      const customUrl = import.meta.env.VITE_API_BASE_URL;
-      if (customUrl && customUrl.includes("localhost:")) {
-        // Extract port from VITE_API_BASE_URL if provided
-        const portMatch = customUrl.match(/localhost:(\d+)/);
-        const backendPort = portMatch ? portMatch[1] : "3001";
-        this.baseURL = `http://localhost:${backendPort}/api`;
-      } else {
-        // Use VITE_BACKEND_PORT or default to 3001
-        const backendPort = import.meta.env.VITE_BACKEND_PORT || "3001";
-        this.baseURL = `http://localhost:${backendPort}/api`;
-      }
     } else {
       // Production: use Vercel serverless function
       // Vercel sẽ tự động route /api/* to /api/server.ts
