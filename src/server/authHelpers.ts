@@ -308,7 +308,7 @@ export async function checkAuthPermissions(
     const userEmail = (user.email || "").toLowerCase().trim();
 
     // PERFORMANCE: Run all async calls in parallel
-    const [userObj, defaultRole, isSuperAdminByEmail] = await Promise.all([
+    let [userObj, defaultRole, isSuperAdminByEmail] = await Promise.all([
       kv.get(`user:${user.id}`),
       getDefaultRole(userEmail),
       isSuperAdminUser(userEmail),
