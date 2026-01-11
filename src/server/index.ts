@@ -276,11 +276,15 @@ app.all("*", (c) => {
 });
 
 // ==================================================
-// START SERVER
+// EXPORT
 // ==================================================
 
-// Export app for Vercel serverless function
+// Export app - will be wrapped with handle() by build script for Vercel
 export default app;
+
+// ==================================================
+// START SERVER (LOCAL DEVELOPMENT ONLY)
+// ==================================================
 
 // Only start server if not in Vercel environment
 if (process.env.VERCEL !== "1") {
