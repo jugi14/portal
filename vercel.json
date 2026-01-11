@@ -4,18 +4,13 @@
   "outputDirectory": "build",
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/server"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
   "functions": {
     "api/server.ts": {
-      "maxDuration": 30,
-      "includeFiles": "src/server/**"
+      "maxDuration": 30
     }
   }
 }
