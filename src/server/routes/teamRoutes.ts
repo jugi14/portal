@@ -1,9 +1,9 @@
 /**
  *Team Routes - Teifi Client Portal
- * 
+ *
  * Team management, hierarchy, access control
  * Schema V2.0 - Customer > Team architecture
- * 
+ *
  * @module teamRoutes
  */
 
@@ -33,10 +33,7 @@ teamRoutes.get("/teams/my-teams", async (c) => {
     const result = await teamMethodsV2.getUserTeams(user.id);
 
     if (!result.success) {
-      return c.json(
-        { success: false, error: result.error },
-        { status: 500 },
-      );
+      return c.json({ success: false, error: result.error }, { status: 500 });
     }
 
     return c.json({
@@ -47,7 +44,7 @@ teamRoutes.get("/teams/my-teams", async (c) => {
     console.error("[Teams] Get user teams error:", error);
     return c.json(
       { success: false, error: "Failed to fetch user teams" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -55,7 +52,7 @@ teamRoutes.get("/teams/my-teams", async (c) => {
 /**
  * GET /teams/hierarchy
  * Get team hierarchy for current user
- * 
+ *
  * ️ IMPORTANT: This MUST be defined BEFORE /teams/:teamId to avoid route conflicts
  *PERMISSION: Open to all authenticated users (no special permission required)
  */
@@ -72,7 +69,7 @@ teamRoutes.get("/teams/hierarchy", async (c) => {
       console.error("[Teams] Missing user context in request");
       return c.json(
         { success: false, error: "Authentication required" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -80,12 +77,8 @@ teamRoutes.get("/teams/hierarchy", async (c) => {
 
     if (!result.success) {
       console.error(`[Teams] getTeamHierarchy failed:`, result.error);
-      return c.json(
-        { success: false, error: result.error },
-        { status: 500 },
-      );
+      return c.json({ success: false, error: result.error }, { status: 500 });
     }
-
 
     return c.json({
       success: true,
@@ -95,7 +88,7 @@ teamRoutes.get("/teams/hierarchy", async (c) => {
     console.error("[Teams] Get hierarchy error:", error);
     return c.json(
       { success: false, error: "Failed to fetch team hierarchy" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -109,14 +102,10 @@ teamRoutes.get("/teams/:teamId/access", async (c) => {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
 
-
     const result = await teamMethodsV2.checkUserTeamAccess(user.id, teamId);
 
     if (!result.success) {
-      return c.json(
-        { success: false, error: result.error },
-        { status: 403 },
-      );
+      return c.json({ success: false, error: result.error }, { status: 403 });
     }
 
     return c.json({
@@ -127,7 +116,7 @@ teamRoutes.get("/teams/:teamId/access", async (c) => {
     console.error("[Teams] Check team access error:", error);
     return c.json(
       { success: false, error: "Failed to check team access" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -135,7 +124,7 @@ teamRoutes.get("/teams/:teamId/access", async (c) => {
 /**
  * GET /teams/:teamId
  * Get team by ID with full details including hierarchy
- * 
+ *
  * Query params:
  * - includeHierarchy=true - Include parent/children relationships
  */
@@ -145,13 +134,15 @@ teamRoutes.get("/teams/:teamId", async (c) => {
     const teamId = c.req.param("teamId");
     const includeHierarchy = c.req.query("includeHierarchy") !== "false"; // Default true
 
-
     // Check user access to team
-    const accessCheck = await teamMethodsV2.checkUserTeamAccess(user.id, teamId);
+    const accessCheck = await teamMethodsV2.checkUserTeamAccess(
+      user.id,
+      teamId
+    );
     if (!accessCheck.success) {
       return c.json(
         { success: false, error: "Access denied" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -161,7 +152,7 @@ teamRoutes.get("/teams/:teamId", async (c) => {
     if (!result.success) {
       return c.json(
         { success: false, error: result.error },
-        { status: result.error === 'Team not found' ? 404 : 500 },
+        { status: result.error === "Team not found" ? 404 : 500 }
       );
     }
 
@@ -173,7 +164,7 @@ teamRoutes.get("/teams/:teamId", async (c) => {
     console.error("[Teams] Get team error:", error);
     return c.json(
       { success: false, error: "Failed to fetch team" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -181,7 +172,7 @@ teamRoutes.get("/teams/:teamId", async (c) => {
 /**
  * GET /teams
  * Get all teams with optional hierarchy
- * 
+ *
  * Query params:
  * - includeHierarchy=true - Include parent-child tree structure
  */
@@ -191,15 +182,11 @@ teamRoutes.get("/teams", async (c) => {
     const role = c.get("role");
     const includeHierarchy = c.req.query("includeHierarchy") === "true"; // Default false
 
-
     // Admin/superadmin can see all teams
     const result = await teamMethodsV2.getAllTeams(includeHierarchy);
 
     if (!result.success) {
-      return c.json(
-        { success: false, error: result.error },
-        { status: 500 },
-      );
+      return c.json({ success: false, error: result.error }, { status: 500 });
     }
 
     return c.json({
@@ -210,7 +197,7 @@ teamRoutes.get("/teams", async (c) => {
     console.error("[Teams] Get all teams error:", error);
     return c.json(
       { success: false, error: "Failed to fetch teams" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -227,36 +214,32 @@ teamRoutes.post("/teams", async (c) => {
   try {
     const user = c.get("user");
     const role = c.get("role");
-    
+
     // Check admin permission
     if (role !== "admin" && role !== "superadmin") {
       return c.json(
         { success: false, error: "Admin access required" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
     const body = await c.req.json();
     const { customer_id, name, linear_team_id, linear_team_key } = body;
 
-
     if (!customer_id || !name) {
       return c.json(
         { success: false, error: "customer_id and name are required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     const result = await teamMethodsV2.createTeam(
       { customer_id, name, linear_team_id, linear_team_key },
-      user.id,
+      user.id
     );
 
     if (!result.success) {
-      return c.json(
-        { success: false, error: result.error },
-        { status: 500 },
-      );
+      return c.json({ success: false, error: result.error }, { status: 500 });
     }
 
     return c.json({
@@ -268,7 +251,7 @@ teamRoutes.post("/teams", async (c) => {
     console.error("[Teams] Create team error:", error);
     return c.json(
       { success: false, error: "Failed to create team" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -287,25 +270,21 @@ teamRoutes.put("/teams/:teamId", async (c) => {
     if (role !== "admin" && role !== "superadmin") {
       return c.json(
         { success: false, error: "Admin access required" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
     const body = await c.req.json();
     const { name, linear_team_id, linear_team_key, status } = body;
 
-
     const result = await teamMethodsV2.updateTeam(
       teamId,
       { name, linear_team_id, linear_team_key, status },
-      user.id,
+      user.id
     );
 
     if (!result.success) {
-      return c.json(
-        { success: false, error: result.error },
-        { status: 500 },
-      );
+      return c.json({ success: false, error: result.error }, { status: 500 });
     }
 
     return c.json({
@@ -317,7 +296,7 @@ teamRoutes.put("/teams/:teamId", async (c) => {
     console.error("[Teams] Update team error:", error);
     return c.json(
       { success: false, error: "Failed to update team" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -336,18 +315,14 @@ teamRoutes.delete("/teams/:teamId", async (c) => {
     if (role !== "admin" && role !== "superadmin") {
       return c.json(
         { success: false, error: "Admin access required" },
-        { status: 403 },
+        { status: 403 }
       );
     }
-
 
     const result = await teamMethodsV2.deleteTeam(teamId, user.id);
 
     if (!result.success) {
-      return c.json(
-        { success: false, error: result.error },
-        { status: 500 },
-      );
+      return c.json({ success: false, error: result.error }, { status: 500 });
     }
 
     return c.json({
@@ -358,7 +333,7 @@ teamRoutes.delete("/teams/:teamId", async (c) => {
     console.error("[Teams] Delete team error:", error);
     return c.json(
       { success: false, error: "Failed to delete team" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -381,10 +356,9 @@ teamRoutes.post("/teams/sync-from-linear", async (c) => {
     if (role !== "admin" && role !== "superadmin") {
       return c.json(
         { success: false, error: "Admin access required" },
-        { status: 403 },
+        { status: 403 }
       );
     }
-
 
     // Import LinearTeamService
     const { LinearTeamService } = await import("../services/linearTeamService");
@@ -394,10 +368,16 @@ teamRoutes.post("/teams/sync-from-linear", async (c) => {
     const linearResult = await linearService.listTeams();
 
     if (!linearResult.success || !linearResult.teams) {
-      console.error("[Teams] Failed to fetch teams from Linear:", linearResult.message);
+      console.error(
+        "[Teams] Failed to fetch teams from Linear:",
+        linearResult.message
+      );
       return c.json(
-        { success: false, error: linearResult.message || "Failed to fetch teams from Linear" },
-        { status: 500 },
+        {
+          success: false,
+          error: linearResult.message || "Failed to fetch teams from Linear",
+        },
+        { status: 500 }
       );
     }
 
@@ -410,14 +390,14 @@ teamRoutes.post("/teams/sync-from-linear", async (c) => {
     for (const team of teams) {
       try {
         const teamKey = `linear_teams:${team.id}`;
-        
+
         // Save team data
         await kv.set(teamKey, {
           id: team.id,
           name: team.name,
           key: team.key,
-          description: team.description || '',
-          state: 'active',
+          description: team.description || "",
+          state: "active",
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           synced_from_linear: true,
@@ -430,7 +410,6 @@ teamRoutes.post("/teams/sync-from-linear", async (c) => {
         console.error(`[Teams] Failed to sync team ${team.name}:`, error);
       }
     }
-
 
     return c.json({
       success: true,
@@ -445,7 +424,7 @@ teamRoutes.post("/teams/sync-from-linear", async (c) => {
     console.error("[Teams] Sync from Linear error:", error);
     return c.json(
       { success: false, error: "Failed to sync teams from Linear" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -463,23 +442,22 @@ teamRoutes.get("/teams/:teamId/members", async (c) => {
     const user = c.get("user");
     const teamId = c.req.param("teamId");
 
-
     // Check user has access to this team
-    const accessCheck = await teamMethodsV2.checkUserTeamAccess(user.id, teamId);
+    const accessCheck = await teamMethodsV2.checkUserTeamAccess(
+      user.id,
+      teamId
+    );
     if (!accessCheck.success) {
       return c.json(
         { success: false, error: "Access denied to this team" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
     const result = await teamMethodsV2.getTeamMembers(teamId);
 
     if (!result.success) {
-      return c.json(
-        { success: false, error: result.error },
-        { status: 500 },
-      );
+      return c.json({ success: false, error: result.error }, { status: 500 });
     }
 
     return c.json({
@@ -490,7 +468,7 @@ teamRoutes.get("/teams/:teamId/members", async (c) => {
     console.error("[Teams] Get team members error:", error);
     return c.json(
       { success: false, error: "Failed to fetch team members" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -507,21 +485,21 @@ teamRoutes.post("/teams/:teamId/members/:userId", async (c) => {
     const userId = c.req.param("userId");
 
     // Check admin permission
-    if (role !== "admin" && role !== "superadmin" && role !== "client_manager") {
+    if (
+      role !== "admin" &&
+      role !== "superadmin" &&
+      role !== "client_manager"
+    ) {
       return c.json(
         { success: false, error: "Insufficient permissions" },
-        { status: 403 },
+        { status: 403 }
       );
     }
-
 
     const result = await teamMethodsV2.addMemberToTeam(teamId, userId, user.id);
 
     if (!result.success) {
-      return c.json(
-        { success: false, error: result.error },
-        { status: 500 },
-      );
+      return c.json({ success: false, error: result.error }, { status: 500 });
     }
 
     return c.json({
@@ -532,7 +510,7 @@ teamRoutes.post("/teams/:teamId/members/:userId", async (c) => {
     console.error("[Teams] Add member error:", error);
     return c.json(
       { success: false, error: "Failed to add member to team" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -549,21 +527,25 @@ teamRoutes.delete("/teams/:teamId/members/:userId", async (c) => {
     const userId = c.req.param("userId");
 
     // Check admin permission
-    if (role !== "admin" && role !== "superadmin" && role !== "client_manager") {
+    if (
+      role !== "admin" &&
+      role !== "superadmin" &&
+      role !== "client_manager"
+    ) {
       return c.json(
         { success: false, error: "Insufficient permissions" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
-
-    const result = await teamMethodsV2.removeMemberFromTeam(teamId, userId, user.id);
+    const result = await teamMethodsV2.removeMemberFromTeam(
+      teamId,
+      userId,
+      user.id
+    );
 
     if (!result.success) {
-      return c.json(
-        { success: false, error: result.error },
-        { status: 500 },
-      );
+      return c.json({ success: false, error: result.error }, { status: 500 });
     }
 
     return c.json({
@@ -574,7 +556,7 @@ teamRoutes.delete("/teams/:teamId/members/:userId", async (c) => {
     console.error("[Teams] Remove member error:", error);
     return c.json(
       { success: false, error: "Failed to remove member from team" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });

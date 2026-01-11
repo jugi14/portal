@@ -13,14 +13,14 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
 // Import modular routes
-import { systemRoutes } from "../src/server/routes/systemRoutes.js";
-import { adminRoutes } from "../src/server/routes/adminRoutes.js";
-import { userRoutes } from "../src/server/routes/userRoutes.js";
-import { teamRoutes } from "../src/server/routes/teamRoutes.js";
-import { linearRoutes } from "../src/server/routes/linearRoutes.js";
-import { linearMaintenanceRoutes } from "../src/server/routes/linearMaintenanceRoutes.js";
-import { issueRoutes } from "../src/server/routes/issueRoutes.js";
-import { superadminRoutes } from "../src/server/routes/superadminRoutes.js";
+import { systemRoutes } from "../src/server/routes/systemRoutes";
+import { adminRoutes } from "../src/server/routes/adminRoutes";
+import { userRoutes } from "../src/server/routes/userRoutes";
+import { teamRoutes } from "../src/server/routes/teamRoutes";
+import { linearRoutes } from "../src/server/routes/linearRoutes";
+import { linearMaintenanceRoutes } from "../src/server/routes/linearMaintenanceRoutes";
+import { issueRoutes } from "../src/server/routes/issueRoutes";
+import { superadminRoutes } from "../src/server/routes/superadminRoutes";
 
 // Initialize Hono app
 const app = new Hono();
