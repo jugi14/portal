@@ -19,9 +19,10 @@
  * @updated 2025-10-19 - Force recompile for GraphQL cycles fix
  */
 
-// Load environment variables from .env file
-// Note: tsx --env-file flag also loads .env, but keeping this as fallback
-import 'dotenv/config';
+// Load environment variables from .env file (local development only)
+// Note: On Vercel, environment variables are automatically available via process.env
+// dotenv/config will silently fail if .env file doesn't exist (OK on Vercel)
+import "dotenv/config";
 
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -56,7 +57,9 @@ const ALLOWED_ORIGINS = [
   "https://dashboard.teifi.work", // Production domain
   // Vercel URLs (dynamic)
   ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
-  ...(process.env.NEXT_PUBLIC_VERCEL_URL ? [`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`] : []),
+  ...(process.env.NEXT_PUBLIC_VERCEL_URL
+    ? [`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`]
+    : []),
 ].filter(Boolean);
 
 app.use(
@@ -77,23 +80,12 @@ app.use(
       console.warn("[CORS] Rejected origin:", origin);
       return null;
     },
-    allowMethods: [
-      "GET",
-      "POST",
-      "PUT",
-      "DELETE",
-      "PATCH",
-      "OPTIONS",
-    ],
-    allowHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-CSRF-Token",
-    ],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
     exposeHeaders: ["Content-Length"],
     maxAge: 86400,
     credentials: true,
-  }),
+  })
 );
 
 // Logger - Track all requests
@@ -136,98 +128,111 @@ app.route(API_PREFIX, superadminRoutes);
 // Debug: Clear ownership cache
 app.post("/api/debug/clear-ownership-cache", async (c) => {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
+    const { createClient } = await import("@supabase/supabase-js");
     const supabase = createClient(
       process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
-    
+
     // Delete ownership cache from KV
     const { error } = await supabase
-      .from('kv_store_7f0d90fb')
+      .from("kv_store_7f0d90fb")
       .delete()
-      .eq('key', 'team_ownership_map:all');
-    
+      .eq("key", "team_ownership_map:all");
+
     if (error) {
-      console.error('[Debug] Error clearing ownership cache:', error);
-      return c.json({
-        success: false,
-        error: error.message
-      }, { status: 500 });
+      console.error("[Debug] Error clearing ownership cache:", error);
+      return c.json(
+        {
+          success: false,
+          error: error.message,
+        },
+        { status: 500 }
+      );
     }
-    
-    console.log('[Debug] Ownership cache cleared successfully');
-    
+
+    console.log("[Debug] Ownership cache cleared successfully");
+
     return c.json({
       success: true,
-      message: 'Ownership cache cleared',
-      timestamp: new Date().toISOString()
+      message: "Ownership cache cleared",
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[Debug] Unexpected error:', error);
-    return c.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    console.error("[Debug] Unexpected error:", error);
+    return c.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
 });
 
 // Debug: Inspect ownership data
 app.get("/api/debug/ownership-data", async (c) => {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
+    const { createClient } = await import("@supabase/supabase-js");
     const supabase = createClient(
       process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
-    
+
     // Get all team ownership mappings
     const { data: ownershipData, error: ownershipError } = await supabase
-      .from('kv_store_7f0d90fb')
-      .select('key, value')
-      .like('key', 'team:%:customer');
-    
+      .from("kv_store_7f0d90fb")
+      .select("key, value")
+      .like("key", "team:%:customer");
+
     if (ownershipError) {
-      return c.json({
-        success: false,
-        error: ownershipError.message
-      }, { status: 500 });
+      return c.json(
+        {
+          success: false,
+          error: ownershipError.message,
+        },
+        { status: 500 }
+      );
     }
-    
+
     // Get cache status
     const { data: cacheData } = await supabase
-      .from('kv_store_7f0d90fb')
-      .select('key, value')
-      .eq('key', 'team_ownership_map:all')
+      .from("kv_store_7f0d90fb")
+      .select("key, value")
+      .eq("key", "team_ownership_map:all")
       .single();
-    
+
     // Build ownership map for display
     const ownershipMap: Record<string, string> = {};
     if (ownershipData) {
       for (const row of ownershipData) {
-        const teamId = row.key.replace('team:', '').replace(':customer', '');
+        const teamId = row.key.replace("team:", "").replace(":customer", "");
         ownershipMap[teamId] = row.value;
       }
     }
-    
+
     return c.json({
       success: true,
       data: {
         directMappings: ownershipData?.length || 0,
         ownershipMap,
         cacheExists: !!cacheData,
-        cacheAge: cacheData?.value?.timestamp ? 
-          Date.now() - cacheData.value.timestamp : null,
-        rawData: ownershipData
+        cacheAge: cacheData?.value?.timestamp
+          ? Date.now() - cacheData.value.timestamp
+          : null,
+        rawData: ownershipData,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[Debug] Error inspecting ownership data:', error);
-    return c.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    console.error("[Debug] Error inspecting ownership data:", error);
+    return c.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
 });
 
@@ -250,8 +255,7 @@ app.get("/", (c) => {
       issues: `/api/issues/team/:teamId`,
       superadmin: `/api/superadmin/list`,
     },
-    documentation:
-      "https://github.com/teifi-digital/client-portal",
+    documentation: "https://github.com/teifi-digital/client-portal",
     timestamp: new Date().toISOString(),
   });
 });
@@ -266,7 +270,7 @@ app.all("*", (c) => {
       method: c.req.method,
       available_prefixes: [],
     },
-    { status: 404 },
+    { status: 404 }
   );
 });
 
@@ -278,17 +282,19 @@ app.all("*", (c) => {
 export default app;
 
 // Only start server if not in Vercel environment
-if (process.env.VERCEL !== '1') {
+if (process.env.VERCEL !== "1") {
   const port = parseInt(process.env.PORT || "3001", 10);
 
   console.log("Starting Teifi Digital Client Portal Server...");
   console.log(`Server listening on port ${port}`);
 
-  serve({
-    fetch: app.fetch,
-    port,
-  }, (info) => {
-    console.log(`Server ready at http://localhost:${info.port}`);
-  });
+  serve(
+    {
+      fetch: app.fetch,
+      port,
+    },
+    (info) => {
+      console.log(`Server ready at http://localhost:${info.port}`);
+    }
+  );
 }
-
