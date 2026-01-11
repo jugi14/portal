@@ -77,8 +77,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run build:server",
-    "build:server": "node scripts/build-server.js",
+    "build": "vite build",
     "server": "tsx --env-file=.env src/server/index.ts",
     "server:dev": "tsx watch --env-file=.env src/server/index.ts",
     "dev:all": "concurrently \"npm run server:dev\" \"npm run dev\""
