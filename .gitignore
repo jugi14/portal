@@ -76,6 +76,7 @@ coverage/
 # Vercel
 # ============================================
 .vercel
+# Note: api/server/ is generated during build but should be committed for Vercel
 
 # ============================================
 # TypeScript
