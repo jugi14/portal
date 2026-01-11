@@ -55,6 +55,7 @@ const ALLOWED_ORIGINS = [
   "http://127.0.0.1:3000", // Localhost alternative
   "https://fwltshzniolrekqhtpgv.supabase.co", // Supabase hosted
   "https://dashboard.teifi.work", // Production domain
+  "https://portal-seven-alpha.vercel.app", // Production domain
   // Vercel URLs (dynamic)
   ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
   ...(process.env.NEXT_PUBLIC_VERCEL_URL
