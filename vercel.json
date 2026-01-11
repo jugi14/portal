@@ -15,9 +15,7 @@
   "functions": {
     "api/server.ts": {
       "maxDuration": 30,
-      "includeFiles": [
-        "src/server/**"
-      ]
+      "includeFiles": "src/server/**"
     }
   }
 }
