@@ -30,6 +30,7 @@ async function buildServer() {
       external: [
         // Keep these as external dependencies (Vercel provides them)
         '@supabase/supabase-js',
+        '@jsr/supabase__supabase-js',
         'hono',
         'hono/cors',
         'hono/logger',
@@ -37,6 +38,10 @@ async function buildServer() {
         '@hono/node-server',
         'dotenv',
       ],
+      // Resolve TypeScript imports correctly
+      resolveExtensions: ['.ts', '.tsx', '.js', '.jsx'],
+      // Tree shaking
+      treeShaking: true,
       banner: {
         js: `
 // @ts-nocheck
