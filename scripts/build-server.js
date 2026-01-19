@@ -23,7 +23,7 @@ async function buildServer() {
       bundle: true,
       outfile: join(rootDir, 'api/server.js'),
       platform: 'node',
-      target: 'node24',
+      target: 'node20',
       format: 'esm',
       sourcemap: false,
       minify: true, // Minify to reduce bundle size
@@ -34,8 +34,9 @@ async function buildServer() {
         'hono',
         'hono/cors',
         'hono/logger',
+        // Note: @hono/node-server/vercel should NOT be external - it needs to be bundled
+        '@hono/node-server',
         'dotenv',
-        // Note: @hono/node-server removed - using native Hono fetch handler
       ],
       // Resolve TypeScript imports correctly
       resolveExtensions: ['.ts', '.tsx', '.js', '.jsx'],

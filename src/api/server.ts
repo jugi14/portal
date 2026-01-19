@@ -5,9 +5,9 @@
  * It will be bundled by esbuild into api/server.js
  */
 
+import { handle } from "@hono/node-server/vercel";
 import app from "../server/index";
 
-// Export handler for Vercel Edge/Serverless
-// Using Hono's native fetch handler instead of @hono/node-server/vercel
-// This avoids body parsing issues with the node-server adapter
-export default app.fetch;
+// Export handler for Vercel using @hono/node-server/vercel adapter
+// This properly converts Vercel's request format to Hono's expected format
+export default handle(app);
