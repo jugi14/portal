@@ -23,12 +23,18 @@ const LINEAR_API_URL = "https://api.linear.app/graphql";
  * Get Linear API key from environment or KV store
  */
 async function getLinearApiKey(): Promise<string> {
-  // First try environment variable
+  console.log("[Linear] Getting API key...");
+  const startTime = Date.now();
+  
+  // First try environment variable (fastest)
   const envKey = process.env.LINEAR_API_KEY;
   if (envKey) {
+    console.log(`[Linear] Using env API key (${Date.now() - startTime}ms)`);
     return envKey;
   }
 
+  console.log("[Linear] No env key, fetching from KV store...");
+  
   // Fallback to KV store
   try {
     const supabase = createClient(
@@ -41,6 +47,8 @@ async function getLinearApiKey(): Promise<string> {
       .select("value")
       .eq("key", "linear_api_key")
       .single();
+
+    console.log(`[Linear] KV store response (${Date.now() - startTime}ms):`, error ? `Error: ${error.message}` : "Success");
 
     if (error || !data?.value) {
       throw new Error("Linear API key not found in environment or KV store");
@@ -76,10 +84,16 @@ export async function executeLinearQuery(
       variables,
     };
 
+    console.log(`[Linear API] Starting ${queryName} request to Linear...`);
+    const fetchStartTime = Date.now();
+
     // PERFORMANCE: Add timeout to prevent hanging requests
-    // Increased to 25s to allow for slow Linear API responses while staying under Vercel's 30s limit
+    // Set to 20s to allow buffer before Vercel's 30s limit
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
+    const timeoutId = setTimeout(() => {
+      console.log(`[Linear API] Request timeout after 20s for ${queryName}`);
+      controller.abort();
+    }, 20000); // 20s timeout
 
     const response = await fetch(LINEAR_API_URL, {
       method: "POST",
@@ -95,13 +109,13 @@ export async function executeLinearQuery(
 
     clearTimeout(timeoutId);
 
+    const fetchTime = Date.now() - fetchStartTime;
     const responseTime = Date.now() - startTime;
-    // Only log slow requests (> 1s) or errors
-    if (responseTime > 1000 || !response.ok) {
-      console.log(
-        `[${requestId}] [Linear API] ${queryName} - ${responseTime}ms (${response.status})`
-      );
-    }
+    
+    // Always log for debugging Vercel timeout issues
+    console.log(
+      `[Linear API] ${queryName} - fetch: ${fetchTime}ms, total: ${responseTime}ms, status: ${response.status}`
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
