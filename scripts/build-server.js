@@ -34,9 +34,8 @@ async function buildServer() {
         'hono',
         'hono/cors',
         'hono/logger',
-        // Note: @hono/node-server/vercel should NOT be external - it needs to be bundled
-        '@hono/node-server',
         'dotenv',
+        // Note: @hono/node-server removed - using native Hono fetch handler
       ],
       // Resolve TypeScript imports correctly
       resolveExtensions: ['.ts', '.tsx', '.js', '.jsx'],
