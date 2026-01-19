@@ -701,12 +701,44 @@ linearRoutes.post("/linear/execute", async (c) => {
     
     console.log("[GraphQL Route] Parsing request body...");
     
-    // DEBUG: Try to check if body is available
-    const rawReq = c.req.raw;
-    console.log("[GraphQL Route] Raw request type:", typeof rawReq);
-    console.log("[GraphQL Route] Raw request bodyUsed:", (rawReq as any)?.bodyUsed);
+    // WORKAROUND: Read body directly from raw request to avoid Hono adapter streaming issues
+    let body: any;
+    try {
+      const rawReq = c.req.raw;
+      
+      // Try reading from raw request body
+      if (rawReq.body) {
+        console.log("[GraphQL Route] Reading from raw.body stream...");
+        const reader = rawReq.body.getReader();
+        const chunks: Uint8Array[] = [];
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+        
+        const bodyText = new TextDecoder().decode(
+          chunks.reduce((acc, chunk) => {
+            const tmp = new Uint8Array(acc.length + chunk.length);
+            tmp.set(acc);
+            tmp.set(chunk, acc.length);
+            return tmp;
+          }, new Uint8Array())
+        );
+        
+        console.log(`[GraphQL Route] Raw body read: ${bodyText.length} chars`);
+        body = JSON.parse(bodyText);
+      } else {
+        // Fallback to c.req.json() if no body stream
+        console.log("[GraphQL Route] No raw body stream, using c.req.json()...");
+        body = await c.req.json();
+      }
+    } catch (parseError) {
+      console.error("[GraphQL Route] Body parse error:", parseError);
+      return c.json({ success: false, error: "Failed to parse request body" }, { status: 400 });
+    }
     
-    const body = await c.req.json();
     console.log(`[GraphQL Route] Body parsed (${Date.now() - startTime}ms)`);
     
     const { query, variables } = body;
@@ -759,28 +791,48 @@ linearRoutes.post("/linear/graphql", async (c) => {
   console.log("[GraphQL Alias] Handler started");
   const startTime = Date.now();
   
-  // DEBUG: Log request details
-  try {
-    console.log("[GraphQL Alias] Request info:", {
-      method: c.req.method,
-      url: c.req.url,
-      path: c.req.path,
-      headers: {
-        contentType: c.req.header("content-type"),
-        contentLength: c.req.header("content-length"),
-      },
-    });
-    console.log("[GraphQL Alias] Raw request bodyUsed:", (c.req.raw as any)?.bodyUsed);
-  } catch (debugError) {
-    console.error("[GraphQL Alias] Debug log error:", debugError);
-  }
-  
   try {
     const user = c.get("user");
     console.log(`[GraphQL Alias] User: ${user?.email} (${Date.now() - startTime}ms)`);
     
     console.log("[GraphQL Alias] Parsing body...");
-    const body = await c.req.json();
+    
+    // WORKAROUND: Read body directly from raw request to avoid Hono adapter streaming issues
+    let body: any;
+    try {
+      const rawReq = c.req.raw;
+      
+      if (rawReq.body) {
+        console.log("[GraphQL Alias] Reading from raw.body stream...");
+        const reader = rawReq.body.getReader();
+        const chunks: Uint8Array[] = [];
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+        
+        const bodyText = new TextDecoder().decode(
+          chunks.reduce((acc, chunk) => {
+            const tmp = new Uint8Array(acc.length + chunk.length);
+            tmp.set(acc);
+            tmp.set(chunk, acc.length);
+            return tmp;
+          }, new Uint8Array())
+        );
+        
+        console.log(`[GraphQL Alias] Raw body read: ${bodyText.length} chars`);
+        body = JSON.parse(bodyText);
+      } else {
+        console.log("[GraphQL Alias] No raw body stream, using c.req.json()...");
+        body = await c.req.json();
+      }
+    } catch (parseError) {
+      console.error("[GraphQL Alias] Body parse error:", parseError);
+      return c.json({ success: false, error: "Failed to parse request body" }, { status: 400 });
+    }
+    
     console.log(`[GraphQL Alias] Body parsed (${Date.now() - startTime}ms)`);
     
     const { query, variables } = body;
