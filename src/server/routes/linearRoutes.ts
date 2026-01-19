@@ -682,7 +682,18 @@ linearRoutes.post("/linear/graphql", async (c) => {
     console.log(`[GraphQL Route] User: ${user?.email} (${Date.now() - startTime}ms)`);
     
     console.log("[GraphQL Route] Parsing request body...");
-    const body = await c.req.json();
+    
+    // WORKAROUND: Use text() then JSON.parse() to avoid Hono streaming issues on Vercel
+    let body;
+    try {
+      const rawBody = await c.req.text();
+      console.log(`[GraphQL Route] Raw body received: ${rawBody.length} chars (${Date.now() - startTime}ms)`);
+      body = JSON.parse(rawBody);
+    } catch (parseError) {
+      console.error("[GraphQL Route] Body parse error:", parseError);
+      return c.json({ success: false, error: "Invalid JSON body" }, { status: 400 });
+    }
+    
     console.log(`[GraphQL Route] Body parsed (${Date.now() - startTime}ms)`);
     
     const { query, variables } = body;
