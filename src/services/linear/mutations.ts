@@ -115,7 +115,8 @@ export class LinearMutations {
       });
 
       // CRITICAL: Use apiClient instead of raw fetch
-      const result = await apiClient.post<any>('/linear/graphql', payload);
+      // Using /linear/execute to avoid potential Vercel routing issues with /linear/graphql
+      const result = await apiClient.post<any>('/linear/execute', payload);
 
       const responseTime = Date.now() - startTime;
 

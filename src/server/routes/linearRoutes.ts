@@ -668,11 +668,13 @@ linearRoutes.get("/linear/teams/:teamId/issues/by-state", async (c) => {
 });
 
 /**
- * POST /linear/graphql
+ * POST /linear/graphql AND /linear/execute
  * Execute GraphQL query/mutation against Linear API
  * Used for drag-and-drop updates and other mutations
+ * 
+ * NOTE: /linear/execute is an alias to work around potential Vercel routing issues
  */
-linearRoutes.post("/linear/graphql", async (c) => {
+linearRoutes.post("/linear/execute", async (c) => {
   const startTime = Date.now();
   console.log("[GraphQL Route] Handler started");
   
@@ -682,18 +684,7 @@ linearRoutes.post("/linear/graphql", async (c) => {
     console.log(`[GraphQL Route] User: ${user?.email} (${Date.now() - startTime}ms)`);
     
     console.log("[GraphQL Route] Parsing request body...");
-    
-    // WORKAROUND: Use text() then JSON.parse() to avoid Hono streaming issues on Vercel
-    let body;
-    try {
-      const rawBody = await c.req.text();
-      console.log(`[GraphQL Route] Raw body received: ${rawBody.length} chars (${Date.now() - startTime}ms)`);
-      body = JSON.parse(rawBody);
-    } catch (parseError) {
-      console.error("[GraphQL Route] Body parse error:", parseError);
-      return c.json({ success: false, error: "Invalid JSON body" }, { status: 400 });
-    }
-    
+    const body = await c.req.json();
     console.log(`[GraphQL Route] Body parsed (${Date.now() - startTime}ms)`);
     
     const { query, variables } = body;
@@ -738,6 +729,37 @@ linearRoutes.post("/linear/graphql", async (c) => {
       },
       { status: 500 }
     );
+  }
+});
+
+// Alias for backward compatibility - redirect to /linear/execute
+linearRoutes.post("/linear/graphql", async (c) => {
+  console.log("[GraphQL Alias] Redirecting /linear/graphql to /linear/execute");
+  const startTime = Date.now();
+  
+  try {
+    const user = c.get("user");
+    const body = await c.req.json();
+    const { query, variables } = body;
+
+    if (!query) {
+      return c.json({ success: false, error: "GraphQL query is required" }, { status: 400 });
+    }
+
+    const queryNameMatch = query.match(/(?:query|mutation)\s+(\w+)/);
+    const queryName = queryNameMatch ? queryNameMatch[1] : "UnknownQuery";
+    console.log(`[GraphQL Alias] Executing ${queryName}...`);
+
+    const result = await linearTeamIssuesService.executeLinearQuery(query, variables || {});
+    
+    console.log(`[GraphQL Alias] Complete (${Date.now() - startTime}ms)`);
+    return c.json({ success: true, data: result });
+  } catch (error) {
+    console.error(`[GraphQL Alias] Error:`, error);
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to execute GraphQL query",
+    }, { status: 500 });
   }
 });
 
