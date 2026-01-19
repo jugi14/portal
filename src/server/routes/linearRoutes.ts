@@ -678,12 +678,34 @@ linearRoutes.post("/linear/execute", async (c) => {
   const startTime = Date.now();
   console.log("[GraphQL Route] Handler started");
   
+  // DEBUG: Log request details
+  try {
+    console.log("[GraphQL Route] Request info:", {
+      method: c.req.method,
+      url: c.req.url,
+      path: c.req.path,
+      headers: {
+        contentType: c.req.header("content-type"),
+        contentLength: c.req.header("content-length"),
+        authorization: c.req.header("authorization") ? "Bearer ***" : "none",
+      },
+    });
+  } catch (debugError) {
+    console.error("[GraphQL Route] Failed to log request info:", debugError);
+  }
+  
   try {
     console.log("[GraphQL Route] Getting user from context...");
     const user = c.get("user");
     console.log(`[GraphQL Route] User: ${user?.email} (${Date.now() - startTime}ms)`);
     
     console.log("[GraphQL Route] Parsing request body...");
+    
+    // DEBUG: Try to check if body is available
+    const rawReq = c.req.raw;
+    console.log("[GraphQL Route] Raw request type:", typeof rawReq);
+    console.log("[GraphQL Route] Raw request bodyUsed:", (rawReq as any)?.bodyUsed);
+    
     const body = await c.req.json();
     console.log(`[GraphQL Route] Body parsed (${Date.now() - startTime}ms)`);
     
@@ -734,12 +756,33 @@ linearRoutes.post("/linear/execute", async (c) => {
 
 // Alias for backward compatibility - redirect to /linear/execute
 linearRoutes.post("/linear/graphql", async (c) => {
-  console.log("[GraphQL Alias] Redirecting /linear/graphql to /linear/execute");
+  console.log("[GraphQL Alias] Handler started");
   const startTime = Date.now();
+  
+  // DEBUG: Log request details
+  try {
+    console.log("[GraphQL Alias] Request info:", {
+      method: c.req.method,
+      url: c.req.url,
+      path: c.req.path,
+      headers: {
+        contentType: c.req.header("content-type"),
+        contentLength: c.req.header("content-length"),
+      },
+    });
+    console.log("[GraphQL Alias] Raw request bodyUsed:", (c.req.raw as any)?.bodyUsed);
+  } catch (debugError) {
+    console.error("[GraphQL Alias] Debug log error:", debugError);
+  }
   
   try {
     const user = c.get("user");
+    console.log(`[GraphQL Alias] User: ${user?.email} (${Date.now() - startTime}ms)`);
+    
+    console.log("[GraphQL Alias] Parsing body...");
     const body = await c.req.json();
+    console.log(`[GraphQL Alias] Body parsed (${Date.now() - startTime}ms)`);
+    
     const { query, variables } = body;
 
     if (!query) {
