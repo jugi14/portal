@@ -345,6 +345,7 @@ const IssueDetailModalComponent = ({
           );
 
           // FIXED: Fetch from API to get complete data including sub-issues
+          // Use cache for normal loads - bypass only after mutations
           const response = await apiClient.get(`/issues/${issueToLoad.id}`);
 
           if (!response.success || !response.data?.issue) {

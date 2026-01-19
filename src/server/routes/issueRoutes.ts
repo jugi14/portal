@@ -125,10 +125,13 @@ issueRoutes.get("/issues/:issueId", async (c) => {
   try {
     const user = c.get("user");
     const issueId = c.req.param("issueId");
+    const bypassCache = c.req.query("bypassCache") === "true";
 
 
     const issue =
-      await linearTeamIssuesService.getIssueDetail(issueId);
+      await linearTeamIssuesService.getIssueDetail(issueId, {
+        bypassCache,
+      });
 
     if (!issue) {
       return c.json(

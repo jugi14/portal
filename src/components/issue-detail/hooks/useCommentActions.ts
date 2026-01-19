@@ -232,7 +232,8 @@ export function useCommentActions({
       const issueToLoad = currentIssue || issue;
       if (issueToLoad) {
         try {
-          const details = await LinearQueries.getIssueDetails(issueToLoad.id);
+          // CRITICAL: Pass true to bypass cache and get fresh data with new comment
+          const details = await LinearQueries.getIssueDetails(issueToLoad.id, true);
           if (details) {
             if (!(details as any).subIssues) {
               (details as any).subIssues = [];

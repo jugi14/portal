@@ -219,6 +219,26 @@ class LinearCacheService {
   }
   
   /**
+   * Manually set cache entry (useful for updating cache after bypass fetch)
+   */
+  set<T>(key: string, data: T, ttl: number, staleTime: number): void {
+    const now = Date.now();
+    
+    const entry: CacheEntry<T> = {
+      data,
+      timestamp: now,
+      expiresAt: now + ttl,
+      staleAt: now + staleTime
+    };
+    
+    this.cache.set(key, entry);
+    this.stats.size = this.cache.size;
+    
+    // Persist to localStorage
+    this.saveToLocalStorage(key, entry);
+  }
+  
+  /**
    * Invalidate specific cache keys
    */
   invalidate(pattern: string | RegExp): void {

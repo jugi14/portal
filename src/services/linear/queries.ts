@@ -132,7 +132,10 @@ export class LinearQueries {
       // CRITICAL: Ensure token is set in apiClient
       this.ensureToken();
       
-      const result = await apiClient.get<any>(`/linear/issues/${issueId}`);
+      const endpoint = bypassCache
+        ? `/linear/issues/${issueId}?bypassCache=true`
+        : `/linear/issues/${issueId}`;
+      const result = await apiClient.get<any>(endpoint);
 
       console.log(`[${methodId}] Response structure check:`, {
         hasResult: !!result,
@@ -173,13 +176,18 @@ export class LinearQueries {
       return issue;
     };
 
-    if (bypassCache) {
-      return fetcher();
-    }
-
     const cacheKey = `linear:issue-detail:issueId:${issueId}`;
     const ttl = 3 * 60 * 1000; // 3 minutes
     const staleTime = 1 * 60 * 1000; // 1 minute
+
+    if (bypassCache) {
+      // Fetch fresh data but STILL update the cache for subsequent reads
+      const freshData = await fetcher();
+      // Manually update cache with fresh data
+      linearCache.set(cacheKey, freshData, ttl, staleTime);
+      console.log(`[${methodId}] Bypassed cache and updated with fresh data`);
+      return freshData;
+    }
 
     try {
       return await linearCache.get<LinearIssue>(cacheKey, fetcher, ttl, staleTime);

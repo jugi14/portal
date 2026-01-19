@@ -14,10 +14,10 @@ export function useIssueNavigation({ initialIssue, isOpen }: UseIssueNavigationP
   const [issueDetails, setIssueDetails] = useState<LinearIssue | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const loadIssueDetails = useCallback(async (issueToLoad: LinearIssue) => {
+  const loadIssueDetails = useCallback(async (issueToLoad: LinearIssue, bypassCache = false) => {
     try {
       setLoading(true);
-      const details = await LinearQueries.getIssueDetails(issueToLoad.id);
+      const details = await LinearQueries.getIssueDetails(issueToLoad.id, bypassCache);
       
       if (details) {
         if (!(details as any).subIssues) {
