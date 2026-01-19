@@ -11,7 +11,7 @@ import React from 'react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
-import { Clock, Ban, CheckCircle, Rocket, XCircle, Plus } from 'lucide-react';
+import { Clock, Ban, CheckCircle, Rocket, XCircle, Plus, Archive } from 'lucide-react';
 import { LinearIssue } from '../services/linearTeamIssuesService';
 import { ClientColumn, ClientColumnConfig } from '../utils/clientTasksMapping';
 import { ClientTaskCard } from './ClientTaskCard';
@@ -69,7 +69,9 @@ const getColumnIcon = (columnId: ClientColumn): React.ReactNode => {
       return <CheckCircle className="h-5 w-5" />;
     case 'released':
       return <Rocket className="h-5 w-5" />;
-    case 'failed-review':
+    case 'archived':
+      return <Archive className="h-5 w-5" />;
+    case 'canceled':
       return <XCircle className="h-5 w-5" />;
     default:
       return null;

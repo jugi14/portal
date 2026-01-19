@@ -19,7 +19,7 @@ Welcome to the Teifi Digital Client Portal! We're excited to have you on board. 
 
 ## Overview
 
-The UAT workflow consists of **5 main stages**:
+The UAT workflow consists of **6 main stages**:
 
 | Stage | Description | Your Action |
 |-------|-------------|-------------|
@@ -27,7 +27,8 @@ The UAT workflow consists of **5 main stages**:
 | **Blocked/Needs Input** | Waiting for your feedback | Answer questions, provide info |
 | **Approved** | Features you've completed | Review before release |
 | **Released** | Features deployed to production | Verify in production |
-| **Failed Review** | Canceled or duplicate items | Reference only |
+| **Archived** | Rejected / failed / duplicate items | Reference only |
+| **Canceled** | Explicitly canceled items | Reference only |
 
 ### Visual Workflow
 
@@ -39,13 +40,15 @@ graph LR
     C -->|Approved| E[Approved]
     D -->|Resolved| B
     E --> F[Released to Production]
-    C -->|Canceled| G[Failed Review]
+    C -->|Rejected / Duplicate / Failed| H[Archived]
+    C -->|Canceled| G[Canceled]
     
     style B fill:#fbbf24,stroke:#f59e0b,color:#000
     style D fill:#ef4444,stroke:#dc2626,color:#fff
     style E fill:#10b981,stroke:#059669,color:#fff
     style F fill:#3b82f6,stroke:#2563eb,color:#fff
-    style G fill:#6b7280,stroke:#4b5563,color:#fff
+    style H fill:#6b7280,stroke:#4b5563,color:#fff
+    style G fill:#ef4444,stroke:#dc2626,color:#fff
 \`\`\`
 
 ---
@@ -218,9 +221,17 @@ Navigate to the **Pending Review** column. Each card shows:
 - Report any production issues
 - Celebrate the successful release
 
-### Failed Review
+### Archived
 
-**What it means:** Feature was canceled or marked as duplicate.
+**What it means:** Feature was rejected / failed / duplicate (reference only).
+
+**Your actions:**
+- No action needed
+- Use as reference history
+
+### Canceled
+
+**What it means:** Feature was explicitly canceled.
 
 **Your actions:**
 - Reference only

@@ -6,7 +6,8 @@
  * - Blocked/Needs Input: Tasks waiting for information or client feedback
  * - Approved: Approved and completed tasks
  * - Released: Shipped to production
- * - Failed Review: Rejected, canceled, or duplicate
+ * - Archived: Rejected/failed/duplicate (reference-only)
+ * - Canceled: Explicitly canceled issues
  * 
  * Logic is separated into modules:
  * - utils/clientTasksMapping.ts: Mapping logic
@@ -132,7 +133,8 @@ export const ClientUATKanban = forwardRef<ClientTasksKanbanRef, ClientTasksKanba
       'blocked': [],
       'done': [],
       'released': [],
-      'failed-review': [],
+      'archived': [],
+      'canceled': [],
     });
     
     const [loading, setLoading] = useState(true);
@@ -161,7 +163,8 @@ export const ClientUATKanban = forwardRef<ClientTasksKanbanRef, ClientTasksKanba
         'blocked': { parents: 0, subIssues: 0, total: 0 },
         'done': { parents: 0, subIssues: 0, total: 0 },
         'released': { parents: 0, subIssues: 0, total: 0 },
-        'failed-review': { parents: 0, subIssues: 0, total: 0 },
+        'archived': { parents: 0, subIssues: 0, total: 0 },
+        'canceled': { parents: 0, subIssues: 0, total: 0 },
       }
     });
 
@@ -275,7 +278,8 @@ export const ClientUATKanban = forwardRef<ClientTasksKanbanRef, ClientTasksKanba
           'blocked': [],
           'done': [],
           'released': [],
-          'failed-review': [],
+          'archived': [],
+          'canceled': [],
         };
 
         // Initialize counters
@@ -286,7 +290,8 @@ export const ClientUATKanban = forwardRef<ClientTasksKanbanRef, ClientTasksKanba
           'blocked': { parents: 0, subIssues: 0, total: 0 },
           'done': { parents: 0, subIssues: 0, total: 0 },
           'released': { parents: 0, subIssues: 0, total: 0 },
-          'failed-review': { parents: 0, subIssues: 0, total: 0 },
+          'archived': { parents: 0, subIssues: 0, total: 0 },
+          'canceled': { parents: 0, subIssues: 0, total: 0 },
         };
         
         filteredIssues.forEach((issue: ClientLinearIssue) => {
@@ -911,7 +916,7 @@ export const ClientUATKanban = forwardRef<ClientTasksKanbanRef, ClientTasksKanba
 
               {/* File Attachments */}
               <div className="space-y-2">
-                <Label>Attachments (Optional)</Label>
+                <Label htmlFor="request-changes-file-upload">Attachments (Optional)</Label>
                 <div className="space-y-3">
                   {requestChangesFiles.length > 0 && (
                     <div className="space-y-2">
@@ -949,6 +954,7 @@ export const ClientUATKanban = forwardRef<ClientTasksKanbanRef, ClientTasksKanba
                       id="request-changes-file-upload"
                       className="hidden"
                       multiple
+                      aria-label="Attach files"
                       onChange={handleRequestChangesFileSelect}
                       disabled={isRequestingChanges}
                     />

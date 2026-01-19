@@ -1,18 +1,19 @@
 /**
  * Client Tasks Mapping Utilities
- * 
+ *
  * Provides state mapping logic and column configuration for UAT Kanban board
  */
 
 import { LinearState } from "../services/linearTeamIssuesService";
 
-// Client-friendly column types (5 columns UAT workflow)
+// Client-friendly column types (UAT workflow)
 export type ClientColumn =
   | "client-review"
   | "blocked"
   | "done"
   | "released"
-  | "failed-review";
+  | "archived"
+  | "canceled";
 
 export interface ClientColumnConfig {
   id: ClientColumn;
@@ -24,14 +25,15 @@ export interface ClientColumnConfig {
 }
 
 /**
- * 5-Column Configuration for Client Portal UAT Workflow
- * 
- * Complete workflow: 
+ * UAT Column Configuration for Client Portal
+ *
+ * Complete workflow:
  * - Client Review (Pending Review) -> Approve -> Done (Approved)
  * - Client Review (Pending Review) -> Request Changes -> Back to In Progress (for developer to fix)
  * - Client Review (Pending Review) -> Needs Input -> Blocked (waiting for client)
  * - Done (Approved) -> Release -> Released (Shipped)
- * - Failed Review: Canceled or duplicate issues (NOT for request changes)
+ * - Archived: Duplicate/rejected/failed issues (NOT for request changes)
+ * - Canceled: Explicitly canceled issues (separate column)
  */
 export const CLIENT_COLUMNS: ClientColumnConfig[] = [
   {
@@ -67,10 +69,18 @@ export const CLIENT_COLUMNS: ClientColumnConfig[] = [
     allowApproval: false,
   },
   {
-    id: "failed-review",
-    title: "Failed Review",
-    description: "Canceled or duplicate issues",
+    id: "canceled",
+    title: "Canceled",
+    description: "Canceled issues",
     color: "#ef4444",
+    allowIssueCreation: false,
+    allowApproval: false,
+  },
+  {
+    id: "archived",
+    title: "Archived",
+    description: "Rejected, failed, or duplicate issues",
+    color: "#64748b",
     allowIssueCreation: false,
     allowApproval: false,
   },
@@ -89,16 +99,17 @@ export const CLIENT_COLUMNS: ClientColumnConfig[] = [
  *
  * PRIORITY ORDER (specific names checked in sequence):
  * 1. Shipped/Released states → Released
- * 2. Client Review state → Pending Review  
- * 3. Canceled/Duplicate states → Failed Review
- * 4. Release Ready states → Approved
- * 5. Blocked/Waiting states → Blocked
+ * 2. Client Review state → Pending Review
+ * 3. Duplicate/Rejected/Failed states → Archived
+ * 4. Canceled states → Canceled
+ * 5. Release Ready states → Approved
+ * 6. Blocked/Waiting states → Blocked
  *
  * @param state - Linear workflow state
  * @returns Mapped client column ID or null if no match
  */
 export const mapStateToClientColumn = (
-  state: LinearState,
+  state: LinearState
 ): ClientColumn | null => {
   const stateName = state.name.toLowerCase();
   const stateType = state.type;
@@ -121,19 +132,25 @@ export const mapStateToClientColumn = (
     return "client-review";
   }
 
-  // Priority 3: Canceled/Duplicate states → Failed Review
+  // Priority 3: Duplicate/Rejected/Failed states → Archived
   if (
-    stateType === "canceled" ||
-    stateName.includes("canceled") ||
-    stateName.includes("cancelled") ||
     stateName.includes("duplicate") ||
     stateName.includes("rejected") ||
     stateName.includes("failed")
   ) {
-    return "failed-review";
+    return "archived";
   }
 
-  // Priority 4: Release Ready states → Approved
+  // Priority 4: Canceled states → Canceled
+  if (
+    stateType === "canceled" ||
+    stateName.includes("canceled") ||
+    stateName.includes("cancelled")
+  ) {
+    return "canceled";
+  }
+
+  // Priority 5: Release Ready states → Approved
   if (
     stateName.includes("release ready") ||
     stateName.includes("ready for release") ||
@@ -143,7 +160,7 @@ export const mapStateToClientColumn = (
     return "done";
   }
 
-  // Priority 5: Blocked/Waiting states → Blocked
+  // Priority 6: Blocked/Waiting states → Blocked
   if (
     stateName.includes("blocked") ||
     stateName.includes("waiting") ||
@@ -162,30 +179,30 @@ export const mapStateToClientColumn = (
  * Calculate distribution statistics
  */
 export const calculateDistribution = (
-  issuesByColumn: Record<ClientColumn, any[]>,
+  issuesByColumn: Record<ClientColumn, any[]>
 ): {
   total: number;
   "client-review": number;
   blocked: number;
   done: number;
   released: number;
-  "failed-review": number;
+  archived: number;
+  canceled: number;
   percentages: Record<ClientColumn, number>;
 } => {
   const total = Object.values(issuesByColumn).reduce(
     (sum, issues) => sum + issues.length,
-    0,
+    0
   );
 
   const distribution = {
     total,
-    "client-review":
-      issuesByColumn["client-review"]?.length || 0,
+    "client-review": issuesByColumn["client-review"]?.length || 0,
     blocked: issuesByColumn["blocked"]?.length || 0,
     done: issuesByColumn["done"]?.length || 0,
     released: issuesByColumn["released"]?.length || 0,
-    "failed-review":
-      issuesByColumn["failed-review"]?.length || 0,
+    archived: issuesByColumn["archived"]?.length || 0,
+    canceled: issuesByColumn["canceled"]?.length || 0,
     percentages: {} as Record<ClientColumn, number>,
   };
 
@@ -193,10 +210,7 @@ export const calculateDistribution = (
   CLIENT_COLUMNS.forEach((col) => {
     distribution.percentages[col.id] =
       total > 0
-        ? Math.round(
-            ((issuesByColumn[col.id]?.length || 0) / total) *
-              100,
-          )
+        ? Math.round(((issuesByColumn[col.id]?.length || 0) / total) * 100)
         : 0;
   });
 
@@ -208,7 +222,7 @@ export const calculateDistribution = (
  * NOTE: Logging removed for production - use dev tools if needed
  */
 export const logDistributionReport = (
-  issuesByColumn: Record<ClientColumn, any[]>,
+  _issuesByColumn: Record<ClientColumn, any[]>
 ): void => {
   // Distribution calculation still available for debugging if needed
   // const distribution = calculateDistribution(issuesByColumn);

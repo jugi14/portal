@@ -19,6 +19,7 @@ import {
   CheckCircle,
   Rocket,
   XCircle,
+  Archive,
   ChevronDown,
 } from 'lucide-react';
 import {
@@ -41,7 +42,8 @@ const COLUMN_ICONS = {
   'blocked': AlertCircle,
   'done': CheckCircle,
   'released': Rocket,
-  'failed-review': XCircle,
+  'archived': Archive,
+  'canceled': XCircle,
 };
 
 const COLUMN_COLORS = {
@@ -49,7 +51,8 @@ const COLUMN_COLORS = {
   'blocked': 'bg-background text-foreground border-border hover:bg-muted',
   'done': 'bg-background text-foreground border-border hover:bg-muted',
   'released': 'bg-background text-foreground border-border hover:bg-muted',
-  'failed-review': 'bg-background text-foreground border-border hover:bg-muted',
+  'archived': 'bg-background text-foreground border-border hover:bg-muted',
+  'canceled': 'bg-background text-foreground border-border hover:bg-muted',
 };
 
 export function MobileUATView({ columns, tasks, onTaskClick }: MobileUATViewProps) {

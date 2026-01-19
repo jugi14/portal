@@ -11,7 +11,8 @@ export const UAT_COLUMN_IDS = [
   'blocked', 
   'done',
   'released',
-  'failed-review',
+  'archived',
+  'canceled',
 ] as const;
 
 // Type-safe column ID
@@ -23,7 +24,8 @@ export const UAT_COLUMN_NAMES: Record<UATColumnId, string> = {
   'blocked': 'Blocked/Needs Input',
   'done': 'Approved',
   'released': 'Released',
-  'failed-review': 'Failed Review',
+  'archived': 'Archived',
+  'canceled': 'Canceled',
 } as const;
 
 // Column descriptions (for tooltips)
@@ -32,7 +34,8 @@ export const UAT_COLUMN_DESCRIPTIONS: Record<UATColumnId, string> = {
   'blocked': 'Waiting for information or client feedback',
   'done': 'Approved and completed',
   'released': 'Shipped to production',
-  'failed-review': 'Rejected, canceled, or duplicate',
+  'archived': 'Rejected, failed, or duplicate',
+  'canceled': 'Canceled items',
 } as const;
 
 // Mobile View Types

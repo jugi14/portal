@@ -25,7 +25,7 @@ interface ColumnConfig {
 
 interface UseClientTasksSettingsOptions {
   teamId: string;
-  columns: string[]; // UAT column IDs: 'client-review', 'blocked', 'done', 'released', 'failed-review'
+  columns: string[]; // UAT column IDs: 'client-review', 'blocked', 'done', 'released', 'archived', 'canceled'
   issuesByColumn: Record<string, any[]>;
   onSettingsChange?: (settings: TasksSettings) => void;
 }
@@ -46,7 +46,7 @@ interface UseClientTasksSettingsReturn {
 }
 
 const DEFAULT_SETTINGS: TasksSettings = {
-  visibleColumns: ['client-review', 'blocked', 'done', 'released', 'failed-review'], // UAT 5-column workflow
+  visibleColumns: ['client-review', 'blocked', 'done', 'released', 'archived', 'canceled'], // UAT workflow
   hideEmptyColumns: false,
   filterByLabel: false, // Default: show all issues (filter disabled by default)
 };
@@ -74,7 +74,8 @@ export function useClientTasksSettings({
     'blocked': 'Blocked/Needs Input',
     'done': 'Approved',
     'released': 'Released',
-    'failed-review': 'Failed Review',
+    'archived': 'Archived',
+    'canceled': 'Canceled',
   };
 
   // Load settings from localStorage
@@ -89,6 +90,14 @@ export function useClientTasksSettings({
         loadedSettings = JSON.parse(stored);
         // Removed verbose log - loaded from storage
         
+        // MIGRATION: Rename legacy column id failed-review -> archived
+        if (loadedSettings.visibleColumns.includes('failed-review')) {
+          loadedSettings.visibleColumns = loadedSettings.visibleColumns.map((col) =>
+            col === 'failed-review' ? 'archived' : col
+          );
+          localStorage.setItem(storageKey, JSON.stringify(loadedSettings));
+        }
+
         // MIGRATION: Detect old column config and reset to UAT workflow
         const hasOldColumns = loadedSettings.visibleColumns.some(col => 
           col === 'to-do' || col === 'in-progress'
@@ -102,7 +111,7 @@ export function useClientTasksSettings({
         }
         
         // Ensure all UAT columns are present
-        const requiredColumns = ['client-review', 'blocked', 'done', 'released', 'failed-review'];
+        const requiredColumns = ['client-review', 'blocked', 'done', 'released', 'archived', 'canceled'];
         const missingColumns = requiredColumns.filter(col => !loadedSettings.visibleColumns.includes(col));
         
         if (missingColumns.length > 0) {
