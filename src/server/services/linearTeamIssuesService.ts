@@ -77,8 +77,9 @@ export async function executeLinearQuery(
     };
 
     // PERFORMANCE: Add timeout to prevent hanging requests
+    // Increased to 25s to allow for slow Linear API responses while staying under Vercel's 30s limit
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
 
     const response = await fetch(LINEAR_API_URL, {
       method: "POST",

@@ -310,15 +310,17 @@ const IssueDetailModalComponent = ({
   // Load detailed issue data - defined early so it can be used in other callbacks
   // CRITICAL FIX: Fetch fresh data from API to get sub-issues
   // Returns the loaded issue details for immediate use
+  // @param bypassCache - When true, fetches fresh data from Linear API (use after mutations like approve)
   const loadIssueDetails = useCallback(
-    async (issueToLoad: LinearIssue): Promise<LinearIssue | null> => {
+    async (issueToLoad: LinearIssue, bypassCache = false): Promise<LinearIssue | null> => {
       if (!issueToLoad) {
         // ERROR: Invalid function call
         return null;
       }
 
-      // PERFORMANCE: Prevent concurrent calls for same issue
+      // PERFORMANCE: Prevent concurrent calls for same issue (unless bypassing cache)
       if (
+        !bypassCache &&
         loadingIssueIdRef.current === issueToLoad.id &&
         loadIssuePromiseRef.current
       ) {
@@ -341,12 +343,16 @@ const IssueDetailModalComponent = ({
 
           console.log(
             "[IssueDetailModal] Fetching issue details for:",
-            issueToLoad.identifier
+            issueToLoad.identifier,
+            bypassCache ? "(bypassing cache)" : ""
           );
 
           // FIXED: Fetch from API to get complete data including sub-issues
-          // Use cache for normal loads - bypass only after mutations
-          const response = await apiClient.get(`/issues/${issueToLoad.id}`);
+          // Use bypassCache=true after mutations to get fresh data from Linear
+          const endpoint = bypassCache
+            ? `/issues/${issueToLoad.id}?bypassCache=true`
+            : `/issues/${issueToLoad.id}`;
+          const response = await apiClient.get(endpoint);
 
           if (!response.success || !response.data?.issue) {
             throw new Error(response.error || "No issue data returned");
@@ -676,14 +682,8 @@ const IssueDetailModalComponent = ({
             );
             setIsRefreshing(true); // Show subtle loading indicator
 
-            // Clear specific cache entry
-            const cacheKey = `linear:issue-detail:issueId:${issueToLoad.id}`;
-            if (localStorage.getItem(cacheKey)) {
-              localStorage.removeItem(cacheKey);
-            }
-
-            // Fetch fresh data (deduplication handled by loadIssueDetails)
-            const refreshedDetails = await loadIssueDetails(issueToLoad);
+            // CRITICAL: Use bypassCache=true to get fresh data from Linear API
+            const refreshedDetails = await loadIssueDetails(issueToLoad, true);
 
             // Update parent via callback with fresh data
             if (onIssueUpdate && refreshedDetails) {
@@ -1085,6 +1085,20 @@ const IssueDetailModalComponent = ({
       // CRITICAL: Wait for Linear API to propagate changes
       await new Promise((resolve) => setTimeout(resolve, 500));
 
+      // CRITICAL: Dispatch event FIRST to trigger Kanban board reload
+      // This ensures the board starts refreshing while modal also refreshes
+      console.log("[Approve Main] Dispatching linear-issue-updated event");
+      window.dispatchEvent(
+        new CustomEvent("linear-issue-updated", {
+          detail: {
+            issueId: targetIssue.id,
+            teamId: targetIssue.team?.id,
+            action: "approve",
+            newState: "Release Ready",
+          },
+        })
+      );
+
       // CRITICAL FIX: Refresh using loadIssueDetails to get fresh data
       // This ensures consistency with modal's fetch mechanism
       const issueToLoad = currentIssue || issue;
@@ -1095,14 +1109,9 @@ const IssueDetailModalComponent = ({
             issueToLoad.identifier
           );
 
-          // Clear cache before refresh
-          const cacheKey = `linear:issue-detail:issueId:${issueToLoad.id}`;
-          if (localStorage.getItem(cacheKey)) {
-            localStorage.removeItem(cacheKey);
-          }
-
-          // Use the same fetch mechanism as modal initialization
-          const refreshedDetails = await loadIssueDetails(issueToLoad);
+          // CRITICAL: Use bypassCache=true to get fresh data from Linear API
+          // This ensures the modal shows the updated state after approve
+          const refreshedDetails = await loadIssueDetails(issueToLoad, true);
 
           // Notify parent component immediately with fresh data
           if (onIssueUpdate && refreshedDetails) {
@@ -1178,8 +1187,8 @@ const IssueDetailModalComponent = ({
             );
             setIsRefreshing(true); // Show subtle loading indicator
 
-            // PERFORMANCE: Load fresh details for modal display
-            const refreshedDetails = await loadIssueDetails(issueToLoad);
+            // CRITICAL: Use bypassCache=true to get fresh data from Linear API
+            const refreshedDetails = await loadIssueDetails(issueToLoad, true);
 
             // Trigger global event for parent components to refresh independently
             console.log(
@@ -3347,9 +3356,13 @@ const IssueDetailModalComponent = ({
             );
 
             // Reload modal with fresh data (board will also reload via event listener)
-            setTimeout(async () => {
-              await loadIssueDetails();
-            }, 100);
+            // CRITICAL: Use bypassCache=true after creating sub-issue
+            const issueToReload = issueDetails || currentIssue || issue;
+            if (issueToReload) {
+              setTimeout(async () => {
+                await loadIssueDetails(issueToReload, true);
+              }, 100);
+            }
           } catch (error) {
             console.error(
               "[IssueDetailModal] Failed to create sub-issue:",

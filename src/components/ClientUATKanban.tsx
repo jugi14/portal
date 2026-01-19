@@ -206,7 +206,11 @@ export const ClientUATKanban = forwardRef<ClientTasksKanbanRef, ClientTasksKanba
         setColumns(config.states);
 
         // Load issues using by-state endpoint
-        const response = await apiClient.get(`/linear/teams/${teamId}/issues-by-state`);
+        // CRITICAL: Use bypassCache=true when forceRefresh to get fresh data from Linear API
+        const endpoint = forceRefresh 
+          ? `/linear/teams/${teamId}/issues-by-state?bypassCache=true`
+          : `/linear/teams/${teamId}/issues-by-state`;
+        const response = await apiClient.get(endpoint);
         
         if (!response.success || !response.data) {
           if (response.error && response.error.includes('not found in Linear workspace')) {
@@ -353,8 +357,10 @@ export const ClientUATKanban = forwardRef<ClientTasksKanbanRef, ClientTasksKanba
         // CRITICAL FIX: Always reload on sub-issue creation
         // Don't check teamId because Linear team ID !== Database team UUID
         // This ensures board updates when sub-issues are created
-        console.log(`[ClientUATKanban] Received ${action} event for issue ${issueId}, reloading...`);
-        loadTeamData();
+        console.log(`[ClientUATKanban] Received ${action} event for issue ${issueId}, reloading with forceRefresh...`);
+        
+        // CRITICAL: Use forceRefresh=true to bypass cache and get fresh data from Linear
+        loadTeamData(true);
       };
       
       window.addEventListener('linear-issue-updated', handleIssueUpdate as EventListener);
