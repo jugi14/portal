@@ -40,8 +40,7 @@ export class LinearQueries {
       this.ensureToken();
 
       // CRITICAL: Use apiClient instead of raw fetch
-      // Using /linear/execute to avoid potential Vercel routing issues with /linear/graphql
-      const result = await apiClient.post<any>('/linear/execute', { query, variables });
+      const result = await apiClient.post<any>('/linear/graphql', { query, variables });
 
       const responseTime = Date.now() - startTime;
 

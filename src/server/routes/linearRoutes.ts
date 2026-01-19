@@ -668,80 +668,17 @@ linearRoutes.get("/linear/teams/:teamId/issues/by-state", async (c) => {
 });
 
 /**
- * POST /linear/graphql AND /linear/execute
+ * POST /linear/graphql
  * Execute GraphQL query/mutation against Linear API
  * Used for drag-and-drop updates and other mutations
- * 
- * NOTE: /linear/execute is an alias to work around potential Vercel routing issues
  */
-linearRoutes.post("/linear/execute", async (c) => {
-  const startTime = Date.now();
-  console.log("[GraphQL Route] Handler started");
-  
-  // DEBUG: Log request details
+linearRoutes.post("/linear/graphql", async (c) => {
   try {
-    console.log("[GraphQL Route] Request info:", {
-      method: c.req.method,
-      url: c.req.url,
-      path: c.req.path,
-      headers: {
-        contentType: c.req.header("content-type"),
-        contentLength: c.req.header("content-length"),
-        authorization: c.req.header("authorization") ? "Bearer ***" : "none",
-      },
-    });
-  } catch (debugError) {
-    console.error("[GraphQL Route] Failed to log request info:", debugError);
-  }
-  
-  try {
-    console.log("[GraphQL Route] Getting user from context...");
     const user = c.get("user");
-    console.log(`[GraphQL Route] User: ${user?.email} (${Date.now() - startTime}ms)`);
-    
-    console.log("[GraphQL Route] Parsing request body...");
-    
-    // WORKAROUND: Read body directly from raw request to avoid Hono adapter streaming issues
-    let body: any;
-    try {
-      const rawReq = c.req.raw;
-      
-      // Try reading from raw request body
-      if (rawReq.body) {
-        console.log("[GraphQL Route] Reading from raw.body stream...");
-        const reader = rawReq.body.getReader();
-        const chunks: Uint8Array[] = [];
-        
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-        }
-        
-        const bodyText = new TextDecoder().decode(
-          chunks.reduce((acc, chunk) => {
-            const tmp = new Uint8Array(acc.length + chunk.length);
-            tmp.set(acc);
-            tmp.set(chunk, acc.length);
-            return tmp;
-          }, new Uint8Array())
-        );
-        
-        console.log(`[GraphQL Route] Raw body read: ${bodyText.length} chars`);
-        body = JSON.parse(bodyText);
-      } else {
-        // Fallback to c.req.json() if no body stream
-        console.log("[GraphQL Route] No raw body stream, using c.req.json()...");
-        body = await c.req.json();
-      }
-    } catch (parseError) {
-      console.error("[GraphQL Route] Body parse error:", parseError);
-      return c.json({ success: false, error: "Failed to parse request body" }, { status: 400 });
-    }
-    
-    console.log(`[GraphQL Route] Body parsed (${Date.now() - startTime}ms)`);
-    
+    const body = await c.req.json();
     const { query, variables } = body;
+
+    // CRITICAL DEBUG: Check if variables is already stringified
 
     // Validate input
     if (!query) {
@@ -754,25 +691,18 @@ linearRoutes.post("/linear/execute", async (c) => {
       );
     }
 
-    // Extract query name for logging
-    const queryNameMatch = query.match(/(?:query|mutation)\s+(\w+)/);
-    const queryName = queryNameMatch ? queryNameMatch[1] : "UnknownQuery";
-    console.log(`[GraphQL Route] Executing ${queryName}...`);
-
     // Execute query via linearTeamIssuesService
     const result = await linearTeamIssuesService.executeLinearQuery(
       query,
       variables || {}
     );
-    
-    console.log(`[GraphQL Route] Complete (${Date.now() - startTime}ms)`);
 
     return c.json({
       success: true,
       data: result,
     });
   } catch (error) {
-    console.error(`[GraphQL Route] Error after ${Date.now() - startTime}ms:`, error);
+    console.error("[Linear] GraphQL execution error:", error);
     return c.json(
       {
         success: false,
@@ -783,78 +713,6 @@ linearRoutes.post("/linear/execute", async (c) => {
       },
       { status: 500 }
     );
-  }
-});
-
-// Alias for backward compatibility - redirect to /linear/execute
-linearRoutes.post("/linear/graphql", async (c) => {
-  console.log("[GraphQL Alias] Handler started");
-  const startTime = Date.now();
-  
-  try {
-    const user = c.get("user");
-    console.log(`[GraphQL Alias] User: ${user?.email} (${Date.now() - startTime}ms)`);
-    
-    console.log("[GraphQL Alias] Parsing body...");
-    
-    // WORKAROUND: Read body directly from raw request to avoid Hono adapter streaming issues
-    let body: any;
-    try {
-      const rawReq = c.req.raw;
-      
-      if (rawReq.body) {
-        console.log("[GraphQL Alias] Reading from raw.body stream...");
-        const reader = rawReq.body.getReader();
-        const chunks: Uint8Array[] = [];
-        
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-        }
-        
-        const bodyText = new TextDecoder().decode(
-          chunks.reduce((acc, chunk) => {
-            const tmp = new Uint8Array(acc.length + chunk.length);
-            tmp.set(acc);
-            tmp.set(chunk, acc.length);
-            return tmp;
-          }, new Uint8Array())
-        );
-        
-        console.log(`[GraphQL Alias] Raw body read: ${bodyText.length} chars`);
-        body = JSON.parse(bodyText);
-      } else {
-        console.log("[GraphQL Alias] No raw body stream, using c.req.json()...");
-        body = await c.req.json();
-      }
-    } catch (parseError) {
-      console.error("[GraphQL Alias] Body parse error:", parseError);
-      return c.json({ success: false, error: "Failed to parse request body" }, { status: 400 });
-    }
-    
-    console.log(`[GraphQL Alias] Body parsed (${Date.now() - startTime}ms)`);
-    
-    const { query, variables } = body;
-
-    if (!query) {
-      return c.json({ success: false, error: "GraphQL query is required" }, { status: 400 });
-    }
-
-    const queryNameMatch = query.match(/(?:query|mutation)\s+(\w+)/);
-    const queryName = queryNameMatch ? queryNameMatch[1] : "UnknownQuery";
-    console.log(`[GraphQL Alias] Executing ${queryName}...`);
-
-    const result = await linearTeamIssuesService.executeLinearQuery(query, variables || {});
-    
-    console.log(`[GraphQL Alias] Complete (${Date.now() - startTime}ms)`);
-    return c.json({ success: true, data: result });
-  } catch (error) {
-    console.error(`[GraphQL Alias] Error:`, error);
-    return c.json({
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to execute GraphQL query",
-    }, { status: 500 });
   }
 });
 
