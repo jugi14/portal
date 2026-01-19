@@ -673,12 +673,19 @@ linearRoutes.get("/linear/teams/:teamId/issues/by-state", async (c) => {
  * Used for drag-and-drop updates and other mutations
  */
 linearRoutes.post("/linear/graphql", async (c) => {
+  const startTime = Date.now();
+  console.log("[GraphQL Route] Handler started");
+  
   try {
+    console.log("[GraphQL Route] Getting user from context...");
     const user = c.get("user");
+    console.log(`[GraphQL Route] User: ${user?.email} (${Date.now() - startTime}ms)`);
+    
+    console.log("[GraphQL Route] Parsing request body...");
     const body = await c.req.json();
+    console.log(`[GraphQL Route] Body parsed (${Date.now() - startTime}ms)`);
+    
     const { query, variables } = body;
-
-    // CRITICAL DEBUG: Check if variables is already stringified
 
     // Validate input
     if (!query) {
@@ -691,18 +698,25 @@ linearRoutes.post("/linear/graphql", async (c) => {
       );
     }
 
+    // Extract query name for logging
+    const queryNameMatch = query.match(/(?:query|mutation)\s+(\w+)/);
+    const queryName = queryNameMatch ? queryNameMatch[1] : "UnknownQuery";
+    console.log(`[GraphQL Route] Executing ${queryName}...`);
+
     // Execute query via linearTeamIssuesService
     const result = await linearTeamIssuesService.executeLinearQuery(
       query,
       variables || {}
     );
+    
+    console.log(`[GraphQL Route] Complete (${Date.now() - startTime}ms)`);
 
     return c.json({
       success: true,
       data: result,
     });
   } catch (error) {
-    console.error("[Linear] GraphQL execution error:", error);
+    console.error(`[GraphQL Route] Error after ${Date.now() - startTime}ms:`, error);
     return c.json(
       {
         success: false,
